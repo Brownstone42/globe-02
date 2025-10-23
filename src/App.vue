@@ -1,10 +1,18 @@
 <template>
-    <h1>test</h1>
+    <slide-header></slide-header>
+    <main-header></main-header>
 </template>
 
 <script>
+import slideHeader from './components/common/slideHeader.vue'
+import mainHeader from './components/common/mainHeader.vue'
+
 export default {
     name: 'App',
+    components: {
+        slideHeader,
+        mainHeader,
+    },
 }
 </script>
 
