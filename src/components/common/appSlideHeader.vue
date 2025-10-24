@@ -1,63 +1,71 @@
 <template>
-    <div
-        class="sub-header"
-        ref="subHeader"
-        @mouseenter="pauseScroll"
-        @mouseleave="resumeScroll"
-        @pointerdown="pauseScroll"
-        @pointerup="resumeScroll"
-    >
+    <div class="wrap">
         <div
-            v-if="!isMobile"
-            class="is-flex is-justify-content-space-between is-align-items-center sub-header-desktop-content"
+            class="sub-header"
+            ref="subHeader"
+            @mouseenter="pauseScroll"
+            @mouseleave="resumeScroll"
+            @pointerdown="pauseScroll"
+            @pointerup="resumeScroll"
         >
-            <div class="is-flex is-align-items-center sub-header-group">
-                <label class="sub-header-label">
-                    <i class="fas fa-mobile-alt sub-header-icon"></i> Sales : 089-999-9999
-                </label>
-                <label class="sub-header-label">
-                    <i class="fas fa-phone sub-header-icon"></i> Office : 02-222-2222
-                </label>
-                <label class="sub-header-label">
-                    <i class="fas fa-envelope sub-header-icon"></i> admin@idealglobe.com
-                </label>
-            </div>
-            <div class="is-flex is-align-items-center sub-header-group sub-header-right-group">
-                <label class="sub-header-label">ผู้นำด้านอุปกรณ์ Cleanroom และ ESD ครบวงจร</label>
-            </div>
-        </div>
-
-        <div v-if="isMobile" class="scrolling-content">
-            <div class="is-flex is-align-items-center sub-header-group">
-                <label class="sub-header-label">
-                    <i class="fas fa-mobile-alt sub-header-icon"></i> Sales : 089-999-9999
-                </label>
-                <label class="sub-header-label">
-                    <i class="fas fa-phone sub-header-icon"></i> Office : 02-222-2222
-                </label>
-                <label class="sub-header-label">
-                    <i class="fas fa-envelope sub-header-icon"></i> admin@idealglobe.com
-                </label>
+            <div
+                v-if="!isMobile"
+                class="is-flex is-justify-content-space-between is-align-items-center sub-header-desktop-content"
+            >
+                <div class="is-flex is-align-items-center sub-header-group">
+                    <label class="sub-header-label">
+                        <i class="fas fa-mobile-alt sub-header-icon"></i> Sales : 089-999-9999
+                    </label>
+                    <label class="sub-header-label">
+                        <i class="fas fa-phone sub-header-icon"></i> Office : 02-222-2222
+                    </label>
+                    <label class="sub-header-label">
+                        <i class="fas fa-envelope sub-header-icon"></i> admin@idealglobe.com
+                    </label>
+                </div>
+                <div class="is-flex is-align-items-center sub-header-group sub-header-right-group">
+                    <label class="sub-header-label"
+                        >ผู้นำด้านอุปกรณ์ Cleanroom และ ESD ครบวงจร</label
+                    >
+                </div>
             </div>
 
-            <div class="is-flex is-align-items-center sub-header-group sub-header-right-group">
-                <label class="sub-header-label">ผู้นำด้านอุปกรณ์ Cleanroom และ ESD ครบวงจร</label>
-            </div>
+            <div v-if="isMobile" class="scrolling-content">
+                <div class="is-flex is-align-items-center sub-header-group">
+                    <label class="sub-header-label">
+                        <i class="fas fa-mobile-alt sub-header-icon"></i> Sales : 089-999-9999
+                    </label>
+                    <label class="sub-header-label">
+                        <i class="fas fa-phone sub-header-icon"></i> Office : 02-222-2222
+                    </label>
+                    <label class="sub-header-label">
+                        <i class="fas fa-envelope sub-header-icon"></i> admin@idealglobe.com
+                    </label>
+                </div>
 
-            <div class="is-flex is-align-items-center sub-header-group">
-                <label class="sub-header-label">
-                    <i class="fas fa-mobile-alt sub-header-icon"></i> Sales : 089-999-9999
-                </label>
-                <label class="sub-header-label">
-                    <i class="fas fa-phone sub-header-icon"></i> Office : 02-222-2222
-                </label>
-                <label class="sub-header-label">
-                    <i class="fas fa-envelope sub-header-icon"></i> admin@idealglobe.com
-                </label>
-            </div>
+                <div class="is-flex is-align-items-center sub-header-group sub-header-right-group">
+                    <label class="sub-header-label"
+                        >ผู้นำด้านอุปกรณ์ Cleanroom และ ESD ครบวงจร</label
+                    >
+                </div>
 
-            <div class="is-flex is-align-items-center sub-header-group sub-header-right-group">
-                <label class="sub-header-label">ผู้นำด้านอุปกรณ์ Cleanroom && ESD ครบวงจร</label>
+                <div class="is-flex is-align-items-center sub-header-group">
+                    <label class="sub-header-label">
+                        <i class="fas fa-mobile-alt sub-header-icon"></i> Sales : 089-999-9999
+                    </label>
+                    <label class="sub-header-label">
+                        <i class="fas fa-phone sub-header-icon"></i> Office : 02-222-2222
+                    </label>
+                    <label class="sub-header-label">
+                        <i class="fas fa-envelope sub-header-icon"></i> admin@idealglobe.com
+                    </label>
+                </div>
+
+                <div class="is-flex is-align-items-center sub-header-group sub-header-right-group">
+                    <label class="sub-header-label"
+                        >ผู้นำด้านอุปกรณ์ Cleanroom && ESD ครบวงจร</label
+                    >
+                </div>
             </div>
         </div>
     </div>
@@ -158,7 +166,12 @@ export default {
 </script>
 
 <style scoped>
+.wrap {
+    background-color: black;
+}
 .sub-header {
+    margin: auto;
+    width: min(1100px, 92vw);
     display: flex;
     position: sticky;
     z-index: 10;

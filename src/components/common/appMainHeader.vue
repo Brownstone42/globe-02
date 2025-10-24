@@ -29,11 +29,11 @@ export default {
 }
 .header .row {
     display: flex;
-    width: 90%;
+    width: min(1100px, 92vw);
     align-items: center;
 }
 .header-logo {
-    max-height: 60px;
+    max-height: 70px;
     width: auto;
 }
 .nav-menu {

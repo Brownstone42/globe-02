@@ -1,17 +1,28 @@
 <template>
-    <slide-header></slide-header>
-    <main-header></main-header>
+    <app-slide-header></app-slide-header>
+    <app-main-header></app-main-header>
+
+    <home-banner></home-banner>
+    <home-sub-banner></home-sub-banner>
+    <home-category></home-category>
 </template>
 
 <script>
-import slideHeader from './components/common/slideHeader.vue'
-import mainHeader from './components/common/mainHeader.vue'
+import appSlideHeader from './components/common/appSlideHeader.vue'
+import appMainHeader from './components/common/appMainHeader.vue'
+
+import homeBanner from './components/home/homeBanner.vue'
+import homeSubBanner from './components/home/homeSubBanner.vue'
+import homeCategory from './components/home/homeCategory.vue'
 
 export default {
     name: 'App',
     components: {
-        slideHeader,
-        mainHeader,
+        appSlideHeader,
+        appMainHeader,
+        homeBanner,
+        homeSubBanner,
+        homeCategory,
     },
 }
 </script>
