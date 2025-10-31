@@ -77,17 +77,22 @@ export default {
     data() {
         return {
             isMobile: false,
+            mql: null,
             animationFrameId: null,
             isPaused: false,
         }
     },
     mounted() {
-        this.checkScreenSize()
-        window.addEventListener('resize', this.checkScreenSize)
+        this.mql = window.matchMedia('(max-width: 999px)')
+        const apply = () => (this.isMobile = this.mql.matches)
+        apply()
+        this.mql.addEventListener?.('change', apply)
+        // fallback สำหรับบางเบราว์เซอร์เก่า
+        if (!this.mql.addEventListener) this.mql.addListener(apply)
     },
     beforeUnmount() {
-        window.removeEventListener('resize', this.checkScreenSize)
-        this.stopScrollLoop()
+        if (this.mql?.removeEventListener) this.mql.removeEventListener('change', apply)
+        else this.mql?.removeListener?.(apply)
     },
     watch: {
         isMobile(newVal) {

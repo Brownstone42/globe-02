@@ -5,6 +5,7 @@
     <home-banner></home-banner>
     <home-sub-banner></home-sub-banner>
     <home-category></home-category>
+    <home-contact></home-contact>
 </template>
 
 <script>
@@ -14,6 +15,7 @@ import appMainHeader from './components/common/appMainHeader.vue'
 import homeBanner from './components/home/homeBanner.vue'
 import homeSubBanner from './components/home/homeSubBanner.vue'
 import homeCategory from './components/home/homeCategory.vue'
+import homeContact from './components/home/homeContact.vue'
 
 export default {
     name: 'App',
@@ -23,6 +25,7 @@ export default {
         homeBanner,
         homeSubBanner,
         homeCategory,
+        homeContact,
     },
 }
 </script>
@@ -31,6 +34,21 @@ export default {
 #app {
     display: flex;
     flex-direction: column;
-    font-family: 'Helvetica';
+    font-family: 'Sukhumvit-Text', 'Helvetica';
+    background-color: #f8f8f8;
+}
+@font-face {
+    font-family: 'Sukhumvit-Text';
+    src: url('./fonts/SukhumvitSet-Text.ttf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Sukhumvit-Thin';
+    src: url('./fonts/SukhumvitSet-Thin.ttf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
 }
 </style>
