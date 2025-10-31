@@ -35,9 +35,9 @@
                             <div class="step-dot">3</div>
                         </div>
                         <div class="step-content">
-                            <span class="step-topic">ยืนยันการสั่งซื้อรับใบสั่งสิ้นค้า</span>
+                            <span class="step-topic">ยืนยันการสั่งซื้อรับใบสั่งสินค้า</span>
                             <span class="step-body"
-                                >ยืนยันกาสั่งซื้อ และ
+                                >ยืนยันการสั่งซื้อ และ
                                 ทางเราจะออกใบสั่งสินค้าเพื่อดำเนินการจัดส่ง</span
                             >
                         </div>
