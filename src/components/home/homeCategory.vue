@@ -185,7 +185,7 @@ export default {
     padding: 16px;
     text-align: center;
 }
-@media (min-width: 1024px) {
+@media (min-width: 768px) {
     .column {
         flex: 0 0 calc(25% - 0.75rem);
     }

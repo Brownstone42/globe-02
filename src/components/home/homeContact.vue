@@ -56,7 +56,16 @@
                         </div>
                     </div>
                 </div>
-                <div class="column"></div>
+                <div class="column">
+                    <span class="form-header mt-4"> กรอกฟอร์มเพื่อให้เราติดต่อกลับ </span>
+                    <div class="form-body">
+                        <input type="text" class="input mt-5" placeholder="Name" />
+                        <input type="text" class="input mt-5" placeholder="Email" />
+                        <input type="text" class="input mt-5" placeholder="Phone No." />
+                        <textarea class="textarea mt-5" placeholder="Messages" rows="3"></textarea>
+                        <button class="button mt-5 is-primary">ติดต่อเรา</button>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -69,16 +78,30 @@ export default {
 </script>
 
 <style scoped>
+.form-body {
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+}
+button {
+    align-self: end;
+}
+input {
+    height: 50px;
+}
+.form-header {
+    font-size: 18pt;
+}
 .step-body {
     font-family: 'Sukhumvit-Thin';
     font-size: 12pt;
 }
 .step-topic {
-    font-size: 20pt;
+    font-size: 18pt;
     color: #25b6b0;
 }
 .step-header {
-    font-size: 32pt;
+    font-size: 28pt;
 }
 .step-dot {
     /* ปรับแต่งง่ายด้วยตัวแปร */
@@ -134,6 +157,7 @@ export default {
 }
 .columns {
     width: 100%;
+    align-items: center;
 }
 .column {
     display: flex;
@@ -155,7 +179,8 @@ export default {
 /* เพิ่ม overlay มืด ๆ ให้ข้อความด้านบนอ่านง่ายขึ้น */
 .overlay {
     position: relative;
-    width: 100%;
+    width: min(1100px, 92vw);
+    margin: auto;
     /*width: 100%;
     height: 100%;*/
     /*background: rgba(0, 0, 0, 0.5);  ปรับความเข้มได้ */
