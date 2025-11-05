@@ -6,6 +6,9 @@
     <home-sub-banner></home-sub-banner>
     <home-category></home-category>
     <home-contact></home-contact>
+    <home-news></home-news>
+
+    <home-footer></home-footer>
 </template>
 
 <script>
@@ -16,6 +19,8 @@ import homeBanner from './components/home/homeBanner.vue'
 import homeSubBanner from './components/home/homeSubBanner.vue'
 import homeCategory from './components/home/homeCategory.vue'
 import homeContact from './components/home/homeContact.vue'
+import homeNews from './components/home/homeNews.vue'
+import homeFooter from './components/home/homeFooter.vue'
 
 export default {
     name: 'App',
@@ -26,6 +31,8 @@ export default {
         homeSubBanner,
         homeCategory,
         homeContact,
+        homeNews,
+        homeFooter,
     },
 }
 </script>

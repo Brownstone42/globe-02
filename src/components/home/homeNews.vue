@@ -1,12 +1,12 @@
 <template>
     <div class="category mt-6 mb-6">
-        <span>สินค้าของเรา</span>
+        <span>ข่าวสาร</span>
 
         <button class="arrow left" @click="go(-1)">‹</button>
 
         <div ref="scroller" class="columns scroller mt-4" @scroll.passive="onScroll">
             <div class="column" v-for="(item, i) in looped" :key="i" ref="cards">
-                <img src="/images/example/product01.png" alt="" />
+                <img src="/images/example/news01.png" alt="" />
                 <div class="column-content">
                     <span class="content-topic1 ml-2">Disposable Gloves</span>
                     <span class="content-topic2 ml-2">ถุงมือใช้แล้วทิ้ง</span>
@@ -24,7 +24,7 @@
 
 <script>
 export default {
-    name: 'homeCategory',
+    name: 'homeNews',
     data() {
         return {
             items: ['Column 1', 'Column 2', 'Column 3', 'Column 4', 'Column 5', 'Column 6'],
@@ -185,12 +185,12 @@ export default {
 }
 @media (min-width: 768px) {
     .column {
-        flex: 0 0 calc(25% - 0.75rem);
+        flex: 0 0 calc(33.3% - 0.75rem);
     }
 }
 .arrow {
     position: absolute;
-    top: 50%;
+    top: 40%;
     transform: translateY(-50%);
     background: white;
     border: none;
@@ -208,7 +208,7 @@ export default {
     left: -32px;
 }
 .arrow.right {
-    right: -32px;
+    right: -26px;
 }
 @media (max-width: 768px) {
     .arrow {

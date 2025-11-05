@@ -73,7 +73,7 @@
 
 <script>
 export default {
-    name: 'homeContact',
+    name: 'homeFooter',
 }
 </script>
 
