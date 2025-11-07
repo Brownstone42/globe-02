@@ -1,74 +1,119 @@
 <template>
-    <section class="contact-section">
-        <div class="overlay">
-            <div class="columns">
-                <div class="column">
-                    <span class="step-header">ขั้นตอนการสั่งสินค้า</span>
+    <section class="footer-wrap">
+        <div class="footer-topic">
+            <span>บริการด้วยคุณภาพ สร้างความไว้วางใจอย่างยั่งยืน</span>
+            <span>พร้อมให้คำปรึกษาและดูแลอย่างใกล้ชิด โดยทีมงานผู้เชี่ยวชาญ</span>
+        </div>
 
-                    <div class="step mt-6">
-                        <div class="step-order">
-                            <div class="step-dot">1</div>
-                        </div>
-                        <div class="step-content">
-                            <span class="step-topic">สอบถามและสั่งซื้อ</span>
-                            <span class="step-body"
-                                >ลูกค้าสามารถสอบถามข้อมูลสินค้าและบริการผ่านช่องทางต่างๆ
-                                ที่สะดวก</span
-                            >
-                        </div>
+        <div class="columns">
+            <div class="column product mt-6 pb-6">
+                <span class="menu-title">สินค้าทั้งหมด</span>
+                <ul class="menu">
+                    <li>
+                        ถุงมือ
+                        <ul class="submenu">
+                            <li>- ถุงมือใช้แล้วทิ้ง</li>
+                            <li>- ถุงมือเฉพาะทาง</li>
+                        </ul>
+                    </li>
+                    <li>อุปกรณ์ควบคุมการปนเปื้อน</li>
+                    <li>ผลิตภัณฑ์ ESD</li>
+                    <li>รองเท้า ESD</li>
+                    <li>แผ่นรองและผ้า ESD</li>
+                    <li>วัสดุยึดติดและทำความสะอาด</li>
+                </ul>
+            </div>
+
+            <div class="column contact mt-6 pb-6">
+                <div class="menu-topic">
+                    <div class="logo">
+                        <i class="fa-solid fa-mobile-screen-button"></i>
                     </div>
-
-                    <div class="step mt-6">
-                        <div class="step-order">
-                            <div class="step-dot">2</div>
-                        </div>
-                        <div class="step-content">
-                            <span class="step-topic">รับใบเสนอราคา</span>
-                            <span class="step-body"
-                                >เราจะจัดทำใบเสนอราคาตามความต้องการของลูกค้าอย่างถูกต้องและรวดเร็ว</span
-                            >
-                        </div>
-                    </div>
-
-                    <div class="step mt-6">
-                        <div class="step-order">
-                            <div class="step-dot">3</div>
-                        </div>
-                        <div class="step-content">
-                            <span class="step-topic">ยืนยันการสั่งซื้อรับใบสั่งสินค้า</span>
-                            <span class="step-body"
-                                >ยืนยันการสั่งซื้อ และ
-                                ทางเราจะออกใบสั่งสินค้าเพื่อดำเนินการจัดส่ง</span
-                            >
-                        </div>
-                    </div>
-
-                    <div class="step mt-6">
-                        <div class="step-order">
-                            <div class="step-dot">4</div>
-                        </div>
-                        <div class="step-content">
-                            <span class="step-topic">จัดส่งสินค้า</span>
-                            <span class="step-body"
-                                >เราจัดส่งสินค้าที่มีคุณภาพให้ถึงมือลูกค้าอย่างถูกต้อง และ
-                                ตรงเวลาพร้อมบริการหลังการขาย โดยทีมงานผู้เชี่ยวชาญ</span
-                            >
-                        </div>
+                    <div class="left">
+                        <span class="menu-title">Call Center</span>
                     </div>
                 </div>
-                <div class="column">
-                    <span class="form-header mt-4"> กรอกฟอร์มเพื่อให้เราติดต่อกลับ </span>
-                    <div class="form-body">
-                        <input type="text" class="input mt-5" placeholder="Name" />
-                        <input type="text" class="input mt-5" placeholder="Email" />
-                        <input type="text" class="input mt-5" placeholder="Phone No." />
-                        <textarea class="textarea mt-5" placeholder="Messages" rows="3"></textarea>
-                        <button class="button mt-5 is-primary">ติดต่อเรา</button>
+                <div class="menu-topic mt-2">
+                    <div class="logo"></div>
+                    <div class="left">
+                        <span>แผนกบริการลูกค้า</span>
                     </div>
+                    <div class="right">
+                        <span>: 02-860-1525</span>
+                    </div>
+                </div>
+                <div class="menu-topic mt-2">
+                    <div class="logo"></div>
+                    <div class="left">
+                        <span>ฝ่ายขาย</span>
+                    </div>
+                    <div class="right">
+                        <span>: 091-010-8349</span>
+                    </div>
+                </div>
+                <div class="menu-topic mt-2">
+                    <div class="logo"></div>
+                    <div class="all">
+                        <span>ติดต่อได้ วันจันทร์ - วันศุกร์ 08.00 - 17.00 น.</span>
+                    </div>
+                </div>
+                <div class="menu-topic mt-4">
+                    <div class="logo">
+                        <i class="fa-solid fa-envelope"></i>
+                    </div>
+                    <div class="left">
+                        <span class="menu-title">Email</span>
+                    </div>
+                </div>
+                <div class="menu-topic mt-2">
+                    <div class="logo"></div>
+                    <div class="all">
+                        <span>admin@idealglobe.com</span>
+                    </div>
+                </div>
+                <div class="menu-topic mt-5">
+                    <img src="/images/footer-contact.png" alt="" />
+                </div>
+            </div>
+
+            <div class="column map mt-6 pb-6">
+                <div class="menu-topic">
+                    <div class="logo">
+                        <i class="fa-solid fa-location-dot"></i>
+                    </div>
+                    <div class="left">
+                        <span class="menu-title">Address</span>
+                    </div>
+                </div>
+                <div class="menu-topic mt-2">
+                    <div class="logo"></div>
+                    <div class="all">
+                        <span>46 Soi Pracha Uthit 27, Bangmod</span>
+                    </div>
+                </div>
+                <div class="menu-topic mt-2">
+                    <div class="logo"></div>
+                    <div class="all">
+                        <span>Thungkru, Bangkok 10140</span>
+                    </div>
+                </div>
+                <div class="menu-topic mt-4">
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3877.0019418603474!2d100.50394717455727!3d13.657645599467553!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e2a3c05ecfe141%3A0xbd9fa16b85a649f4!2zaWRlYWwgR2xvYmUgQ28uLEx0ZC7guIjguLHguJTguIjguLPguKvguJnguYjguLLguKLguK3guLjguJvguIHguKPguJPguYwgQ2xlYW5yb29tIEVTRCDguYHguJrguJrguITguKPguJrguKfguIfguIjguKM!5e0!3m2!1sen!2sth!4v1762496582219!5m2!1sen!2sth"
+                        width="300"
+                        height="225"
+                        style="border: 0"
+                        allowfullscreen=""
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                    ></iframe>
                 </div>
             </div>
         </div>
     </section>
+    <div class="credit">
+        <span>© 2025 idealglobe.co.th. All Rights Reserved.</span>
+    </div>
 </template>
 
 <script>
@@ -78,130 +123,110 @@ export default {
 </script>
 
 <style scoped>
-.form-body {
-    width: 80%;
+.credit {
+    display: flex;
+    background-color: black;
+    color: rgba(255, 255, 255, 0.705);
+    justify-content: center;
+    padding-top: 10px;
+    font-size: 18px;
+}
+iframe {
+    padding-left: 10px;
+}
+img {
+    width: 70%;
+}
+.right {
+    width: 45%;
+}
+.left {
+    width: 40%;
+}
+.logo {
+    width: 15%;
+}
+.all {
+    width: 87%;
+}
+.menu-content {
     display: flex;
     flex-direction: column;
-}
-button {
-    align-self: end;
-}
-input {
-    height: 50px;
-}
-.form-header {
-    font-size: 18pt;
-}
-.step-body {
-    font-family: 'Sukhumvit-Thin';
-    font-size: 12pt;
-}
-.step-topic {
-    font-size: 18pt;
-    color: #25b6b0;
-}
-.step-header {
-    font-size: 28pt;
-}
-.step-dot {
-    /* ปรับแต่งง่ายด้วยตัวแปร */
-    --size: 30px; /* ขนาดวงกลม */
-    --bg: #25b6b0; /* สีเขียววงใน */
-    --ring: 10px; /* ความหนาวงแหวนเงารอบนอก */
-    --shadow-offset: 10px; /* ระยะเลื่อนของเงา */
-    --shadow-blur: 12px; /* ความเบลอของเงา */
-
-    position: relative;
-    width: var(--size);
-    height: var(--size);
-    border-radius: 50%;
-    background: var(--bg);
-    color: #fff;
-    font:
-        700 calc(var(--size) * 0.42) / 1 system-ui,
-        sans-serif;
-    display: grid;
-    place-items: center;
-
-    /* วงแหวนเงารอบนอก */
-    box-shadow: 0 0 0 var(--ring) rgba(0, 0, 0, 0.25);
-    isolation: isolate; /* ให้ pseudo อยู่ด้านหลังจริง ๆ */
-}
-
-/* เงาหล่นนุ่ม ๆ ไปทางขวาล่าง */
-.step-dot::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.35);
-    transform: translate(var(--shadow-offset), var(--shadow-offset)) scale(0.9);
-    filter: blur(var(--shadow-blur));
-    z-index: -1;
-}
-.step-content {
-    width: 90%;
-    display: flex;
-    flex-direction: column;
-    padding-left: 20px;
-}
-.step-order {
-    width: 10%;
-    display: flex;
-    align-items: center;
-    justify-content: end;
-}
-.step {
-    display: flex;
+    justify-content: center;
     width: 100%;
-}
-.columns {
-    width: 100%;
-    align-items: center;
 }
 .column {
+    padding-left: 2%;
+}
+.menu-topic {
     display: flex;
-    flex-direction: column;
+}
+.menu-topic > div {
+    display: flex;
     align-items: center;
 }
-.contact-section {
-    position: relative;
-    width: 100%;
-    background-image: url('/images/contact-background.png');
-    background-size: cover; /* ปรับให้เต็มโดยรักษาอัตราส่วน */
-    background-position: center center; /* ให้อยู่ตรงกลาง */
-    background-repeat: no-repeat;
-    display: flex;
-    /*align-items: center;
-    justify-content: center;*/
+i {
+    font-size: 30px;
 }
-
-/* เพิ่ม overlay มืด ๆ ให้ข้อความด้านบนอ่านง่ายขึ้น */
-.overlay {
-    position: relative;
-    width: min(1100px, 92vw);
-    margin: auto;
-    /*width: 100%;
-    height: 100%;*/
-    /*background: rgba(0, 0, 0, 0.5);  ปรับความเข้มได้ */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    /*justify-content: center;*/
+.footer-wrap {
+    background: linear-gradient(to bottom, #000 0%, #3d3b3b 100%);
     color: white;
-    /*text-align: center;*/
-    padding: 2rem;
+    padding: 40px 20px 20px 20px;
 }
-
-/* สำหรับมือถือ */
+.footer-topic {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+.menu-title {
+    font-weight: bold;
+}
+.menu {
+    list-style: none;
+    padding: 0;
+    margin-top: 10px;
+}
+.menu > li {
+    position: relative;
+    margin-bottom: 8px;
+    padding-left: 15px;
+}
+.menu > li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 7px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #00ff80 0%, #00cc66 60%, #006633 100%);
+    box-shadow: 0 0 6px #00ff80; /* เพิ่ม glow ให้ดูสว่าง */
+}
+.submenu {
+    list-style: none;
+    padding-left: 15px; /* เว้นระยะให้เห็นเป็นชั้น */
+    margin-top: 5px;
+}
+.submenu li {
+    font-size: 0.9em;
+    color: #18a87d;
+}
+.column.product {
+    padding-left: 50px;
+}
 @media (max-width: 768px) {
-    .contact-section {
-        background-position: center top; /* โฟกัสส่วนบนของภาพ */
-        background-size: cover;
+    .column.product {
+        padding-left: 25%;
+        padding-bottom: 0 !important;
     }
-
-    .overlay {
-        padding: 1.5rem;
+    .column.contact {
+        padding-left: 10%;
+        padding-bottom: 0 !important;
+    }
+    .column.map {
+        padding-left: 10%;
+        padding-bottom: 20px;
     }
 }
 </style>

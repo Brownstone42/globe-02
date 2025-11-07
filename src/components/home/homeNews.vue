@@ -1,11 +1,11 @@
 <template>
     <div class="category mt-6 mb-6">
-        <span>ข่าวสาร</span>
+        <span>สินค้าของเรา</span>
 
-        <button class="arrow left" @click="go(-1)">‹</button>
+        <button class="arrow left" :disabled="!canLeft" @click="go(-1)">‹</button>
 
-        <div ref="scroller" class="columns scroller mt-4" @scroll.passive="onScroll">
-            <div class="column" v-for="(item, i) in looped" :key="i" ref="cards">
+        <div ref="scroller" class="columns scroller mt-4" @scroll.passive="updateCanScroll">
+            <div class="column" v-for="(item, i) in items" :key="i" ref="cards">
                 <img src="/images/example/news01.png" alt="" />
                 <div class="column-content">
                     <span class="content-topic1 ml-2">Disposable Gloves</span>
@@ -18,36 +18,26 @@
             </div>
         </div>
 
-        <button class="arrow right" @click="go(1)">›</button>
+        <button class="arrow right" :disabled="!canRight" @click="go(1)">›</button>
     </div>
 </template>
 
 <script>
 export default {
-    name: 'homeNews',
+    name: 'homeCategorySimple',
     data() {
         return {
-            items: ['Column 1', 'Column 2', 'Column 3', 'Column 4', 'Column 5', 'Column 6'],
-            cardWidth: 0,
-            gap: 0,
-            isMeasuring: true,
+            items: ['Column 1', 'Column 2', 'Column 3', 'Column 4', 'Column 5', 'Column 6'], // ข้อมูลเดิมใส่มาได้เลย
+            cardStep: 0,
+            canLeft: false,
+            canRight: false,
+            gapPx: 16, // ควรตรงกับ CSS gap (1rem≈16px)
         }
-    },
-    computed: {
-        n() {
-            return this.items.length
-        },
-        looped() {
-            return [...this.items, ...this.items, ...this.items]
-        },
-        startIndex() {
-            return this.n
-        },
     },
     mounted() {
         this.$nextTick(() => {
             this.measure()
-            this.jumpTo(this.startIndex)
+            this.updateCanScroll()
             window.addEventListener('resize', this.onResize, { passive: true })
         })
     },
@@ -56,77 +46,40 @@ export default {
     },
     methods: {
         onResize() {
-            const idx = this.currentLogicalIndex()
             this.measure()
-            this.jumpTo(this.startIndex + idx)
+            this.updateCanScroll()
         },
         measure() {
             const cards = this.$refs.cards
+            if (!cards || cards.length === 0) return
+            // กำหนดระยะ “เลื่อนทีละใบ”
+            // เอาความกว้างใบแรก + gap (กันกรณี snap-center บนมือถือ)
+            const w = cards[0].getBoundingClientRect().width
+            this.cardStep = Math.round(w + this.gapPx)
+        },
+        go(dir) {
             const scroller = this.$refs.scroller
-            if (!cards || cards.length < 2) return
-
-            const r0 = cards[0].getBoundingClientRect()
-            const r1 = cards[1].getBoundingClientRect()
-            this.cardWidth = r0.width
-            this.gap = Math.max(0, r1.left - r0.right)
-            scroller.style.scrollSnapType = 'x mandatory'
-            this.isMeasuring = false
+            if (!scroller) return
+            scroller.scrollBy({ left: dir * this.cardStep, behavior: 'smooth' })
+            // อัพเดทสถานะปุ่มหลังเลื่อน (ดีเลย์สั้น ๆ ให้ตำแหน่งขยับก่อน)
+            clearTimeout(this._t)
+            this._t = setTimeout(this.updateCanScroll, 250)
         },
-        stepPx() {
-            return this.cardWidth + this.gap
-        },
-        go(delta) {
-            const scroller = this.$refs.scroller
-            scroller.scrollBy({ left: delta * this.stepPx(), behavior: 'smooth' })
-            window.clearTimeout(this._t)
-            this._t = window.setTimeout(this.recenterIfNeeded, 350)
-        },
-        jumpTo(absIndex) {
-            const scroller = this.$refs.scroller
-            const snap = scroller.style.scrollSnapType
-            scroller.style.scrollSnapType = 'none'
-            scroller.scrollLeft = absIndex * this.stepPx()
-            requestAnimationFrame(() => {
-                scroller.style.scrollSnapType = snap || 'x mandatory'
-            })
-        },
-        onScroll() {
-            this.recenterIfNeeded()
-        },
-        recenterIfNeeded() {
-            if (this.isMeasuring) return
-            const scroller = this.$refs.scroller
-            const pos = scroller.scrollLeft
-            const step = this.stepPx()
-            const firstIndex = 0
-            const lastIndex = this.looped.length - 1
-
-            let i = Math.round(pos / step)
-
-            if (i < this.startIndex) {
-                const offset = (((i - this.startIndex) % this.n) + this.n) % this.n
-                this.jumpTo(this.startIndex + offset)
-                return
-            }
-            if (i > this.startIndex + this.n - 1) {
-                const offset = (i - this.startIndex) % this.n
-                this.jumpTo(this.startIndex + offset)
-                return
-            }
-            if (i <= firstIndex) this.jumpTo(this.startIndex)
-            if (i >= lastIndex) this.jumpTo(this.startIndex + this.n - 1)
-        },
-        currentLogicalIndex() {
-            const iAbs = Math.round(this.$refs.scroller.scrollLeft / this.stepPx())
-            let idx = (iAbs - this.startIndex) % this.n
-            if (idx < 0) idx += this.n
-            return idx
+        updateCanScroll() {
+            const s = this.$refs.scroller
+            if (!s) return
+            // เช็คสุดซ้าย/สุดขวาแบบตรงไปตรงมา
+            const max = s.scrollWidth - s.clientWidth
+            const left = s.scrollLeft
+            this.canLeft = left > 0
+            this.canRight = left < max - 1
         },
     },
 }
 </script>
 
 <style scoped>
+/* ——— text parts (เหมือนเดิม) ——— */
 .content-topic1 {
     font-size: 14pt;
     color: #115511;
@@ -141,7 +94,7 @@ export default {
     flex-direction: column;
     align-items: flex-start;
     padding-bottom: 12px;
-    border-bottom: 1px solid rgba(128, 128, 128, 0.452);
+    border-bottom: 1px solid rgba(128, 128, 128, 0.45);
 }
 .column-content2 {
     display: flex;
@@ -156,49 +109,77 @@ export default {
 .column-content2 img {
     width: 35px;
 }
+
+/* ——— wrapper ——— */
 .category {
     position: relative;
     margin: auto;
     width: min(1100px, 80vw);
 }
+
+/* ——— scroller ——— */
 .columns.scroller {
     display: flex;
     flex-wrap: nowrap !important;
     overflow-x: auto;
     overflow-y: hidden;
-    gap: 1rem;
+    gap: 1rem; /* ตรงกับ gapPx ใน script */
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+    user-select: none;
+    cursor: grab;
 }
 .columns.scroller::-webkit-scrollbar {
     display: none;
 }
+
+/* ——— card ——— */
 .column {
     flex: 0 0 100%;
-    scroll-snap-align: start;
+    scroll-snap-align: start; /* มือถือ: เริ่มที่ขอบซ้าย */
     min-height: 140px;
     background: white;
     border-radius: 12px;
     padding: 16px;
     text-align: center;
 }
+
+/* ——— desktop: คง 4 ใบ/แถว (ยังเลื่อนถ้ามีมากกว่า 4) ——— */
 @media (min-width: 768px) {
     .column {
-        flex: 0 0 calc(33.3% - 0.75rem);
+        flex: 0 0 calc(33.33% - 0.75rem);
+    }
+    .columns.scroller {
+        padding: 0;
+        scroll-padding: 0;
     }
 }
+
+/* ——— mobile: ให้ “โผล่ข้างๆ” เห็นนิดนึง + snap center ——— */
+@media (max-width: 767.98px) {
+    .columns.scroller {
+        padding: 0 10vw; /* ทำให้มี peek ซ้าย/ขวา */
+        scroll-padding: 0 10vw; /* ให้ snap เผื่อ padding */
+    }
+    .column {
+        flex: 0 0 85%; /* ให้ใบหลักกว้าง 85% ของ viewport */
+        scroll-snap-align: center;
+    }
+}
+
+/* ——— arrows ——— */
 .arrow {
     position: absolute;
-    top: 40%;
+    top: 50%;
     transform: translateY(-50%);
     background: white;
     border: none;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
     border-radius: 999px;
     width: 40px;
     height: 40px;
     cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
     font-size: 1.5rem;
     line-height: 1;
     color: #333;
@@ -208,13 +189,24 @@ export default {
     left: -32px;
 }
 .arrow.right {
-    right: -26px;
+    right: -32px;
 }
+.arrow:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
 @media (max-width: 768px) {
     .arrow {
-        width: 48px;
-        height: 48px;
-        font-size: 1.8rem;
+        width: 32px;
+        height: 32px;
+        font-size: 1.6rem;
+    }
+    .arrow.left {
+        left: -8%;
+    }
+    .arrow.right {
+        right: -8%;
     }
 }
 </style>
