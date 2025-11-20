@@ -196,12 +196,16 @@ input {
 /* สำหรับมือถือ */
 @media (max-width: 768px) {
     .contact-section {
-        background-position: center top; /* โฟกัสส่วนบนของภาพ */
+        background-position: center center; /* โฟกัสส่วนบนของภาพ */
         background-size: cover;
     }
-
     .overlay {
         padding: 1.5rem;
+    }
+    .contact-section {
+        background-image: url('/images/contact-background-mobile.png');
+        background-position: center top;
+        background-size: cover;
     }
 }
 </style>
