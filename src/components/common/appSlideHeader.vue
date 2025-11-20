@@ -182,7 +182,7 @@ export default {
     z-index: 10;
     height: 30px;
     background-color: black;
-    color: white;
+    color: #ead5b7;
     align-items: center;
     padding: 0 10px;
 

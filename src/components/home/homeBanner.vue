@@ -6,21 +6,13 @@
         <picture class="hero-media" aria-hidden="true">
             <source
                 type="image/webp"
-                srcset="
-                    /images/idealglobe-banner-640.webp   640w,
-                    /images/idealglobe-banner-960.webp   960w,
-                    /images/idealglobe-banner-1280.webp 1280w
-                "
+                srcset="/images/banner.png 640w, /images/banner.png 960w, /images/banner.png 1280w"
                 sizes="100vw"
             />
             <img
                 class="hero-img"
                 src="/images/idealglobe-banner-1280.jpg"
-                srcset="
-                    /images/idealglobe-banner-640.jpg   640w,
-                    /images/idealglobe-banner-960.jpg   960w,
-                    /images/idealglobe-banner-1280.jpg 1280w
-                "
+                srcset="/images/banner.png 640w, /images/banner.png 960w, /images/banner.png 1280w"
                 sizes="100vw"
                 alt=""
                 decoding="async"
@@ -44,7 +36,6 @@ export default { name: 'AppBanner' }
 .hero {
     position: relative;
     height: 450px; /* ← กำหนดความสูงคงที่ */
-    border-radius: 16px;
     overflow: hidden;
     isolation: isolate;
 }

@@ -60,12 +60,12 @@ export default {
 
 <style scoped>
 .item-icon {
-    width: 20%;
+    width: 15%;
     display: flex;
     align-items: center;
 }
 .item-text {
-    width: 80%;
+    width: 85%;
     margin-left: 10px;
     display: flex;
     align-items: center;

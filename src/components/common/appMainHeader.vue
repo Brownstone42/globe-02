@@ -1,14 +1,14 @@
 <template>
     <div class="header">
         <div class="row">
-            <img src="/images/logo.png" alt="Company Logo" class="header-logo" />
+            <img src="/images/logo2.png" alt="Company Logo" class="header-logo" />
 
             <!-- Desktop Menu -->
             <nav class="nav-menu desktop-menu">
-                <a href="#" class="nav-item">หน้าแรก</a>
-                <a href="#" class="nav-item">สินค้า</a>
-                <a href="#" class="nav-item">เกี่ยวกับเรา</a>
-                <a href="#" class="nav-item">ติดต่อเรา</a>
+                <a href="#" class="nav-item">ABOUT</a>
+                <a href="#" class="nav-item">PRODUCT</a>
+                <a href="#" class="nav-item">BLOGS</a>
+                <a href="#" class="nav-item">CONTACT US</a>
             </nav>
 
             <!-- Hamburger Button (Mobile) -->
@@ -21,10 +21,10 @@
 
         <!-- Mobile Menu -->
         <nav class="mobile-menu" v-if="isOpen">
-            <a href="#" class="mobile-item">หน้าแรก</a>
-            <a href="#" class="mobile-item">สินค้า</a>
-            <a href="#" class="mobile-item">เกี่ยวกับเรา</a>
-            <a href="#" class="mobile-item">ติดต่อเรา</a>
+            <a href="#" class="mobile-item">ABOUT</a>
+            <a href="#" class="mobile-item">PRODUCT</a>
+            <a href="#" class="mobile-item">BLOGS</a>
+            <a href="#" class="mobile-item">CONTACT US</a>
         </nav>
     </div>
 </template>
@@ -44,7 +44,8 @@ export default {
 .header {
     display: flex;
     flex-direction: column;
-    background: linear-gradient(to top, #216e74, #2b8489, #3cabae);
+    /*background: linear-gradient(to top, #216e74, #2b8489, #3cabae);*/
+    background-color: #23272d;
     width: 100%;
 }
 
@@ -59,24 +60,25 @@ export default {
 }
 
 .header-logo {
-    max-height: 70px;
+    max-height: 50px;
     width: auto;
 }
 
 /* Desktop Menu */
 .desktop-menu {
     display: flex;
-    gap: 100px;
+    gap: 50px;
 }
 
 .nav-item {
-    color: white;
+    color: #ead5b7;
     text-decoration: none;
     font-weight: 500;
     font-size: 18px;
 }
 .nav-item:hover {
     opacity: 0.8;
+    color: #3ca9ac;
 }
 
 /* Hamburger Button */
@@ -90,7 +92,7 @@ export default {
 .hamburger span {
     width: 28px;
     height: 3px;
-    background: white;
+    background: #ead5b7;
     border-radius: 2px;
 }
 
@@ -98,14 +100,14 @@ export default {
 .mobile-menu {
     display: flex;
     flex-direction: column;
-    background: #2b8489;
+    background: #23272d;
     width: 100%;
     padding: 10px 0;
 }
 
 .mobile-item {
     padding: 12px 20px;
-    color: white;
+    color: #ead5b7;
     text-decoration: none;
     font-weight: 500;
 }
