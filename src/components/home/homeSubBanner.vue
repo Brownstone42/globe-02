@@ -1,19 +1,21 @@
 <template>
     <div class="feature-strip" aria-label="Store benefits">
         <div class="columns is-multiline is-4">
-            <div class="column is-half-desktop is-half-tablet is-full-mobile">
+            <div class="column is-one-quarter-desktop is-half-tablet is-full-mobile">
                 <div class="feature-item">
                     <div class="item-icon">
                         <img src="/images/icon-banner04.png" alt="" />
                     </div>
                     <div class="item-text">
                         <p class="title">คุ้มค่าและโปร่งใส</p>
-                        <p class="subtitle">เสนอราคาที่คุ้มค่าโดยไม่ลดคุณภาพ</p>
+                        <p class="subtitle">
+                            เสนอราคาที่คุ้มค่าโดยไม่ลดคุณภาพ โปร่งใสตรวจสอบย้อนหลังได้
+                        </p>
                     </div>
                 </div>
             </div>
 
-            <div class="column is-half-desktop is-half-tablet is-full-mobile">
+            <div class="column is-one-quarter-desktop is-half-tablet is-full-mobile">
                 <div class="feature-item">
                     <div class="item-icon">
                         <img src="/images/icon-banner03.png" alt="" />
@@ -25,7 +27,7 @@
                 </div>
             </div>
 
-            <div class="column is-half-desktop is-half-tablet is-full-mobile">
+            <div class="column is-one-quarter-desktop is-half-tablet is-full-mobile">
                 <div class="feature-item">
                     <div class="item-icon">
                         <img src="/images/icon-banner02.png" alt="" />
@@ -37,7 +39,7 @@
                 </div>
             </div>
 
-            <div class="column is-half-desktop is-half-tablet is-full-mobile">
+            <div class="column is-one-quarter-desktop is-half-tablet is-full-mobile">
                 <div class="feature-item">
                     <div class="item-icon">
                         <img src="/images/icon-banner01.png" alt="" />

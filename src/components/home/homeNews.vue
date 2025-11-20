@@ -1,6 +1,6 @@
 <template>
     <div class="category mt-6 mb-8">
-        <span>สินค้าของเรา</span>
+        <span>ข่าวสารที่น่าสนใจ</span>
 
         <button class="arrow left" :disabled="!canLeft" @click="go(-1)">‹</button>
 

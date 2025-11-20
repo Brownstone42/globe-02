@@ -57,20 +57,23 @@ export default {
     /*background: linear-gradient(to top, #216e74, #2b8489, #3cabae);*/
     background-color: #23272d;
     width: 100%;
+    position: sticky; /* NEW: stick to top */
+    top: 0; /* NEW */
+    z-index: 50; /* NEW: above page content */
 }
 
 /* Row (Logo + Menu/Hamburger) */
 .header .row {
     display: flex;
     width: min(1100px, 92vw);
-    height: 100px;
+    height: 70px;
     margin: auto;
     align-items: center;
     justify-content: space-between;
 }
 
 .header-logo {
-    max-height: 50px;
+    max-height: 40px;
     width: auto;
     cursor: pointer;
 }

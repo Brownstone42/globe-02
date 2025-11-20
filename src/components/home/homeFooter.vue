@@ -101,7 +101,7 @@
                 <div class="menu-topic mt-4">
                     <iframe
                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3877.0019418603474!2d100.50394717455727!3d13.657645599467553!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e2a3c05ecfe141%3A0xbd9fa16b85a649f4!2zaWRlYWwgR2xvYmUgQ28uLEx0ZC7guIjguLHguJTguIjguLPguKvguJnguYjguLLguKLguK3guLjguJvguIHguKPguJPguYwgQ2xlYW5yb29tIEVTRCDguYHguJrguJrguITguKPguJrguKfguIfguIjguKM!5e0!3m2!1sen!2sth!4v1762496582219!5m2!1sen!2sth"
-                        width="300"
+                        width="325"
                         height="225"
                         style="border: 0"
                         allowfullscreen=""
@@ -188,6 +188,7 @@ i {
     flex-direction: column;
     align-items: center;
     text-align: center;
+    margin-top: 50px !important;
 }
 .menu-title {
     font-weight: bold;
@@ -210,7 +211,7 @@ i {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: radial-gradient(circle, #00ff80 0%, #00cc66 60%, #006633 100%);
+    background: radial-gradient(circle, #3ca9ac 0%, #3ca9ac 60%, #3ca9ac 100%);
     box-shadow: 0 0 6px #00ff80; /* เพิ่ม glow ให้ดูสว่าง */
 }
 .submenu {
