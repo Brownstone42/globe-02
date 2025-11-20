@@ -1,5 +1,5 @@
 <template>
-    <div class="category mt-6 mb-6">
+    <div class="category mt-6 mb-8">
         <span>สินค้าของเรา</span>
 
         <button class="arrow left" :disabled="!canLeft" @click="go(-1)">‹</button>
@@ -79,6 +79,9 @@ export default {
 </script>
 
 <style scoped>
+.mb-8 {
+    margin-bottom: 4rem !important;
+}
 /* ——— text parts (เหมือนเดิม) ——— */
 .content-topic1 {
     font-size: 14pt;

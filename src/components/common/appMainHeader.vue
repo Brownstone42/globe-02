@@ -1,12 +1,17 @@
 <template>
     <div class="header">
         <div class="row">
-            <img src="/images/logo2.png" alt="Company Logo" class="header-logo" />
+            <img
+                src="/images/logo2.png"
+                alt="Company Logo"
+                class="header-logo"
+                @click="navigate('/')"
+            />
 
             <!-- Desktop Menu -->
             <nav class="nav-menu desktop-menu">
-                <a href="#" class="nav-item">ABOUT</a>
-                <a href="#" class="nav-item">PRODUCT</a>
+                <a href="#" class="nav-item">ABOUT US</a>
+                <a href="#" class="nav-item" @click="navigate('/product')">PRODUCT</a>
                 <a href="#" class="nav-item">BLOGS</a>
                 <a href="#" class="nav-item">CONTACT US</a>
             </nav>
@@ -21,8 +26,8 @@
 
         <!-- Mobile Menu -->
         <nav class="mobile-menu" v-if="isOpen">
-            <a href="#" class="mobile-item">ABOUT</a>
-            <a href="#" class="mobile-item">PRODUCT</a>
+            <a href="#" class="mobile-item">ABOUT US</a>
+            <a href="#" class="mobile-item" @click="navigate('/product')">PRODUCT</a>
             <a href="#" class="mobile-item">BLOGS</a>
             <a href="#" class="mobile-item">CONTACT US</a>
         </nav>
@@ -36,6 +41,11 @@ export default {
         return {
             isOpen: false,
         }
+    },
+    methods: {
+        navigate(path) {
+            this.$router.push(path)
+        },
     },
 }
 </script>
@@ -62,6 +72,7 @@ export default {
 .header-logo {
     max-height: 50px;
     width: auto;
+    cursor: pointer;
 }
 
 /* Desktop Menu */

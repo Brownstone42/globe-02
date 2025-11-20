@@ -1,5 +1,6 @@
 <template>
     <section class="footer-wrap">
+        <img class="footer-logo" src="/images/footer-logo.png" alt="" />
         <div class="footer-topic">
             <span>บริการด้วยคุณภาพ สร้างความไว้วางใจอย่างยั่งยืน</span>
             <span>พร้อมให้คำปรึกษาและดูแลอย่างใกล้ชิด โดยทีมงานผู้เชี่ยวชาญ</span>
@@ -123,6 +124,14 @@ export default {
 </script>
 
 <style scoped>
+.footer-logo {
+    position: absolute;
+    width: 200px;
+    left: calc(50% - 100px);
+    top: -60px;
+    z-index: 2;
+    opacity: 0.75;
+}
 .credit {
     display: flex;
     background-color: black;
@@ -166,12 +175,13 @@ img {
     align-items: center;
 }
 i {
-    font-size: 30px;
+    font-size: 25px;
 }
 .footer-wrap {
     background: linear-gradient(to bottom, #000 0%, #3d3b3b 100%);
-    color: white;
+    color: #ead5b7;
     padding: 40px 20px 20px 20px;
+    position: relative;
 }
 .footer-topic {
     display: flex;
@@ -210,7 +220,7 @@ i {
 }
 .submenu li {
     font-size: 0.9em;
-    color: #18a87d;
+    color: #3ca9ac;
 }
 .column.product {
     padding-left: 50px;
