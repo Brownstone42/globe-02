@@ -124,6 +124,10 @@ export default {
 </script>
 
 <style scoped>
+.contact,
+.map {
+    font-size: 13px;
+}
 .footer-logo {
     position: absolute;
     width: 200px;
@@ -175,7 +179,7 @@ img {
     align-items: center;
 }
 i {
-    font-size: 25px;
+    font-size: 20px;
 }
 .footer-wrap {
     background: linear-gradient(to bottom, #000 0%, #3d3b3b 100%);
@@ -192,6 +196,7 @@ i {
 }
 .menu-title {
     font-weight: bold;
+    font-size: 16px;
 }
 .menu {
     list-style: none;

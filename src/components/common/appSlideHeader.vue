@@ -14,13 +14,16 @@
             >
                 <div class="is-flex is-align-items-center sub-header-group">
                     <label class="sub-header-label">
-                        <i class="fas fa-mobile-alt sub-header-icon"></i> Sales : 089-999-9999
+                        <!--<i class="fas fa-mobile-alt sub-header-icon"></i>-->
+                        Sales : 089-999-9999
                     </label>
                     <label class="sub-header-label">
-                        <i class="fas fa-phone sub-header-icon"></i> Office : 02-222-2222
+                        <!--<i class="fas fa-phone sub-header-icon"></i>-->
+                        Office : 02-222-2222
                     </label>
                     <label class="sub-header-label">
-                        <i class="fas fa-envelope sub-header-icon"></i> admin@idealglobe.com
+                        <!--<i class="fas fa-envelope sub-header-icon"></i>-->
+                        admin@idealglobe.com
                     </label>
                 </div>
                 <div class="is-flex is-align-items-center sub-header-group sub-header-right-group">

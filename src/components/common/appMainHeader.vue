@@ -88,7 +88,7 @@ export default {
     color: #ead5b7;
     text-decoration: none;
     font-weight: 500;
-    font-size: 18px;
+    font-size: 16px;
 }
 .nav-item:hover {
     opacity: 0.8;
