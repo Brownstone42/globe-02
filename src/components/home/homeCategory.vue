@@ -12,7 +12,7 @@
                     <span class="content-topic2 ml-2">ถุงมือใช้แล้วทิ้ง</span>
                 </div>
                 <div class="column-content2 mt-5">
-                    <span class="ml-2">ดูสินค้าทั้งหมด</span>
+                    <span class="ml-2 content-topic3">ดูสินค้าทั้งหมด</span>
                     <img class="mr-2" src="/images/example/button.png" alt="" />
                 </div>
             </div>
@@ -82,12 +82,15 @@ export default {
 /* ——— text parts (เหมือนเดิม) ——— */
 .content-topic1 {
     font-size: 14pt;
-    color: #115511;
+    color: #205266;
     font-weight: bold;
 }
 .content-topic2 {
     font-size: 11pt;
-    color: rgba(128, 128, 128, 0.76);
+    color: #a4a4a4;
+}
+.content-topic3 {
+    color: #3ca9ac;
 }
 .column-content {
     display: flex;

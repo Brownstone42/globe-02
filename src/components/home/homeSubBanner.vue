@@ -8,7 +8,7 @@
                     </div>
                     <div class="item-text">
                         <p class="title">คุ้มค่าและโปร่งใส</p>
-                        <p class="subtitle">เสนอราคาที่คุ้มค่าโดยไม่ลดคุณภาพ ตรวจสอบย้อนหลังได้</p>
+                        <p class="subtitle">เสนอราคาที่คุ้มค่าโดยไม่ลดคุณภาพ</p>
                     </div>
                 </div>
             </div>
@@ -86,11 +86,13 @@ export default {
     border: 1px solid rgba(0, 0, 0, 0.06);
 }
 .column {
-    padding: 1rem;
+    display: flex;
+    align-items: center;
+    padding: 0 0.5rem 0 0.5rem !important;
 }
 .feature-item {
     border-radius: 12px;
-    padding: 1.5rem 1rem;
+    padding: 1rem 0 1rem 0;
     transition: all 0.25s ease;
     display: flex;
 }

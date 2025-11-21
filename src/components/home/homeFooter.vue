@@ -126,6 +126,7 @@ export default {
 <style scoped>
 .contact,
 .map {
+    color: white;
     font-size: 13px;
 }
 .footer-logo {
@@ -188,6 +189,7 @@ i {
     position: relative;
 }
 .footer-topic {
+    color: white;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -197,6 +199,7 @@ i {
 .menu-title {
     font-weight: bold;
     font-size: 16px;
+    color: #ead5b7;
 }
 .menu {
     list-style: none;
@@ -217,7 +220,6 @@ i {
     height: 8px;
     border-radius: 50%;
     background: radial-gradient(circle, #3ca9ac 0%, #3ca9ac 60%, #3ca9ac 100%);
-    box-shadow: 0 0 6px #00ff80; /* เพิ่ม glow ให้ดูสว่าง */
 }
 .submenu {
     list-style: none;
