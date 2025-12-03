@@ -210,6 +210,7 @@ i {
     position: relative;
     margin-bottom: 8px;
     padding-left: 15px;
+    color: white;
 }
 .menu > li::before {
     content: '';
