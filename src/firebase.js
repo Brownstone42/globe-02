@@ -1,6 +1,7 @@
 // src/firebase.js
 import { initializeApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
+import { getFirestore } from 'firebase/firestore'
 
 const firebaseConfig = {
     apiKey: 'AIzaSyA-59Hd3cwKU-IArkorrybzk-bmpCNqAJc',
@@ -11,9 +12,14 @@ const firebaseConfig = {
     appId: '1:1003894705965:web:b08d4eadec663f9ff7cda4',
 }
 
+// Start Firebase
 const app = initializeApp(firebaseConfig)
 
-// เตรียม auth ให้ใช้งาน
-export const auth = getAuth(app)
+// Firestore
+const db = getFirestore(app)
 
-export default app
+// Auth
+const auth = getAuth(app)
+
+// ❗ EXPORT แบบ named exports
+export { app, db, auth }
