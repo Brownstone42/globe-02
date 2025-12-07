@@ -37,6 +37,12 @@
 <script>
 export default {
     name: 'mainHeader',
+    mounted() {
+        window.addEventListener('resize', this.handleResize)
+    },
+    beforeUnmount() {
+        window.removeEventListener('resize', this.handleResize)
+    },
     data() {
         return {
             isOpen: false,
@@ -45,6 +51,12 @@ export default {
     methods: {
         navigate(path) {
             this.$router.push(path)
+            this.isOpen = false
+        },
+        handleResize() {
+            if (window.innerWidth > 768 && this.isOpen) {
+                this.isOpen = false
+            }
         },
     },
 }
