@@ -16,14 +16,16 @@
                         }"
                     >
                         <figure class="image related-image">
-                            <img :src="item.image" :alt="item.name" />
+                            <img :src="item.mainImageUrl" :alt="item.name" />
                         </figure>
+
                         <div class="related-info">
                             <h3 class="is-size-6 has-text-weight-semibold">
                                 {{ item.name }}
                             </h3>
+
                             <p class="is-size-7">
-                                {{ item.shortDescription }}
+                                {{ shortText(item.description) }}
                             </p>
                         </div>
                     </RouterLink>
@@ -40,6 +42,13 @@ export default {
         items: {
             type: Array,
             default: () => [],
+        },
+    },
+    methods: {
+        shortText(text) {
+            if (!text) return ''
+            // ตัดข้อความความยาวให้เหมาะเพื่อให้ layout สวยเหมือนเดิม
+            return text.length > 50 ? text.slice(0, 47) + '...' : text
         },
     },
 }

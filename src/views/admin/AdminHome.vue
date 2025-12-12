@@ -11,7 +11,13 @@
                 Category Management
             </button>
 
-            <button class="admin-menu-item" disabled>Product Management (coming soon)</button>
+            <button
+                class="admin-menu-item"
+                :class="{ active: currentModule === 'product' }"
+                @click="currentModule = 'product'"
+            >
+                Product Management
+            </button>
 
             <button class="admin-menu-item" disabled>News Management (coming soon)</button>
 
@@ -20,6 +26,7 @@
 
         <main class="admin-content">
             <category-management v-if="currentModule === 'category'"></category-management>
+            <product-management v-else-if="currentModule === 'product'"></product-management>
 
             <div v-else class="placeholder">Select a module from the left menu.</div>
         </main>
@@ -29,11 +36,13 @@
 <script>
 import { useAuthStore } from '@/stores/authStore'
 import CategoryManagement from '@/components/admin/categoryManagement.vue'
+import ProductManagement from '@/components/admin/productManagement.vue'
 
 export default {
     name: 'AdminHome',
     components: {
         CategoryManagement,
+        ProductManagement,
     },
     data() {
         return {

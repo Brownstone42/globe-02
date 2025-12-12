@@ -5,13 +5,22 @@
         <button class="arrow left" :disabled="!canLeft" @click="go(-1)">‹</button>
 
         <div ref="scroller" class="columns scroller mt-4" @scroll.passive="updateCanScroll">
-            <div class="column" v-for="(item, i) in items" :key="i" ref="cards">
-                <img src="/images/example/product01.png" alt="" />
+            <div
+                class="column"
+                v-for="(item, i) in categoryStore.visibleCategories"
+                :key="item.id || i"
+                ref="cards"
+            >
+                <img :src="item.imageUrl || '/images/example/product01.png'" alt="" />
                 <div class="column-content">
-                    <span class="content-topic1 ml-2">Disposable Gloves</span>
-                    <span class="content-topic2 ml-2">ถุงมือใช้แล้วทิ้ง</span>
+                    <span class="content-topic1 ml-2">
+                        {{ item.name || 'Category Name' }}
+                    </span>
+                    <span class="content-topic2 ml-2">
+                        {{ item.description || '' }}
+                    </span>
                 </div>
-                <div class="column-content2 mt-5">
+                <div class="column-content2 mt-5" @click="goToCategory(item)">
                     <span class="ml-2 content-topic3">ดูสินค้าทั้งหมด</span>
                     <img class="mr-2" src="/images/example/button.png" alt="" />
                 </div>
@@ -23,63 +32,86 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia'
+import { useCategoryStore } from '@/stores/categoryStore'
+
 export default {
-    name: 'homeCategorySimple',
+    name: 'homeCategory',
+
     data() {
         return {
-            items: ['Column 1', 'Column 2', 'Column 3', 'Column 4', 'Column 5', 'Column 6'], // ข้อมูลเดิมใส่มาได้เลย
             cardStep: 0,
             canLeft: false,
             canRight: false,
-            gapPx: 16, // ควรตรงกับ CSS gap (1rem≈16px)
+            gapPx: 16,
         }
     },
-    mounted() {
-        this.$nextTick(() => {
-            this.measure()
-            this.updateCanScroll()
-            window.addEventListener('resize', this.onResize, { passive: true })
-        })
+
+    computed: {
+        ...mapStores(useCategoryStore),
     },
+
+    mounted() {
+        // ✅ โหลด categories ที่นี่ แล้วค่อย measure หลังโหลดเสร็จ
+        this.categoryStore.loadCategories().then(() => {
+            this.$nextTick(() => {
+                this.measure()
+                this.updateCanScroll()
+            })
+        })
+
+        window.addEventListener('resize', this.onResize, { passive: true })
+    },
+
     beforeUnmount() {
         window.removeEventListener('resize', this.onResize)
     },
+
     methods: {
+        goToCategory(item) {
+            if (!item.slug) return
+            this.$router.push(`/product/${item.slug}`)
+        },
+
         onResize() {
             this.measure()
             this.updateCanScroll()
         },
+
         measure() {
             const cards = this.$refs.cards
             if (!cards || cards.length === 0) return
-            // กำหนดระยะ “เลื่อนทีละใบ”
-            // เอาความกว้างใบแรก + gap (กันกรณี snap-center บนมือถือ)
             const w = cards[0].getBoundingClientRect().width
             this.cardStep = Math.round(w + this.gapPx)
         },
+
         go(dir) {
             const scroller = this.$refs.scroller
             if (!scroller) return
+
             scroller.scrollBy({ left: dir * this.cardStep, behavior: 'smooth' })
-            // อัพเดทสถานะปุ่มหลังเลื่อน (ดีเลย์สั้น ๆ ให้ตำแหน่งขยับก่อน)
-            clearTimeout(this._t)
-            this._t = setTimeout(this.updateCanScroll, 250)
+
+            // force update after animation
+            setTimeout(() => this.updateCanScroll(), 300)
         },
+
         updateCanScroll() {
             const s = this.$refs.scroller
             if (!s) return
-            // เช็คสุดซ้าย/สุดขวาแบบตรงไปตรงมา
+
             const max = s.scrollWidth - s.clientWidth
             const left = s.scrollLeft
-            this.canLeft = left > 0
-            this.canRight = left < max - 1
+
+            const threshold = 3 // ป้องกัน floating error
+
+            this.canLeft = left > threshold
+            this.canRight = left < max - threshold
         },
     },
 }
 </script>
 
 <style scoped>
-/* ——— text parts (เหมือนเดิม) ——— */
 .content-topic1 {
     font-size: 14pt;
     color: #205266;
@@ -113,20 +145,18 @@ export default {
     width: 35px;
 }
 
-/* ——— wrapper ——— */
 .category {
     position: relative;
     margin: auto;
     width: min(1100px, 80vw);
 }
 
-/* ——— scroller ——— */
 .columns.scroller {
     display: flex;
     flex-wrap: nowrap !important;
     overflow-x: auto;
     overflow-y: hidden;
-    gap: 1rem; /* ตรงกับ gapPx ใน script */
+    gap: 1rem;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -137,18 +167,20 @@ export default {
     display: none;
 }
 
-/* ——— card ——— */
 .column {
     flex: 0 0 100%;
-    scroll-snap-align: start; /* มือถือ: เริ่มที่ขอบซ้าย */
+    scroll-snap-align: start;
     min-height: 140px;
     background: white;
     border-radius: 12px;
     padding: 16px;
     text-align: center;
 }
+.column img {
+    max-width: 100%;
+    object-fit: contain;
+}
 
-/* ——— desktop: คง 4 ใบ/แถว (ยังเลื่อนถ้ามีมากกว่า 4) ——— */
 @media (min-width: 768px) {
     .column {
         flex: 0 0 calc(25% - 0.75rem);
@@ -159,19 +191,17 @@ export default {
     }
 }
 
-/* ——— mobile: ให้ “โผล่ข้างๆ” เห็นนิดนึง + snap center ——— */
 @media (max-width: 767.98px) {
     .columns.scroller {
-        padding: 0 10vw; /* ทำให้มี peek ซ้าย/ขวา */
-        scroll-padding: 0 10vw; /* ให้ snap เผื่อ padding */
+        padding: 0 10vw;
+        scroll-padding: 0 10vw;
     }
     .column {
-        flex: 0 0 85%; /* ให้ใบหลักกว้าง 85% ของ viewport */
+        flex: 0 0 85%;
         scroll-snap-align: center;
     }
 }
 
-/* ——— arrows ——— */
 .arrow {
     position: absolute;
     top: 50%;

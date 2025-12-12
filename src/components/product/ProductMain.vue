@@ -18,7 +18,7 @@
                         class="thumb-button"
                         :class="{ 'is-active': index === selectedImageIndex }"
                         type="button"
-                        @click="$emit('update:selectedImageIndex', index)"
+                        @click="$emit('update:selected-image-index', index)"
                     >
                         <figure class="image is-64x64">
                             <img :src="img" :alt="product.name + ' thumbnail ' + (index + 1)" />
@@ -31,9 +31,11 @@
         <!-- ขวา: รายละเอียด -->
         <div class="column is-6 product-info">
             <h1 class="title is-4">{{ product.name }}</h1>
-            <p class="subtitle is-6">{{ product.shortDescription }}</p>
+            <p class="subtitle is-6">
+                {{ product.description }}
+            </p>
 
-            <div class="content product-brief">
+            <div v-if="hasBrief" class="content product-brief">
                 <p v-for="(line, i) in product.brief" :key="i">
                     {{ line }}
                 </p>
@@ -41,11 +43,11 @@
 
             <div class="columns mt-4">
                 <div class="column">
-                    <p class="has-text-weight-semibold">Brand :</p>
+                    <p class="has-text-weight-semibold">Brand</p>
                     <p>{{ product.brand || '-' }}</p>
                 </div>
                 <div class="column">
-                    <p class="has-text-weight-semibold">Standard Packing :</p>
+                    <p class="has-text-weight-semibold">Standard Packing</p>
                     <p>{{ product.packing || '-' }}</p>
                 </div>
             </div>
@@ -74,13 +76,25 @@ export default {
             required: true,
         },
     },
-    emits: ['update:selectedImageIndex'],
+    emits: ['update:selected-image-index'],
     computed: {
+        // รวม mainImageUrl + galleryImageUrls ให้กลายเป็น array เดียว
         images() {
-            if (this.product.images && this.product.images.length) {
-                return this.product.images
+            const list = []
+            if (this.product.mainImageUrl) {
+                list.push(this.product.mainImageUrl)
             }
-            return [this.product.image]
+            if (
+                Array.isArray(this.product.galleryImageUrls) &&
+                this.product.galleryImageUrls.length
+            ) {
+                list.push(...this.product.galleryImageUrls)
+            }
+            // ถ้าไม่มีรูปเลย คืน array ว่าง แต่ layout ยังอยู่เพราะ v-for แค่ไม่ render ปุ่ม
+            return list
+        },
+        hasBrief() {
+            return Array.isArray(this.product.brief) && this.product.brief.length > 0
         },
     },
 }
@@ -144,6 +158,10 @@ export default {
 
 .product-brief p {
     margin-bottom: 0.25rem;
+}
+
+figure {
+    margin: auto;
 }
 
 /* mobile: main บน / thumbs ล่าง */

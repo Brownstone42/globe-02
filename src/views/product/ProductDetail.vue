@@ -26,8 +26,11 @@
                 </ul>
             </nav>
 
-            <!-- ถ้าไม่พบสินค้า -->
-            <div v-if="!product" class="mt-6 mb-6">ไม่พบสินค้า</div>
+            <!-- กำลังโหลด -->
+            <div v-if="productStore.loading" class="mt-6 mb-6">กำลังโหลดข้อมูลสินค้า...</div>
+
+            <!-- ถ้าไม่พบสินค้า (และไม่ได้กำลังโหลด) -->
+            <div v-else-if="!product" class="mt-6 mb-6">ไม่พบสินค้า</div>
 
             <!-- เจอสินค้า -->
             <div v-else class="mt-4">
@@ -56,6 +59,7 @@
 
 <script>
 import { useProductStore } from '@/stores/productStore'
+import { useCategoryStore } from '@/stores/categoryStore'
 import ProductMain from '@/components/product/ProductMain.vue'
 import ProductTabs from '@/components/product/ProductTabs.vue'
 import RelatedProducts from '@/components/product/RelatedProducts.vue'
@@ -87,33 +91,69 @@ export default {
         productStore() {
             return useProductStore()
         },
-
-        product() {
-            return this.productStore.productById(this.productId)
+        categoryStore() {
+            return useCategoryStore()
         },
 
+        // ดึง product จาก store ตาม productId
+        product() {
+            return this.productStore.products.find((item) => item.id === this.productId) || null
+        },
+
+        // หา label ของ category จาก categoryStore (อิง slug)
         categoryLabel() {
-            if (this.product) {
-                return this.productStore.categoryMap[this.product.category] || 'สินค้า'
+            const slug = this.product ? this.product.category : this.category
+
+            const categories = this.categoryStore.sortedCategories || []
+            const found = categories.find((cat) => cat.slug === slug)
+
+            return found ? found.name : 'สินค้า'
+        },
+
+        // รวม mainImage + gallery เข้ามาเป็น array เดียว ใช้กับ currentImage
+        imageList() {
+            if (!this.product) return []
+
+            const list = []
+            if (this.product.mainImageUrl) {
+                list.push(this.product.mainImageUrl)
             }
-            return this.productStore.categoryMap[this.category] || 'สินค้า'
+            if (
+                Array.isArray(this.product.galleryImageUrls) &&
+                this.product.galleryImageUrls.length
+            ) {
+                list.push(...this.product.galleryImageUrls)
+            }
+            return list
         },
 
         currentImage() {
-            if (!this.product) return ''
-            const imgs =
-                this.product.images && this.product.images.length
-                    ? this.product.images
-                    : [this.product.image]
-            return imgs[this.selectedImageIndex] || imgs[0]
+            if (!this.imageList.length) return ''
+            return this.imageList[this.selectedImageIndex] || this.imageList[0]
         },
 
+        // สินค้าในหมวดเดียวกัน (ไม่รวมตัวเอง)
         relatedProducts() {
-            return this.productStore.relatedProducts(this.product)
+            if (!this.product) return []
+            const sameCategory = this.productStore.productsByCategory(this.product.category) || []
+
+            return sameCategory.filter((item) => item.id !== this.product.id).slice(0, 4) // จะปรับจำนวนทีหลังก็ได้
         },
+    },
+    async mounted() {
+        // โหลด products ถ้ายังไม่มีใน store
+        if (!this.productStore.products.length) {
+            await this.productStore.fetchProducts()
+        }
+
+        // โหลด categories ถ้ายังไม่มี
+        if (!this.categoryStore.categories || !this.categoryStore.categories.length) {
+            await this.categoryStore.loadCategories()
+        }
     },
     watch: {
         productId() {
+            // เวลาเปลี่ยน product (เช่น จาก relatedProducts) ให้ reset state
             this.selectedImageIndex = 0
             this.activeTab = 'feature'
         },

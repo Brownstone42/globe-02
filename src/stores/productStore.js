@@ -1,121 +1,193 @@
+// src/stores/productStore.js
 import { defineStore } from 'pinia'
+import {
+    collection,
+    addDoc,
+    getDocs,
+    doc,
+    updateDoc,
+    deleteDoc,
+    serverTimestamp,
+} from 'firebase/firestore'
+import { db, app } from '@/firebase'
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage'
+
+const productsCol = collection(db, 'products')
+const storage = getStorage(app)
 
 export const useProductStore = defineStore('product', {
     state: () => ({
-        products: [
-            // ---- glove: ถุงมือใช้แล้วทิ้ง ----
-            {
-                id: 'latex-powder-free',
-                category: 'glove',
-                group: 'disposable',
-                name: 'Disposable Gloves',
-                shortDescription: 'ถุงมือใช้แล้วทิ้ง',
-                image: '/images/products/glove-01.png',
-                images: [
-                    '/images/products/glove-01.png',
-                    '/images/products/glove-01-side.png',
-                    '/images/products/glove-01-box.png',
-                ],
-                brief: [
-                    'ถุงมือยางไนไตร คุณภาพสูง สำหรับห้องคลีนรูม',
-                    'ปราศจากแป้ง เหมาะสำหรับงานที่ต้องการความสะอาด',
-                ],
-                brand: 'IDEAL / TBG',
-                packing: '100 pcs / Dispenser Box',
-            },
-            {
-                id: 'vinyl-disposable',
-                category: 'glove',
-                group: 'disposable',
-                name: 'Vinyl Disposable Gloves',
-                shortDescription: 'ถุงมือไวนิล ใช้แล้วทิ้ง',
-                image: '/images/products/glove-vinyl.png',
-                images: ['/images/products/glove-vinyl.png'],
-                brief: ['ถุงมือไวนิล สำหรับงานทั่วไปในห้องคลีนรูม'],
-                brand: 'IDEAL',
-                packing: '100 pcs / Dispenser Box',
-            },
-
-            // ---- glove: ถุงมือเฉพาะทาง ----
-            {
-                id: 'black-esd',
-                category: 'glove',
-                group: 'special',
-                name: 'Specialty Work',
-                shortDescription: 'ถุงมือพิเศษงาน ESD',
-                image: '/images/products/glove-black.png',
-                images: [
-                    '/images/products/glove-black.png',
-                    '/images/products/glove-black-close.png',
-                ],
-                brief: ['ถุงมือสำหรับงานป้องกันไฟฟ้าสถิต', 'เหมาะสำหรับงานอิเล็กทรอนิกส์'],
-                brand: 'IDEAL',
-                packing: '1 pair / pack',
-            },
-            {
-                id: 'cut-resistant',
-                category: 'glove',
-                group: 'special',
-                name: 'Cut Resistant Gloves',
-                shortDescription: 'ถุงมือกันบาด',
-                image: '/images/products/glove-cut.png',
-                images: ['/images/products/glove-cut.png'],
-                brief: ['ถุงมือกันบาด สำหรับงานประกอบชิ้นส่วนที่มีคม'],
-                brand: 'IDEAL',
-                packing: '1 pair / pack',
-            },
-
-            // ---- หมวดอื่น (ตัวอย่าง) ----
-            {
-                id: 'coverall-white',
-                category: 'coverall',
-                name: 'Coverall Protection',
-                shortDescription: 'ชุดป้องกันฝุ่นและสารเคมี',
-                image: '/images/products/coverall-white.png',
-                images: ['/images/products/coverall-white.png'],
-                brief: ['ชุดคลุมป้องกันแบบทั้งตัว สำหรับงานคลีนรูม'],
-                brand: 'IDEAL',
-                packing: '1 pc / pack',
-            },
-            {
-                id: 'footwear-white',
-                category: 'shoe',
-                name: 'Footwear Protection',
-                shortDescription: 'อุปกรณ์ป้องกันเท้า',
-                image: '/images/products/shoe-white.png',
-                images: ['/images/products/shoe-white.png'],
-                brief: ['รองเท้าสำหรับใช้ในห้องคลีนรูม'],
-                brand: 'IDEAL',
-                packing: '1 pair / box',
-            },
-        ],
-        categoryMap: {
-            all: 'สินค้าทั้งหมด',
-            glove: 'ถุงมือ',
-            coverall: 'ชุดคลุมป้องกัน',
-            mask: 'หน้ากากอนามัย',
-            esd: 'ผลิตภัณฑ์ ESD',
-            shoe: 'รองเท้า',
-        },
+        products: [],
+        loading: false,
+        error: null,
     }),
 
     getters: {
-        allProducts: (state) => state.products,
-
         productsByCategory: (state) => (category) => {
-            if (category === 'all') return state.products
-            return state.products.filter((p) => p.category === category)
+            if (!category || category === 'all') {
+                return state.products
+            }
+            return state.products.filter((item) => item.category === category)
+        },
+    },
+
+    actions: {
+        async fetchProducts() {
+            this.loading = true
+            this.error = null
+            try {
+                const snapshot = await getDocs(productsCol)
+                const items = []
+                snapshot.forEach((docSnap) => {
+                    const data = docSnap.data()
+                    items.push({
+                        id: docSnap.id,
+                        ...data,
+                    })
+                })
+                this.products = items
+            } catch (err) {
+                console.error('fetchProducts error:', err)
+                this.error = 'โหลดสินค้าล้มเหลว'
+            } finally {
+                this.loading = false
+            }
         },
 
-        productById: (state) => (id) => {
-            return state.products.find((p) => p.id === id) || null
+        async saveProduct(form) {
+            this.loading = true
+            this.error = null
+
+            try {
+                let mainImageUrl = null
+                const galleryImageUrls = []
+
+                // 1) upload main image
+                if (form.mainImageFile) {
+                    const file = form.mainImageFile
+                    const filePath = `products/main/${file.name}`
+                    const fileRef = storageRef(storage, filePath)
+
+                    const snapshot = await uploadBytes(fileRef, file)
+                    mainImageUrl = await getDownloadURL(snapshot.ref)
+                }
+
+                // 2) upload gallery images
+                if (form.galleryImageFiles && form.galleryImageFiles.length) {
+                    for (let i = 0; i < form.galleryImageFiles.length; i++) {
+                        const file = form.galleryImageFiles[i]
+                        const filePath = `products/gallery/${file.name}`
+                        const fileRef = storageRef(storage, filePath)
+
+                        const snapshot = await uploadBytes(fileRef, file)
+                        const url = await getDownloadURL(snapshot.ref)
+                        galleryImageUrls.push(url)
+                    }
+                }
+
+                // 3) save to Firestore
+                const productData = {
+                    name: form.name || '',
+                    description: form.description || '',
+                    brand: form.brand || '',
+                    sku: form.sku || '',
+                    standards: form.standards || [],
+                    packing: form.packing || '',
+                    mainImageUrl: mainImageUrl,
+                    galleryImageUrls: galleryImageUrls,
+                    category: form.category || '',
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp(),
+                }
+
+                const docRef = await addDoc(productsCol, productData)
+
+                this.products.push({
+                    id: docRef.id,
+                    ...productData,
+                })
+            } catch (err) {
+                console.error('saveProduct error:', err)
+                this.error = 'บันทึกสินค้าล้มเหลว'
+            } finally {
+                this.loading = false
+            }
         },
 
-        relatedProducts: (state) => (product) => {
-            if (!product) return []
-            return state.products
-                .filter((p) => p.category === product.category && p.id !== product.id)
-                .slice(0, 4)
+        async updateProduct(id, form) {
+            this.loading = true
+            this.error = null
+
+            try {
+                const existing = this.products.find((item) => item.id === id) || {}
+
+                // เอาค่าเดิมเป็น base
+                let mainImageUrl = existing.mainImageUrl || null
+                let galleryImageUrls = Array.isArray(existing.galleryImageUrls)
+                    ? [...existing.galleryImageUrls]
+                    : []
+
+                // ถ้ามีการเลือก mainImage ใหม่ → อัปใหม่ทับ
+                if (form.mainImageFile) {
+                    const file = form.mainImageFile
+                    const filePath = `products/main/${file.name}`
+                    const fileRef = storageRef(storage, filePath)
+
+                    const snapshot = await uploadBytes(fileRef, file)
+                    mainImageUrl = await getDownloadURL(snapshot.ref)
+                }
+
+                // ถ้ามีการเลือก gallery ใหม่ (อย่างน้อย 1 รูป) → ลิสต์ใหม่ทั้งชุด
+                if (form.galleryImageFiles && form.galleryImageFiles.length) {
+                    galleryImageUrls = []
+
+                    for (let i = 0; i < form.galleryImageFiles.length; i++) {
+                        const file = form.galleryImageFiles[i]
+                        const filePath = `products/gallery/${file.name}`
+                        const fileRef = storageRef(storage, filePath)
+
+                        const snapshot = await uploadBytes(fileRef, file)
+                        const url = await getDownloadURL(snapshot.ref)
+                        galleryImageUrls.push(url)
+                    }
+                }
+
+                const updateData = {
+                    name: form.name || '',
+                    description: form.description || '',
+                    brand: form.brand || '',
+                    sku: form.sku || '',
+                    standards: form.standards || [],
+                    packing: form.packing || '',
+                    category: form.category || '',
+                    mainImageUrl,
+                    galleryImageUrls,
+                    updatedAt: serverTimestamp(),
+                }
+
+                const docRef = doc(db, 'products', id)
+                await updateDoc(docRef, updateData)
+
+                // อัปเดตใน state
+                this.products = this.products.map((item) =>
+                    item.id === id ? { ...item, ...updateData } : item,
+                )
+            } catch (err) {
+                console.error('updateProduct error:', err)
+                this.error = 'อัปเดตสินค้าล้มเหลว'
+            } finally {
+                this.loading = false
+            }
+        },
+
+        async deleteProduct(id) {
+            try {
+                const docRef = doc(db, 'products', id)
+                await deleteDoc(docRef)
+                this.products = this.products.filter((item) => item.id !== id)
+            } catch (err) {
+                console.error('deleteProduct error:', err)
+            }
         },
     },
 })

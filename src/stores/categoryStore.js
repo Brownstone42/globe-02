@@ -1,3 +1,4 @@
+// src/stores/categoryStore.js
 import { defineStore } from 'pinia'
 import {
     collection,
@@ -10,7 +11,8 @@ import {
     orderBy,
     serverTimestamp,
 } from 'firebase/firestore'
-import { db } from '@/firebase'
+import { db, app } from '@/firebase'
+import { getStorage, ref as storageRef, getDownloadURL } from 'firebase/storage'
 
 export const useCategoryStore = defineStore('category', {
     state: () => ({
@@ -20,9 +22,13 @@ export const useCategoryStore = defineStore('category', {
     }),
 
     getters: {
-        // ถ้าอยากได้ category เรียงตาม order อยู่แล้ว
+        // ใช้ใน admin (เหมือนเดิม)
         sortedCategories(state) {
             return [...state.categories].sort((a, b) => (a.order || 0) - (b.order || 0))
+        },
+        // ใช้ในหน้า Home (โชว์เฉพาะที่ visibility = true)
+        visibleCategories(state) {
+            return state.categories.filter((c) => c.visibility !== false)
         },
     },
 
@@ -35,10 +41,31 @@ export const useCategoryStore = defineStore('category', {
                 const q = query(collection(db, 'categories'), orderBy('order', 'asc'))
                 const snap = await getDocs(q)
 
-                this.categories = snap.docs.map((d) => ({
-                    id: d.id,
-                    ...d.data(),
-                }))
+                const storage = getStorage(app)
+                const result = []
+
+                for (const d of snap.docs) {
+                    const data = d.data()
+
+                    const item = {
+                        id: d.id,
+                        ...data,
+                        imageUrl: '', // เพิ่ม field ใช้กับหน้า Home
+                    }
+
+                    // ถ้ามี path รูปใน Storage → ดึง URL มาเก็บใน imageUrl
+                    if (item.image) {
+                        try {
+                            item.imageUrl = await getDownloadURL(storageRef(storage, item.image))
+                        } catch (e) {
+                            console.warn('getDownloadURL error for category image:', item.image, e)
+                        }
+                    }
+
+                    result.push(item)
+                }
+
+                this.categories = result
             } catch (err) {
                 console.error('loadCategories error:', err)
                 this.error = err.message || 'Failed to load categories'
@@ -61,10 +88,11 @@ export const useCategoryStore = defineStore('category', {
                     updatedAt: serverTimestamp(),
                 })
 
-                // เพิ่มเข้า state ให้ด้วย จะได้ไม่ต้อง reload
+                // push เข้าสตอร์แบบเดิม + imageUrl ว่างไปก่อน
                 this.categories.push({
                     id: ref.id,
                     ...payload,
+                    imageUrl: '',
                 })
             } catch (err) {
                 console.error('createCategory error:', err)
@@ -85,12 +113,13 @@ export const useCategoryStore = defineStore('category', {
                     updatedAt: serverTimestamp(),
                 })
 
-                // อัปเดตใน state
+                // อัปเดตใน state (ยังไม่ยุ่ง imageUrl – ให้ reload ตอนหน้าอื่นเรียก loadCategories)
                 const idx = this.categories.findIndex((c) => c.id === id)
                 if (idx !== -1) {
                     this.categories[idx] = {
                         id,
                         ...payload,
+                        imageUrl: this.categories[idx].imageUrl || '',
                     }
                 }
             } catch (err) {
@@ -118,7 +147,6 @@ export const useCategoryStore = defineStore('category', {
             }
         },
         async deleteCategory(id) {
-            // ถ้าคุณไม่อยากลบจริง ๆ อาจไม่ใช้ method นี้ก็ได้ ใช้แค่ visibility แทน
             try {
                 const ref = doc(db, 'categories', id)
                 await deleteDoc(ref)

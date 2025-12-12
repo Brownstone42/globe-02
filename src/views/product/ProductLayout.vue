@@ -1,14 +1,5 @@
 <template>
     <section class="product-page">
-        <!-- Hero / Banner 
-        <div class="hero">
-            <div class="hero-image"></div>
-            <div class="hero-text">
-                <h1>ถุงมือใช้แล้วทิ้ง ลาเท็กซ์ ไร้แป้ง</h1>
-                <p>สินค้าพร้อมส่ง ไม่ต้องรอ จำนวนจำกัด</p>
-            </div>
-        </div> -->
-
         <div class="container is-max-desktop product-body">
             <div class="columns mt-6">
                 <!-- Sidebar Category -->
@@ -28,40 +19,21 @@
                         </RouterLink>
                     </div>
 
+                    <!-- หมวดหมู่จาก Firebase (ผ่าน Pinia) -->
                     <ul class="category-list mt-4">
-                        <li v-for="cat in categories" :key="cat.slug">
-                            <!-- เมนูหลัก -->
+                        <li v-for="cat in sortedCategories" :key="cat.slug">
                             <RouterLink
-                                :to="{ name: 'product-category', params: { category: cat.slug } }"
+                                :to="{
+                                    name: 'product-category',
+                                    params: { category: cat.slug },
+                                }"
                                 :class="[
                                     'category-link',
                                     { 'is-active': cat.slug === $route.params.category },
                                 ]"
                             >
-                                {{ cat.label }}
+                                {{ cat.name }}
                             </RouterLink>
-
-                            <!-- เมนูย่อย (เฉพาะหมวดที่มี children เช่น ถุงมือ) -->
-                            <ul
-                                v-if="cat.children && cat.slug === $route.params.category"
-                                class="subcategory-list"
-                            >
-                                <li v-for="sub in cat.children" :key="sub.key">
-                                    <RouterLink
-                                        :to="{
-                                            name: 'product-category',
-                                            params: { category: cat.slug },
-                                            query: { sub: sub.key }, // ส่ง query ไปกรอง
-                                        }"
-                                        :class="[
-                                            'subcategory-link',
-                                            { 'is-active': sub.key === $route.query.sub },
-                                        ]"
-                                    >
-                                        {{ sub.label }}
-                                    </RouterLink>
-                                </li>
-                            </ul>
                         </li>
                     </ul>
                 </div>
@@ -76,24 +48,27 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia'
+import { useCategoryStore } from '@/stores/categoryStore'
+
 export default {
     name: 'ProductLayout',
-    data() {
-        return {
-            categories: [
-                {
-                    slug: 'glove',
-                    label: 'ถุงมือ',
-                    children: [
-                        { key: 'disposable', label: 'ถุงมือใช้แล้วทิ้ง' },
-                        { key: 'special', label: 'ถุงมือเฉพาะทาง' },
-                    ],
-                },
-                { slug: 'coverall', label: 'ชุดคลุมป้องกัน' },
-                { slug: 'mask', label: 'หน้ากากอนามัย' },
-                { slug: 'esd', label: 'ผลิตภัณฑ์ ESD' },
-                // เพิ่มได้ตามจริง
-            ],
+
+    computed: {
+        // จะได้ this.categoryStore
+        ...mapStores(useCategoryStore),
+
+        // ใช้ category จาก Pinia แทน data แบบเดิม
+        sortedCategories() {
+            // ถ้าใน store มี getter ที่ชื่อ sortedCategories ก็ใช้เลย
+            // ถ้าไม่มี จะเปลี่ยนเป็น this.categoryStore.categories แทน
+            return this.categoryStore.sortedCategories
+        },
+    },
+
+    created() {
+        if (!this.categoryStore.categories?.length && !this.categoryStore.loading) {
+            this.categoryStore.loadCategories()
         }
     },
 }
