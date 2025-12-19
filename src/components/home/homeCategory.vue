@@ -22,7 +22,7 @@
                 </div>
                 <div class="column-content2 mt-5" @click="goToCategory(item)">
                     <span class="ml-2 content-topic3">ดูสินค้าทั้งหมด</span>
-                    <img class="mr-2" src="/images/example/button.png" alt="" />
+                    <img class="mr-2 go-button" src="/images/example/button.png" alt="" />
                 </div>
             </div>
         </div>
@@ -122,7 +122,7 @@ export default {
     color: #a4a4a4;
 }
 .content-topic3 {
-    color: #3ca9ac;
+    color: #205266;
 }
 .column-content {
     display: flex;
@@ -139,7 +139,7 @@ export default {
 }
 .column-content2 span {
     font-size: 11pt;
-    color: #115511;
+    color: #205266;
 }
 .column-content2 img {
     width: 35px;
@@ -240,6 +240,21 @@ export default {
     }
     .arrow.right {
         right: -8%;
+    }
+}
+
+@media (max-width: 1040px) {
+    .content-topic1 {
+        font-size: 12px;
+    }
+    .content-topic2 {
+        font-size: 10px;
+    }
+    .content-topic3 {
+        font-size: 12px !important;
+    }
+    .go-button {
+        width: 20% !important;
     }
 }
 </style>

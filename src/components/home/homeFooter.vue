@@ -48,8 +48,9 @@
                     <div class="left">
                         <span>ฝ่ายขาย</span>
                     </div>
-                    <div class="right">
+                    <div class="right call-center">
                         <span>: 091-010-8349</span>
+                        <span>: 097-294-7975</span>
                     </div>
                 </div>
                 <div class="menu-topic mt-2">
@@ -233,6 +234,10 @@ i {
 }
 .column.product {
     padding-left: 50px;
+}
+.call-center {
+    flex-direction: column;
+    align-items: flex-start !important;
 }
 @media (max-width: 768px) {
     .column.product {

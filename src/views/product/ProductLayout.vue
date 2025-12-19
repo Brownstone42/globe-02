@@ -103,4 +103,9 @@ li {
 .subcategory-list > li > a {
     color: #3ca9ac;
 }
+@media (max-width: 768px) {
+    .sidebar {
+        padding-left: 50px;
+    }
+}
 </style>

@@ -85,7 +85,7 @@ export default {
 /* ——— text parts (เหมือนเดิม) ——— */
 .content-topic1 {
     font-size: 14pt;
-    color: #115511;
+    color: #205266;
     font-weight: bold;
 }
 .content-topic2 {
@@ -107,7 +107,7 @@ export default {
 }
 .column-content2 span {
     font-size: 11pt;
-    color: #115511;
+    color: #205266;
 }
 .column-content2 img {
     width: 35px;

@@ -8,8 +8,17 @@
             </div>
         </div>
 
+        <!-- Pagination (mock) -->
+        <nav class="pagination is-centered" role="navigation">
+            <button class="pagination-previous" :disabled="page === 1" @click="page--">‹</button>
+
+            <button class="pagination-next" :disabled="end >= baseProducts.length" @click="page++">
+                ›
+            </button>
+        </nav>
+
         <!-- Product grid -->
-        <div class="columns is-multiline mt-4">
+        <div class="columns is-multiline mt-4 mb-8">
             <div v-for="product in pagedProducts" :key="product.id" class="column is-4">
                 <div class="product-card">
                     <RouterLink
@@ -30,14 +39,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Pagination (mock) -->
-        <nav class="pagination is-centered" role="navigation">
-            <a class="pagination-previous" :disabled="page === 1" @click="page--"> ‹ </a>
-            <a class="pagination-next" :disabled="end >= baseProducts.length" @click="page++">
-                ›
-            </a>
-        </nav>
     </div>
 </template>
 
@@ -121,5 +122,25 @@ export default {
     padding: 10px;
     border-radius: 10px;
     border-bottom-right-radius: 40px;
+}
+.product-info {
+    display: flex;
+    flex-direction: column;
+    height: 120px;
+}
+.product-info span {
+    margin-top: auto;
+}
+.mb-8 {
+    margin-bottom: 5rem !important;
+}
+@media (max-width: 768px) {
+    .product-card {
+        width: 80%;
+        margin: auto;
+    }
+    .category-header {
+        text-align: center;
+    }
 }
 </style>

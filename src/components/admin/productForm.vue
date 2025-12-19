@@ -133,7 +133,7 @@ export default {
                 galleryImageFiles: [],
                 category: '',
             },
-            availableStandards: ['ISO 9001', 'ISO 14001', 'CE', 'RoHS'],
+            availableStandards: ['EN388:2016 3131X', 'ISO 9001', 'ISO 13485'],
             tempStandard: '',
             standardError: '',
             mainImagePreview: null,

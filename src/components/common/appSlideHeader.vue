@@ -15,15 +15,15 @@
                 <div class="is-flex is-align-items-center sub-header-group">
                     <label class="sub-header-label">
                         <!--<i class="fas fa-mobile-alt sub-header-icon"></i>-->
-                        Sales : 089-999-9999
+                        Sales : 091-010-8349, 097-294-7975
                     </label>
                     <label class="sub-header-label">
                         <!--<i class="fas fa-phone sub-header-icon"></i>-->
-                        Office : 02-222-2222
+                        Office : 02-860-1525
                     </label>
                     <label class="sub-header-label">
                         <!--<i class="fas fa-envelope sub-header-icon"></i>-->
-                        admin@idealglobe.com
+                        Email : admin@idealglobe.com
                     </label>
                 </div>
                 <div class="is-flex is-align-items-center sub-header-group sub-header-right-group">
@@ -36,10 +36,11 @@
             <div v-if="isMobile" class="scrolling-content">
                 <div class="is-flex is-align-items-center sub-header-group">
                     <label class="sub-header-label">
-                        <i class="fas fa-mobile-alt sub-header-icon"></i> Sales : 089-999-9999
+                        <i class="fas fa-mobile-alt sub-header-icon"></i> Sales : 091-010-8349,
+                        097-294-7975
                     </label>
                     <label class="sub-header-label">
-                        <i class="fas fa-phone sub-header-icon"></i> Office : 02-222-2222
+                        <i class="fas fa-phone sub-header-icon"></i> Office : 02-860-1525
                     </label>
                     <label class="sub-header-label">
                         <i class="fas fa-envelope sub-header-icon"></i> admin@idealglobe.com
@@ -54,10 +55,11 @@
 
                 <div class="is-flex is-align-items-center sub-header-group">
                     <label class="sub-header-label">
-                        <i class="fas fa-mobile-alt sub-header-icon"></i> Sales : 089-999-9999
+                        <i class="fas fa-mobile-alt sub-header-icon"></i> Sales : 091-010-8349,
+                        097-294-7975
                     </label>
                     <label class="sub-header-label">
-                        <i class="fas fa-phone sub-header-icon"></i> Office : 02-222-2222
+                        <i class="fas fa-phone sub-header-icon"></i> Office : 02-860-1525
                     </label>
                     <label class="sub-header-label">
                         <i class="fas fa-envelope sub-header-icon"></i> admin@idealglobe.com
