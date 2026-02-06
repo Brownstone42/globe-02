@@ -7,19 +7,21 @@
             <source
                 type="image/webp"
                 srcset="
-                    /images/banner4.png  640w,
-                    /images/banner4.png  960w,
-                    /images/banner4.png 1280w
+                    /images/banner5.png  500w,
+                    /images/banner5.png  640w,
+                    /images/banner5.png  960w,
+                    /images/banner5.png 1280w
                 "
                 sizes="100vw"
             />
             <img
                 class="hero-img"
-                src="/images/banner4.png"
+                src="/images/banner5.png"
                 srcset="
-                    /images/banner4.png  640w,
-                    /images/banner4.png  960w,
-                    /images/banner4.png 1280w
+                    /images/banner5.png  500w,
+                    /images/banner5.png  640w,
+                    /images/banner5.png  960w,
+                    /images/banner5.png 1280w
                 "
                 sizes="100vw"
                 alt=""
