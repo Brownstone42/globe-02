@@ -113,8 +113,8 @@
             </div>
         </div>
     </section>
-    <div class="credit">
-        <span>© 2025 idealglobe.co.th. All Rights Reserved.</span>
+    <div class="credit pb-2">
+        <span>© 2026 idealglobe.com All Rights Reserved.</span>
     </div>
 </template>
 
