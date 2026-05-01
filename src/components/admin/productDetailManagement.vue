@@ -1,31 +1,68 @@
-<!-- src/components/admin/productManagement.vue -->
 <template>
     <div class="product-management">
         <div class="pm-layout">
-            <!-- FORM -->
+            <!-- FORM (Left Column) -->
             <div class="pm-column">
                 <div class="pm-form-header">
                     <h2 class="pm-section-title">
-                        {{ currentProductId ? 'Edit Product' : 'Create Product' }}
+                        {{ editingProduct ? 'Editing: ' + editingProduct.name : 'Select a Product' }}
                     </h2>
-                    <button
-                        v-if="currentProductId"
-                        type="button"
-                        class="btn-secondary small"
-                        @click="startCreate"
-                    >
-                        + สร้างสินค้าใหม่
-                    </button>
                 </div>
                 <section class="pm-form">
-                    <product-form
-                        :editing-product="editingProduct"
-                        @saved="handleSaved"
-                    ></product-form>
+                    <div v-if="!editingProduct" class="form-placeholder">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                        <p>เลือกสินค้าจากรายการด้านขวาเพื่อเริ่มกรอกรายละเอียด</p>
+                    </div>
+
+                    <form v-else @submit.prevent="handleSaveDetail" class="detail-edit-form">
+                        <div class="form-group">
+                            <label for="details">1. รายละเอียดสินค้า (Detail)</label>
+                            <textarea
+                                id="details"
+                                v-model="form.details"
+                                rows="4"
+                                placeholder="รายละเอียดข้อมูลทั่วไปของสินค้า..."
+                                class="form-textarea"
+                            ></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="spec">2. คุณสมบัติทางเทคนิค (Spec)</label>
+                            <textarea
+                                id="spec"
+                                v-model="form.spec"
+                                rows="4"
+                                placeholder="ข้อมูลคุณสมบัติทางเทคนิค (Specification)..."
+                                class="form-textarea"
+                            ></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="usecase">3. การใช้งาน (Usecase)</label>
+                            <textarea
+                                id="usecase"
+                                v-model="form.usecase"
+                                rows="4"
+                                placeholder="ตัวอย่างการนำไปใช้งานหรือกรณีศึกษา..."
+                                class="form-textarea"
+                            ></textarea>
+                        </div>
+
+                        <div class="form-actions-sticky">
+                            <button
+                                type="submit"
+                                class="btn-primary-large"
+                                :disabled="productStore.loading"
+                            >
+                                <span v-if="productStore.loading">บันทึกข้อมูล...</span>
+                                <span v-else>บันทึกรายละเอียดทั้งหมด</span>
+                            </button>
+                        </div>
+                    </form>
                 </section>
             </div>
 
-            <!-- LIST -->
+            <!-- LIST (Right Column) -->
             <div class="pm-column">
                 <div class="pm-list-header">
                     <h2 class="pm-section-title">Product List</h2>
@@ -53,11 +90,15 @@
                                     <th>Image</th>
                                     <th>Name</th>
                                     <th>Category</th>
-                                    <th style="width: 120px">Actions</th>
+                                    <th style="width: 80px">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="product in filteredProducts" :key="product.id">
+                                <tr
+                                    v-for="product in filteredProducts"
+                                    :key="product.id"
+                                    :class="{ 'row-active': currentProductId === product.id }"
+                                >
                                     <td class="col-image">
                                         <img
                                             v-if="product.mainImageUrl"
@@ -74,14 +115,7 @@
                                             class="btn-ghost"
                                             @click="startEdit(product)"
                                         >
-                                            แก้ไข
-                                        </button>
-                                        <button
-                                            type="button"
-                                            class="btn-danger"
-                                            @click="deleteProduct(product)"
-                                        >
-                                            ลบ
+                                            จัดการ
                                         </button>
                                     </td>
                                 </tr>
@@ -99,19 +133,20 @@
 </template>
 
 <script>
-import ProductForm from './productForm.vue'
 import { useProductStore } from '@/stores/productStore'
 import { useCategoryStore } from '@/stores/categoryStore'
 
 export default {
-    name: 'ProductManagement',
-    components: {
-        ProductForm,
-    },
+    name: 'ProductDetailManagement',
     data() {
         return {
-            currentProductId: null, // null = create mode, not null = edit mode
-            filterCategory: '', // หมวดหมู่ที่เลือกกรอง
+            currentProductId: null,
+            filterCategory: '',
+            form: {
+                details: '',
+                spec: '',
+                usecase: '',
+            },
         }
     },
     computed: {
@@ -139,39 +174,44 @@ export default {
         },
         editingProduct() {
             if (!this.currentProductId) return null
-            return this.products.find((item) => item.id === this.currentProductId) || null
+            return this.products.find((p) => p.id === this.currentProductId)
         },
     },
     async mounted() {
-        // โหลดสินค้าครั้งแรก
         await this.productStore.fetchProducts()
-        // โหลดหมวดหมู่
         if (!this.categoryStore.categories || !this.categoryStore.categories.length) {
             await this.categoryStore.loadCategories()
         }
     },
     methods: {
-        startCreate() {
-            this.currentProductId = null
-        },
         startEdit(product) {
             this.currentProductId = product.id
+            // Load existing data into form
+            this.form.details = product.details || ''
+            this.form.spec = product.spec || ''
+            this.form.usecase = product.usecase || ''
         },
-        async deleteProduct(product) {
-            const ok = window.confirm(`ต้องการลบสินค้า "${product.name}" ใช่หรือไม่?`)
-            if (!ok) return
+        async handleSaveDetail() {
+            if (!this.currentProductId) return
 
-            await this.productStore.deleteProduct(product.id)
+            try {
+                // We use updateProduct which already handles these fields now
+                await this.productStore.updateProduct(this.currentProductId, {
+                    ...this.editingProduct, // Keep existing fields
+                    details: this.form.details,
+                    spec: this.form.spec,
+                    usecase: this.form.usecase,
+                })
 
-            if (this.currentProductId === product.id) {
-                this.currentProductId = null
+                if (!this.productStore.error) {
+                    alert('บันทึกรายละเอียดสินค้าเรียบร้อยแล้ว')
+                } else {
+                    alert('เกิดข้อผิดพลาด: ' + this.productStore.error)
+                }
+            } catch (err) {
+                console.error(err)
+                alert('เกิดข้อผิดพลาดในการบันทึก')
             }
-        },
-        handleSaved() {
-            // หลัง save หรือ update เสร็จ → กลับสู่ create mode
-            this.currentProductId = null
-            // ถ้าอยากแน่นอนก็ reload อีกรอบได้ (แต่ไม่จำเป็นเพราะ state update ใน store แล้ว)
-            // this.productStore.fetchProducts()
         },
     },
 }
@@ -186,17 +226,10 @@ export default {
     overflow: hidden;
 }
 
-.pm-title {
-    font-size: 1.4rem;
-    font-weight: 600;
-    margin-bottom: 8px;
-    flex-shrink: 0;
-}
-
 .pm-layout {
     display: grid;
-    grid-template-columns: 1.1fr 1fr;
-    gap: 32px; /* กว้างขึ้นนิดหน่อยให้ดูโปร่ง */
+    grid-template-columns: 1.1fr 1.1fr; /* Equal or slight variation */
+    gap: 32px;
     align-items: stretch;
     flex: 1;
     min-height: 0;
@@ -221,7 +254,7 @@ export default {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px;
-    height: 40px; /* ยึดความสูงให้เท่ากับฝั่งซ้าย */
+    height: 40px;
 }
 
 .pm-filter {
@@ -239,11 +272,6 @@ export default {
     color: #475569;
     outline: none;
     cursor: pointer;
-    transition: border-color 0.2s;
-}
-
-.filter-select:focus {
-    border-color: #3b82f6;
 }
 
 .pm-form,
@@ -258,6 +286,79 @@ export default {
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    position: relative;
+}
+
+.detail-edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-textarea {
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #1e293b;
+    background: #f8fafc;
+    resize: vertical;
+    transition: all 0.2s;
+}
+
+.form-textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.form-actions-sticky {
+    position: sticky;
+    bottom: -24px; /* Align with padding */
+    left: -24px;
+    right: -24px;
+    background: white;
+    padding: 16px 0;
+    border-top: 1px solid #f1f5f9;
+    margin-top: 12px;
+    z-index: 5;
+}
+
+.btn-primary-large {
+    width: 100%;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+}
+
+.btn-primary-large:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+}
+
+.btn-primary-large:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.row-active {
+    background-color: #f0f9ff !important;
+}
+
+.row-active td {
+    border-bottom-color: #bae6fd !important;
 }
 
 .pm-list {
@@ -270,28 +371,26 @@ export default {
     width: 6px;
 }
 
-.pm-form::-webkit-scrollbar-track,
-.pm-list::-webkit-scrollbar-track {
-    background: transparent;
-}
-
 .pm-form::-webkit-scrollbar-thumb,
 .pm-list::-webkit-scrollbar-thumb {
     background: #e2e8f0;
     border-radius: 10px;
 }
 
-.pm-form::-webkit-scrollbar-thumb:hover,
-.pm-list::-webkit-scrollbar-thumb:hover {
-    background: #cbd5e1;
+.form-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #94a3b8;
+    text-align: center;
+    gap: 16px;
 }
 
-.pm-form-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-    flex-shrink: 0;
+.form-placeholder i {
+    font-size: 3rem;
+    opacity: 0.3;
 }
 
 .pm-list-placeholder {
@@ -303,12 +402,11 @@ export default {
 
 .pm-table-wrapper {
     flex: 1;
-    overflow-y: visible; /* We use the parent (pm-list) for scrolling */
 }
 
 .pm-table {
     width: 100%;
-    border-collapse: separate; /* Required for sticky border to look good */
+    border-collapse: separate;
     border-spacing: 0;
     font-size: 0.9rem;
 }
@@ -318,7 +416,6 @@ export default {
     padding: 12px 10px;
     border-bottom: 1px solid #f1f5f9;
     text-align: left;
-    vertical-align: middle;
 }
 
 .pm-table th {
@@ -328,20 +425,20 @@ export default {
     position: sticky;
     top: 0;
     z-index: 10;
-    box-shadow: 0 1px 0 #e2e8f0; /* เส้นแบ่งใต้หัวตารางเวลาเลื่อน */
+    box-shadow: 0 1px 0 #e2e8f0;
 }
 
 .col-image img {
-    width: 56px;
-    height: 56px;
+    width: 50px;
+    height: 50px;
     object-fit: cover;
     border-radius: 8px;
     border: 1px solid #e2e8f0;
 }
 
 .image-placeholder {
-    width: 56px;
-    height: 56px;
+    width: 50px;
+    height: 50px;
     border-radius: 8px;
     border: 1px dashed #cbd5e1;
     display: flex;
@@ -349,7 +446,6 @@ export default {
     justify-content: center;
     font-size: 0.7rem;
     color: #94a3b8;
-    background: #f8fafc;
 }
 
 .btn-ghost {
@@ -358,40 +454,15 @@ export default {
     border: 1px solid #e2e8f0;
     background: white;
     font-size: 0.85rem;
-    color: #475569;
+    color: #2563eb;
+    font-weight: 600;
     cursor: pointer;
-    margin-right: 6px;
     transition: all 0.2s;
 }
 
 .btn-ghost:hover {
-    background: #f1f5f9;
-    color: #1e293b;
-    border-color: #cbd5e1;
-}
-
-.btn-danger {
-    padding: 6px 12px;
-    border-radius: 6px;
-    border: none;
-    background: #fee2e2;
-    color: #dc2626;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn-danger:hover {
-    background: #fecaca;
-    color: #b91c1c;
-}
-
-.btn-secondary.small {
-    padding: 6px 12px;
-    font-size: 0.85rem;
-    border-radius: 6px;
-    background: #f1f5f9;
-    border: 1px solid #e2e8f0;
+    background: #eff6ff;
+    border-color: #3b82f6;
 }
 
 .error-text {
