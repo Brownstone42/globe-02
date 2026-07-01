@@ -2,7 +2,7 @@
     <div class="header">
         <div class="row">
             <img
-                src="/images/logo2.png"
+                src="/images/logo4.png"
                 alt="Company Logo"
                 class="header-logo"
                 @click="navigate('/')"
@@ -12,7 +12,7 @@
             <nav class="nav-menu desktop-menu">
                 <a href="#" class="nav-item">ABOUT US</a>
                 <a href="#" class="nav-item" @click="navigate('/product')">PRODUCT</a>
-                <a href="#" class="nav-item">BLOGS</a>
+                <a href="#" class="nav-item" @click.prevent="navigate('/blogs')">BLOGS</a>
                 <a href="#" class="nav-item">CONTACT US</a>
             </nav>
 
@@ -28,7 +28,7 @@
         <nav class="mobile-menu" v-if="isOpen">
             <a href="#" class="mobile-item">ABOUT US</a>
             <a href="#" class="mobile-item" @click="navigate('/product')">PRODUCT</a>
-            <a href="#" class="mobile-item">BLOGS</a>
+            <a href="#" class="mobile-item" @click.prevent="navigate('/blogs')">BLOGS</a>
             <a href="#" class="mobile-item">CONTACT US</a>
         </nav>
     </div>

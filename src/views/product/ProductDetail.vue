@@ -44,7 +44,7 @@
                 />
 
                 <!-- 2. แท็บรายละเอียด -->
-                <ProductTabs class="mt-6" v-model:activeTab="activeTab" />
+                <ProductTabs class="mt-0" v-model:activeTab="activeTab" :product="product" />
 
                 <!-- 3. สินค้าในหมวดเดียวกัน -->
                 <RelatedProducts
@@ -84,7 +84,7 @@ export default {
     data() {
         return {
             selectedImageIndex: 0,
-            activeTab: 'feature', // default = คุณสมบัติ
+            activeTab: 'highlights',
         }
     },
     computed: {
@@ -155,7 +155,7 @@ export default {
         productId() {
             // เวลาเปลี่ยน product (เช่น จาก relatedProducts) ให้ reset state
             this.selectedImageIndex = 0
-            this.activeTab = 'feature'
+            this.activeTab = 'highlights'
         },
     },
 }

@@ -2,28 +2,33 @@
     <div class="product-tabs">
         <div class="tabs is-toggle is-small">
             <ul class="product-ul">
-                <li :class="{ 'is-active': internalActive === 'detail' }">
-                    <a @click.prevent="updateTab('detail')">รายละเอียด</a>
+                <li :class="{ 'is-active': internalActive === 'highlights' }">
+                    <a @click.prevent="updateTab('highlights')">ข้อมูลทางเทคนิค</a>
                 </li>
-                <li :class="{ 'is-active': internalActive === 'feature' }">
-                    <a @click.prevent="updateTab('feature')">คุณสมบัติ</a>
+                <li :class="{ 'is-active': internalActive === 'industry' }">
+                    <a @click.prevent="updateTab('industry')">เหมาะสำหรับอุตสาหกรรม</a>
                 </li>
-                <li :class="{ 'is-active': internalActive === 'usage' }">
-                    <a @click.prevent="updateTab('usage')">ประเภทการใช้งาน</a>
+                <li :class="{ 'is-active': internalActive === 'usecase' }">
+                    <a @click.prevent="updateTab('usecase')">การใช้งานแนะนำ</a>
+                </li>
+                <li :class="{ 'is-active': internalActive === 'protection' }">
+                    <a @click.prevent="updateTab('protection')">คุณสมบัติการป้องกัน</a>
                 </li>
             </ul>
         </div>
 
-        <div class="box">
-            <!-- ตอนนี้ยังเป็น placeholder ตามที่บอก -->
-            <div v-if="internalActive === 'detail'">
-                <p>เนื้อหารายละเอียดสินค้า (รายละเอียด) — ยังไม่ต้องใส่จริงตอนนี้</p>
+        <div class="box tab-content">
+            <div v-if="internalActive === 'highlights'">
+                <p class="content-text">{{ product.spec || '-' }}</p>
             </div>
-            <div v-else-if="internalActive === 'feature'">
-                <p>เนื้อหาคุณสมบัติของสินค้า — default แท็บนี้</p>
+            <div v-else-if="internalActive === 'industry'">
+                <p class="content-text">{{ product.suitableIndustries || '-' }}</p>
             </div>
-            <div v-else-if="internalActive === 'usage'">
-                <p>เนื้อหาเกี่ยวกับประเภทการใช้งาน — ยังไม่ต้องใส่รายละเอียดตอนนี้</p>
+            <div v-else-if="internalActive === 'usecase'">
+                <p class="content-text">{{ product.usecase || '-' }}</p>
+            </div>
+            <div v-else-if="internalActive === 'protection'">
+                <p class="content-text">{{ product.protectionProperties || '-' }}</p>
             </div>
         </div>
     </div>
@@ -35,13 +40,17 @@ export default {
     props: {
         activeTab: {
             type: String,
-            default: 'feature',
+            default: 'highlights',
+        },
+        product: {
+            type: Object,
+            required: true,
         },
     },
     emits: ['update:activeTab'],
     computed: {
         internalActive() {
-            return this.activeTab || 'feature'
+            return this.activeTab || 'highlights'
         },
     },
     methods: {
@@ -59,5 +68,11 @@ export default {
 }
 .product-ul {
     justify-content: center;
+}
+.tab-content {
+    min-height: 80px;
+}
+.content-text {
+    white-space: pre-wrap;
 }
 </style>

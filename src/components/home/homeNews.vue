@@ -5,14 +5,18 @@
         <button class="arrow left" :disabled="!canLeft" @click="go(-1)">‹</button>
 
         <div ref="scroller" class="columns scroller mt-4" @scroll.passive="updateCanScroll">
-            <div class="column" v-for="(item, i) in items" :key="i" ref="cards">
-                <img src="/images/example/news01.png" alt="" />
-                <div class="column-content">
-                    <span class="content-topic1 ml-2">Disposable Gloves</span>
-                    <span class="content-topic2 ml-2">ถุงมือใช้แล้วทิ้ง</span>
+            <div class="column" v-for="(item, i) in items" :key="item.id || i" ref="cards">
+                <div class="news-thumb">
+                    <img
+                        :src="item.featuredImageUrl || '/images/example/news01.png'"
+                        :alt="item.title"
+                    />
                 </div>
-                <div class="column-content2 mt-5">
-                    <span class="ml-2">ดูสินค้าทั้งหมด</span>
+                <div class="column-content">
+                    <span class="content-topic1 ml-2">{{ item.title }}</span>
+                </div>
+                <div class="column-content2 mt-5" @click="$router.push('/blogs/' + item.id)">
+                    <span class="ml-2">อ่านเพิ่มเติม</span>
                     <img class="mr-2" src="/images/example/button.png" alt="" />
                 </div>
             </div>
@@ -23,15 +27,28 @@
 </template>
 
 <script>
+import { useNewsStore } from '@/stores/newsStore'
+
 export default {
     name: 'homeCategorySimple',
     data() {
         return {
-            items: ['Column 1', 'Column 2', 'Column 3', 'Column 4', 'Column 5', 'Column 6'], // ข้อมูลเดิมใส่มาได้เลย
             cardStep: 0,
             canLeft: false,
             canRight: false,
-            gapPx: 16, // ควรตรงกับ CSS gap (1rem≈16px)
+            gapPx: 16,
+        }
+    },
+    computed: {
+        items() {
+            const store = useNewsStore()
+            return store.publishedNews
+        },
+    },
+    created() {
+        const store = useNewsStore()
+        if (!store.news.length) {
+            store.fetchNews()
         }
     },
     mounted() {
@@ -82,9 +99,27 @@ export default {
 .mb-8 {
     margin-bottom: 4rem !important;
 }
+/* ——— thumbnail 16:9 ——— */
+.news-thumb {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 9/16 */
+    overflow: hidden;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+.news-thumb img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+}
+
 /* ——— text parts (เหมือนเดิม) ——— */
 .content-topic1 {
-    font-size: 14pt;
+    font-size: 11pt;
     color: #205266;
     font-weight: bold;
 }

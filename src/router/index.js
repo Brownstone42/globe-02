@@ -8,6 +8,8 @@ import ProductDetail from '@/views/product/ProductDetail.vue'
 
 import AdminLogin from '@/views/admin/AdminLogin.vue'
 import AdminHome from '@/views/admin/AdminHome.vue'
+import BlogList from '@/views/news/BlogList.vue'
+import BlogDetail from '@/views/news/BlogDetail.vue'
 
 const routes = [
     {
@@ -25,6 +27,17 @@ const routes = [
         path: '/',
         name: 'home',
         component: Home,
+    },
+    {
+        path: '/blogs',
+        name: 'blog-list',
+        component: BlogList,
+    },
+    {
+        path: '/blogs/:id',
+        name: 'blog-detail',
+        component: BlogDetail,
+        props: true,
     },
     {
         path: '/product/:category/:productId',

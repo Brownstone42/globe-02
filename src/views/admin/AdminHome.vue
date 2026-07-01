@@ -27,7 +27,13 @@
                 Product Detail
             </button>
 
-            <button class="admin-menu-item" disabled>News Management (coming soon)</button>
+            <button
+                class="admin-menu-item"
+                :class="{ active: currentModule === 'news' }"
+                @click="currentModule = 'news'"
+            >
+                News Management
+            </button>
 
             <button class="admin-menu-item" disabled>Banner Management (coming soon)</button>
         </aside>
@@ -38,6 +44,7 @@
             <product-detail-management
                 v-else-if="currentModule === 'product-detail'"
             ></product-detail-management>
+            <news-management v-else-if="currentModule === 'news'"></news-management>
 
             <div v-else class="placeholder">Select a module from the left menu.</div>
         </main>
@@ -49,6 +56,7 @@ import { useAuthStore } from '@/stores/authStore'
 import CategoryManagement from '@/components/admin/categoryManagement.vue'
 import ProductManagement from '@/components/admin/productManagement.vue'
 import ProductDetailManagement from '@/components/admin/productDetailManagement.vue'
+import NewsManagement from '@/components/admin/newsManagement.vue'
 
 export default {
     name: 'AdminHome',
@@ -56,6 +64,7 @@ export default {
         CategoryManagement,
         ProductManagement,
         ProductDetailManagement,
+        NewsManagement,
     },
     data() {
         return {

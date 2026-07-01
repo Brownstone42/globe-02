@@ -1,21 +1,11 @@
 <template>
     <div class="product-category">
-        <!-- Header + sorting / pagination -->
+        <!-- Header + pagination controls on one row -->
         <div class="category-header">
-            <div class="meta">
-                <span>Showing {{ start }}–{{ end }} of {{ baseProducts.length }} results</span>
-                <!-- ที่เหลือ เช่น Show 10 / 20 / 40, Sorting ไว้ใส่ทีหลังได้ -->
-            </div>
+            <button class="page-btn" :disabled="page === 1" @click="page--">‹</button>
+            <span class="meta">Showing {{ start }}–{{ end }} of {{ baseProducts.length }} results</span>
+            <button class="page-btn" :disabled="end >= baseProducts.length" @click="page++">›</button>
         </div>
-
-        <!-- Pagination (mock) -->
-        <nav class="pagination is-centered" role="navigation">
-            <button class="pagination-previous" :disabled="page === 1" @click="page--">‹</button>
-
-            <button class="pagination-next" :disabled="end >= baseProducts.length" @click="page++">
-                ›
-            </button>
-        </nav>
 
         <!-- Product grid -->
         <div class="columns is-multiline mt-4 mb-8">
@@ -30,10 +20,16 @@
                         <figure class="image is-square">
                             <img :src="product.mainImageUrl" :alt="product.name" />
                         </figure>
-                        <div class="product-info">
-                            <h3>{{ product.name }}</h3>
-                            <p class="subtitle is-7">{{ product.description }}</p>
-                            <span class="link-more">ดูรายละเอียดสินค้า</span>
+                        <div class="product-info pt-1">
+                            <div class="product-text">
+                                <h3>{{ product.name }}</h3>
+                                <p class="short-desc">{{ product.shortDescription }}</p>
+                            </div>
+                            <hr class="desc-divider" />
+                            <div class="product-footer">
+                                <span class="link-more">ดูรายละเอียดสินค้า</span>
+                                <img class="card-arrow" src="/images/example/button.png" alt="" />
+                            </div>
                         </div>
                     </RouterLink>
                 </div>
@@ -113,23 +109,90 @@ export default {
 </script>
 
 <style scoped>
-.pagination {
-    margin-top: 2rem;
-    margin-bottom: 6rem;
+.category-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+.meta {
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+.page-btn {
+    background: white;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.page-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
 }
 .product-card {
     background-color: white;
     padding: 10px;
     border-radius: 10px;
     border-bottom-right-radius: 40px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.product-card a {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 .product-info {
     display: flex;
     flex-direction: column;
-    height: 120px;
+    flex: 1;
+    padding: 0.25rem 0.25rem 0.5rem;
 }
-.product-info span {
-    margin-top: auto;
+.product-text {
+    min-height: 6.5rem;
+}
+.product-info h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1a5c3a;
+    margin-bottom: 0.3rem;
+}
+.short-desc {
+    font-size: 0.82rem;
+    color: #6b7280;
+    margin-bottom: 0.6rem;
+    line-height: 1.4;
+}
+.desc-divider {
+    border: none;
+    border-top: 1px solid #e2e8f0;
+    margin: 0 0 0.6rem;
+}
+.product-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.link-more {
+    font-size: 0.82rem;
+    color: #1ab9b4;
+    font-weight: 500;
+}
+.card-arrow {
+    width: 35px;
+    height: 35px;
+    flex-shrink: 0;
 }
 .mb-8 {
     margin-bottom: 5rem !important;

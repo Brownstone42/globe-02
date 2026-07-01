@@ -30,26 +30,24 @@
 
         <!-- ขวา: รายละเอียด -->
         <div class="column is-6 product-info">
-            <h1 class="title is-4">{{ product.name }}</h1>
-            <p class="subtitle is-6">
+            <h1 class="title is-4 mb-2">{{ product.name }}</h1>
+
+            <p v-if="product.shortDescription" class="short-desc">
+                {{ product.shortDescription }}
+            </p>
+
+            <p v-if="product.description" class="full-desc">
                 {{ product.description }}
             </p>
 
-            <div v-if="hasBrief" class="content product-brief">
-                <p v-for="(line, i) in product.brief" :key="i">
-                    {{ line }}
-                </p>
+            <div v-if="product.highlights" class="info-block">
+                <p class="info-label">จุดเด่นสินค้า</p>
+                <p class="info-value">{{ product.highlights }}</p>
             </div>
 
-            <div class="columns mt-4">
-                <div class="column">
-                    <p class="has-text-weight-semibold">Brand</p>
-                    <p>{{ product.brand || '-' }}</p>
-                </div>
-                <div class="column">
-                    <p class="has-text-weight-semibold">Standard Packing</p>
-                    <p>{{ product.packing || '-' }}</p>
-                </div>
+            <div v-if="product.standards" class="info-block">
+                <p class="info-label">มาตรฐานและการรับรอง</p>
+                <p class="info-value">{{ product.standards }}</p>
             </div>
         </div>
     </div>
@@ -92,9 +90,6 @@ export default {
             }
             // ถ้าไม่มีรูปเลย คืน array ว่าง แต่ layout ยังอยู่เพราะ v-for แค่ไม่ render ปุ่ม
             return list
-        },
-        hasBrief() {
-            return Array.isArray(this.product.brief) && this.product.brief.length > 0
         },
     },
 }
@@ -156,8 +151,37 @@ export default {
     border-radius: 6px;
 }
 
-.product-brief p {
-    margin-bottom: 0.25rem;
+.short-desc {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+}
+
+.full-desc {
+    font-size: 0.9rem;
+    color: #475569;
+    white-space: pre-wrap;
+    margin-bottom: 1rem;
+}
+
+.info-block {
+    margin-bottom: 0.75rem;
+}
+
+.info-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.15rem;
+}
+
+.info-value {
+    font-size: 0.9rem;
+    color: #1e293b;
+    white-space: pre-wrap;
 }
 
 figure {
