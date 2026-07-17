@@ -3,6 +3,8 @@
     <app-main-header></app-main-header>
 
     <router-view></router-view>
+
+    <home-footer></home-footer>
 </template>
 
 <script>

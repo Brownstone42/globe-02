@@ -48,8 +48,9 @@
                             </div>
                         </div>
 
+                        <!-- 1. Cover: cards on home + blogs list -->
                         <div class="form-group">
-                            <label>Cover Image <small class="hint">(รูปบนการ์ดหน้าแรก / หน้า Blogs)</small></label>
+                            <label>1. Cover Image <small class="hint">(การ์ดหน้าแรก / หน้า Blogs — 16:9)</small></label>
                             <input ref="coverInput" type="file" accept="image/*" @change="onCoverChange" />
 
                             <ImageCropper
@@ -57,31 +58,53 @@
                                 ref="coverCropper"
                                 :file="coverSourceFile"
                                 :aspect="16 / 9"
+                                ratio-label="16:9"
                             />
 
                             <template v-else>
-                                <div v-if="currentCoverUrl" class="cover-preview">
+                                <div v-if="currentCoverUrl" class="cover-preview ratio-16x9">
                                     <img :src="currentCoverUrl" alt="cover preview" />
                                 </div>
-                                <small v-else class="hint">ถ้าไม่ใส่ การ์ดจะใช้ Featured Image แทน</small>
+                                <small v-else class="hint">ยังไม่มีรูป — การ์ดจะใช้รูปตัวอย่างแทน</small>
                             </template>
                         </div>
 
+                        <!-- 2. Header: hero at the top of the article page -->
                         <div class="form-group">
-                            <label>Featured Image <small class="hint">(รูปใหญ่ในหน้าบทความ)</small></label>
-                            <input type="file" accept="image/*" @change="onImageChange" />
-                            <div v-if="imagePreview || (editingId && currentImageUrl)" class="image-preview">
-                                <img :src="imagePreview || currentImageUrl" alt="preview" />
+                            <label>2. Header Image <small class="hint">(หัวเรื่องหน้าบทความ — 32:9)</small></label>
+                            <input ref="headerInput" type="file" accept="image/*" @change="onHeaderChange" />
+
+                            <ImageCropper
+                                v-if="headerSourceFile"
+                                ref="headerCropper"
+                                :file="headerSourceFile"
+                                :aspect="32 / 9"
+                                ratio-label="32:9"
+                            />
+
+                            <template v-else>
+                                <div v-if="currentHeaderUrl" class="cover-preview ratio-32x9">
+                                    <img :src="currentHeaderUrl" alt="header preview" />
+                                </div>
+                                <small v-else class="hint">ถ้าไม่ใส่ หน้าบทความจะใช้ Cover Image แทน</small>
+                            </template>
+                        </div>
+
+                        <!-- 3. Content: shown above the FAQ (stored as featuredImageUrl) -->
+                        <div class="form-group">
+                            <label>3. Content Image <small class="hint">(ในเนื้อหา เหนือ FAQ — ไม่ครอบตัด)</small></label>
+                            <input ref="contentInput" type="file" accept="image/*" @change="onImageChange" />
+                            <div v-if="imagePreview || currentImageUrl" class="image-preview">
+                                <img :src="imagePreview || currentImageUrl" alt="content preview" />
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label>Content</label>
-                            <textarea
+                            <RichTextEditor
                                 v-model="form.content"
-                                rows="8"
                                 placeholder="Article body..."
-                            ></textarea>
+                            />
                         </div>
 
                         <!-- FAQ -->
@@ -216,10 +239,11 @@
 import { mapStores } from 'pinia'
 import { useNewsStore } from '@/stores/newsStore'
 import ImageCropper from '@/components/admin/imageCropper.vue'
+import RichTextEditor from '@/components/admin/richTextEditor.vue'
 
 export default {
     name: 'newsManagement',
-    components: { ImageCropper },
+    components: { ImageCropper, RichTextEditor },
     data() {
         return {
             editingId: null,
@@ -230,6 +254,8 @@ export default {
             currentImageUrl: null,
             coverSourceFile: null,
             currentCoverUrl: null,
+            headerSourceFile: null,
+            currentHeaderUrl: null,
             form: {
                 title: '',
                 slug: '',
@@ -238,6 +264,7 @@ export default {
                 status: 'draft',
                 featuredImageFile: null,
                 coverImageFile: null,
+                headerImageFile: null,
                 content: '',
                 faq: [],
             },
@@ -276,6 +303,12 @@ export default {
             this.coverSourceFile = file
         },
 
+        onHeaderChange(e) {
+            const file = e.target.files[0]
+            if (!file) return
+            this.headerSourceFile = file
+        },
+
         addFaq() {
             this.form.faq.push({ question: '', answer: '' })
         },
@@ -310,8 +343,12 @@ export default {
             this.currentImageUrl = null
             this.coverSourceFile = null
             this.currentCoverUrl = null
-            // Clear the native input too, so re-picking the same file still fires change.
-            if (this.$refs.coverInput) this.$refs.coverInput.value = ''
+            this.headerSourceFile = null
+            this.currentHeaderUrl = null
+            // Clear the native inputs too, so re-picking the same file still fires change.
+            for (const ref of ['coverInput', 'headerInput', 'contentInput']) {
+                if (this.$refs[ref]) this.$refs[ref].value = ''
+            }
             this.form = {
                 title: '',
                 slug: '',
@@ -320,6 +357,7 @@ export default {
                 status: 'draft',
                 featuredImageFile: null,
                 coverImageFile: null,
+                headerImageFile: null,
                 content: '',
                 faq: [],
             }
@@ -333,6 +371,8 @@ export default {
             this.currentImageUrl = article.featuredImageUrl || null
             this.coverSourceFile = null
             this.currentCoverUrl = article.coverImageUrl || null
+            this.headerSourceFile = null
+            this.currentHeaderUrl = article.headerImageUrl || null
             this.form = {
                 title: article.title || '',
                 slug: article.slug || '',
@@ -341,6 +381,7 @@ export default {
                 status: article.status || 'draft',
                 featuredImageFile: null,
                 coverImageFile: null,
+                headerImageFile: null,
                 content: article.content || '',
                 faq: (article.faq || []).map((f) => ({ ...f })),
             }
@@ -352,15 +393,18 @@ export default {
                 .map((t) => t.replace(/^#/, '').trim())
                 .filter(Boolean)
 
+            const baseName = this.form.slug || 'image'
             const coverImageFile = this.coverSourceFile
-                ? await this.$refs.coverCropper.getCroppedFile(
-                      `${this.form.slug || 'cover'}.jpg`,
-                  )
+                ? await this.$refs.coverCropper.getCroppedFile(`${baseName}-cover.jpg`)
+                : null
+            const headerImageFile = this.headerSourceFile
+                ? await this.$refs.headerCropper.getCroppedFile(`${baseName}-header.jpg`)
                 : null
 
             const payload = {
                 ...this.form,
                 coverImageFile,
+                headerImageFile,
                 slug:
                     this.form.slug.trim() ||
                     this.form.title.trim().toLowerCase().replace(/\s+/g, '-'),
@@ -396,11 +440,17 @@ export default {
 
 .layout {
     display: grid;
-    grid-template-columns: minmax(320px, 420px) 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 32px;
     align-items: stretch;
     flex: 1;
     min-height: 0;
+}
+
+@media (max-width: 900px) {
+    .layout {
+        grid-template-columns: 1fr;
+    }
 }
 
 .col {
@@ -533,11 +583,18 @@ textarea {
     margin-top: 8px;
     width: 100%;
     max-width: 320px;
-    aspect-ratio: 16 / 9;
     border-radius: 8px;
     border: 1px solid #e2e8f0;
     overflow: hidden;
     background: #f1f5f9;
+}
+
+.cover-preview.ratio-16x9 {
+    aspect-ratio: 16 / 9;
+}
+
+.cover-preview.ratio-32x9 {
+    aspect-ratio: 32 / 9;
 }
 
 .cover-preview img {

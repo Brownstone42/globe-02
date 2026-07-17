@@ -21,6 +21,26 @@ async function uploadImage(file, folder) {
     return getDownloadURL(snap.ref)
 }
 
+// The three images a post can carry. `featuredImageUrl` is the content image shown
+// above the FAQ; the name predates the cover/header split and is kept so existing
+// documents keep rendering without a migration.
+const IMAGE_FIELDS = [
+    { file: 'coverImageFile', url: 'coverImageUrl', folder: 'news/cover' },
+    { file: 'headerImageFile', url: 'headerImageUrl', folder: 'news/header' },
+    { file: 'featuredImageFile', url: 'featuredImageUrl', folder: 'news' },
+]
+
+// Uploads whichever images were newly picked, keeping any existing URL untouched.
+async function resolveImageUrls(form, existing = {}) {
+    const urls = {}
+    for (const field of IMAGE_FIELDS) {
+        urls[field.url] = form[field.file]
+            ? await uploadImage(form[field.file], field.folder)
+            : existing[field.url] || null
+    }
+    return urls
+}
+
 export const useNewsStore = defineStore('news', {
     state: () => ({
         news: [],
@@ -55,16 +75,6 @@ export const useNewsStore = defineStore('news', {
             this.loading = true
             this.error = null
             try {
-                let featuredImageUrl = null
-                if (form.featuredImageFile) {
-                    featuredImageUrl = await uploadImage(form.featuredImageFile, 'news')
-                }
-
-                let coverImageUrl = null
-                if (form.coverImageFile) {
-                    coverImageUrl = await uploadImage(form.coverImageFile, 'news/cover')
-                }
-
                 const data = {
                     title: form.title || '',
                     slug: form.slug || '',
@@ -74,8 +84,7 @@ export const useNewsStore = defineStore('news', {
                     category: form.category || '',
                     metaDescription: form.metaDescription || '',
                     status: form.status || 'draft',
-                    featuredImageUrl,
-                    coverImageUrl,
+                    ...(await resolveImageUrls(form)),
                     createdAt: serverTimestamp(),
                     updatedAt: serverTimestamp(),
                 }
@@ -95,15 +104,6 @@ export const useNewsStore = defineStore('news', {
             this.error = null
             try {
                 const existing = this.news.find((item) => item.id === id) || {}
-                let featuredImageUrl = existing.featuredImageUrl || null
-                if (form.featuredImageFile) {
-                    featuredImageUrl = await uploadImage(form.featuredImageFile, 'news')
-                }
-
-                let coverImageUrl = existing.coverImageUrl || null
-                if (form.coverImageFile) {
-                    coverImageUrl = await uploadImage(form.coverImageFile, 'news/cover')
-                }
 
                 const data = {
                     title: form.title || '',
@@ -114,8 +114,7 @@ export const useNewsStore = defineStore('news', {
                     category: form.category || '',
                     metaDescription: form.metaDescription || '',
                     status: form.status || 'draft',
-                    featuredImageUrl,
-                    coverImageUrl,
+                    ...(await resolveImageUrls(form, existing)),
                     updatedAt: serverTimestamp(),
                 }
 

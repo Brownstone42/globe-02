@@ -8,9 +8,9 @@
             <header class="blog-hero">
                 <div class="blog-hero-inner">
                     <img
-                        v-if="coverUrl"
+                        v-if="heroUrl"
                         class="blog-hero-img"
-                        :src="coverUrl"
+                        :src="heroUrl"
                         :alt="article.title"
                     />
                     <div class="blog-hero-overlay">
@@ -25,7 +25,12 @@
 
                 <!-- Body content -->
                 <div class="article-body" v-if="article.content">
-                    {{ article.content }}
+                    <div
+                        v-if="contentIsHtml"
+                        class="ql-editor rich-content"
+                        v-html="article.content"
+                    ></div>
+                    <div v-else class="plain-content">{{ article.content }}</div>
                 </div>
 
                 <!-- Featured image -->
@@ -87,9 +92,15 @@ export default {
         article() {
             return useNewsStore().news.find((item) => item.id === this.id) || null
         },
-        coverUrl() {
+        // Posts written before the rich text editor hold plain text, which must keep
+        // its line breaks; anything from the editor is HTML.
+        contentIsHtml() {
+            return /<[a-z][\s\S]*>/i.test((this.article && this.article.content) || '')
+        },
+        // Posts created before the header image existed fall back to their cover.
+        heroUrl() {
             if (!this.article) return null
-            return this.article.coverImageUrl || this.article.featuredImageUrl || null
+            return this.article.headerImageUrl || this.article.coverImageUrl || null
         },
     },
     created() {
@@ -144,7 +155,8 @@ export default {
 
 /* Hero */
 .blog-hero {
-    background: #205266;
+    /* Same as appMainHeader, so the bands beside the image extend the site header. */
+    background: #23272d;
     padding: 0 24px;
 }
 
@@ -152,9 +164,9 @@ export default {
     position: relative;
     max-width: 1100px;
     margin: 0 auto;
-    /* Matches the 16:9 crop produced in admin, so the image is never re-cropped. */
-    aspect-ratio: 16 / 9;
-    background: #205266;
+    /* Matches the 32:9 header crop produced in admin, so the image is never re-cropped. */
+    aspect-ratio: 32 / 9;
+    background: #23272d;
     overflow: hidden;
 }
 
@@ -205,8 +217,35 @@ export default {
     font-size: 1rem;
     color: #374151;
     line-height: 1.8;
-    white-space: pre-wrap;
     margin-bottom: 40px;
+}
+
+/* Legacy plain-text posts: keep the line breaks the author typed. */
+.plain-content {
+    white-space: pre-wrap;
+}
+
+/* quill.core.css sizes .ql-editor for a scrolling editor pane; on the page it is
+   just article markup, so undo the box it assumes. */
+.article-body :deep(.ql-editor) {
+    height: auto;
+    overflow-y: visible;
+    padding: 0;
+    line-height: inherit;
+}
+
+.article-body :deep(.ql-editor p) {
+    margin-bottom: 1em;
+}
+
+.article-body :deep(.ql-editor a) {
+    color: #3cabae;
+    text-decoration: underline;
+}
+
+.article-body :deep(.ql-editor img) {
+    max-width: 100%;
+    height: auto;
 }
 
 .featured-image {
