@@ -2,6 +2,9 @@ import { defineStore } from 'pinia'
 import { auth } from '@/firebase'
 import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth'
 
+// Resolves once Firebase has restored (or ruled out) a persisted session.
+let authReady = null
+
 export const useAuthStore = defineStore('auth', {
     state: () => ({
         user: null,
@@ -18,14 +21,21 @@ export const useAuthStore = defineStore('auth', {
 
     actions: {
         initAuth() {
-            onAuthStateChanged(auth, (user) => {
-                this.user = user || null
-            })
+            if (!authReady) {
+                authReady = new Promise((resolve) => {
+                    onAuthStateChanged(auth, (user) => {
+                        this.user = user || null
+                        resolve()
+                    })
+                })
+            }
+            return authReady
         },
 
         async loginWithGoogle() {
             const provider = new GoogleAuthProvider()
-            await signInWithPopup(auth, provider)
+            const result = await signInWithPopup(auth, provider)
+            this.user = result.user
         },
 
         async logout() {

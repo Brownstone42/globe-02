@@ -4,25 +4,33 @@
         <div v-else-if="!article" class="info-text">ไม่พบบทความนี้</div>
 
         <template v-else>
+            <!-- Hero: cover image with title/meta overlaid -->
+            <header class="blog-hero">
+                <div class="blog-hero-inner">
+                    <img
+                        v-if="coverUrl"
+                        class="blog-hero-img"
+                        :src="coverUrl"
+                        :alt="article.title"
+                    />
+                    <div class="blog-hero-overlay">
+                        <h1 class="blog-hero-title">{{ article.title }}</h1>
+                    </div>
+                </div>
+            </header>
+
             <div class="content-wrap">
                 <!-- Back -->
                 <button class="back-btn" @click="$router.push('/blogs')">← กลับไปบทความทั้งหมด</button>
 
-                <!-- Cover image -->
-                <div class="cover-image">
-                    <img
-                        :src="article.featuredImageUrl || '/images/example/news01.png'"
-                        :alt="article.title"
-                    />
-                </div>
-
-                <!-- Category + title -->
-                <span v-if="article.category" class="article-category">{{ article.category }}</span>
-                <h1 class="article-title">{{ article.title }}</h1>
-
                 <!-- Body content -->
                 <div class="article-body" v-if="article.content">
                     {{ article.content }}
+                </div>
+
+                <!-- Featured image -->
+                <div class="featured-image" v-if="article.featuredImageUrl">
+                    <img :src="article.featuredImageUrl" :alt="article.title" />
                 </div>
 
                 <!-- FAQ -->
@@ -79,6 +87,10 @@ export default {
         article() {
             return useNewsStore().news.find((item) => item.id === this.id) || null
         },
+        coverUrl() {
+            if (!this.article) return null
+            return this.article.coverImageUrl || this.article.featuredImageUrl || null
+        },
     },
     created() {
         const store = useNewsStore()
@@ -130,40 +142,62 @@ export default {
     opacity: 0.75;
 }
 
-.cover-image {
-    width: 100%;
-    margin-bottom: 28px;
-    border-radius: 12px;
+/* Hero */
+.blog-hero {
+    background: #205266;
+    padding: 0 24px;
+}
+
+.blog-hero-inner {
+    position: relative;
+    max-width: 1100px;
+    margin: 0 auto;
+    /* Matches the 16:9 crop produced in admin, so the image is never re-cropped. */
+    aspect-ratio: 16 / 9;
+    background: #205266;
     overflow: hidden;
 }
 
-.cover-image img {
+.blog-hero-img {
+    position: absolute;
+    inset: 0;
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: cover;
     display: block;
 }
 
-.article-category {
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: #3cabae;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    display: block;
-    margin-bottom: 10px;
+.blog-hero-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 32px 6%;
+    /* Keeps the title readable over any image. */
+    background: linear-gradient(
+        180deg,
+        rgba(15, 23, 42, 0.15) 0%,
+        rgba(15, 23, 42, 0.55) 55%,
+        rgba(15, 23, 42, 0.75) 100%
+    );
 }
 
-.article-title {
-    font-size: 1.75rem;
+.blog-hero-title {
+    color: #fff;
+    font-size: clamp(1.4rem, 3.2vw, 2.6rem);
     font-weight: 800;
-    color: #205266;
-    line-height: 1.3;
-    margin-bottom: 28px;
+    line-height: 1.35;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+    margin: 0;
+    max-width: 90%;
 }
 
 @media (max-width: 768px) {
-    .article-title {
-        font-size: 1.3rem;
+    .blog-hero {
+        padding: 0;
     }
 }
 
@@ -173,6 +207,19 @@ export default {
     line-height: 1.8;
     white-space: pre-wrap;
     margin-bottom: 40px;
+}
+
+.featured-image {
+    width: 100%;
+    margin-bottom: 40px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.featured-image img {
+    width: 100%;
+    height: auto;
+    display: block;
 }
 
 /* FAQ */

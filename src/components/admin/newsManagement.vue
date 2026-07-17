@@ -49,7 +49,26 @@
                         </div>
 
                         <div class="form-group">
-                            <label>Featured Image</label>
+                            <label>Cover Image <small class="hint">(รูปบนการ์ดหน้าแรก / หน้า Blogs)</small></label>
+                            <input ref="coverInput" type="file" accept="image/*" @change="onCoverChange" />
+
+                            <ImageCropper
+                                v-if="coverSourceFile"
+                                ref="coverCropper"
+                                :file="coverSourceFile"
+                                :aspect="16 / 9"
+                            />
+
+                            <template v-else>
+                                <div v-if="currentCoverUrl" class="cover-preview">
+                                    <img :src="currentCoverUrl" alt="cover preview" />
+                                </div>
+                                <small v-else class="hint">ถ้าไม่ใส่ การ์ดจะใช้ Featured Image แทน</small>
+                            </template>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Featured Image <small class="hint">(รูปใหญ่ในหน้าบทความ)</small></label>
                             <input type="file" accept="image/*" @change="onImageChange" />
                             <div v-if="imagePreview || (editingId && currentImageUrl)" class="image-preview">
                                 <img :src="imagePreview || currentImageUrl" alt="preview" />
@@ -196,9 +215,11 @@
 <script>
 import { mapStores } from 'pinia'
 import { useNewsStore } from '@/stores/newsStore'
+import ImageCropper from '@/components/admin/imageCropper.vue'
 
 export default {
     name: 'newsManagement',
+    components: { ImageCropper },
     data() {
         return {
             editingId: null,
@@ -207,6 +228,8 @@ export default {
             faqRawInput: '',
             imagePreview: null,
             currentImageUrl: null,
+            coverSourceFile: null,
+            currentCoverUrl: null,
             form: {
                 title: '',
                 slug: '',
@@ -214,6 +237,7 @@ export default {
                 metaDescription: '',
                 status: 'draft',
                 featuredImageFile: null,
+                coverImageFile: null,
                 content: '',
                 faq: [],
             },
@@ -243,6 +267,13 @@ export default {
             if (!file) return
             this.form.featuredImageFile = file
             this.imagePreview = URL.createObjectURL(file)
+        },
+
+        // The raw pick only feeds the cropper; the upload file is produced on submit.
+        onCoverChange(e) {
+            const file = e.target.files[0]
+            if (!file) return
+            this.coverSourceFile = file
         },
 
         addFaq() {
@@ -277,6 +308,10 @@ export default {
             this.faqRawInput = ''
             this.imagePreview = null
             this.currentImageUrl = null
+            this.coverSourceFile = null
+            this.currentCoverUrl = null
+            // Clear the native input too, so re-picking the same file still fires change.
+            if (this.$refs.coverInput) this.$refs.coverInput.value = ''
             this.form = {
                 title: '',
                 slug: '',
@@ -284,6 +319,7 @@ export default {
                 metaDescription: '',
                 status: 'draft',
                 featuredImageFile: null,
+                coverImageFile: null,
                 content: '',
                 faq: [],
             }
@@ -295,6 +331,8 @@ export default {
             this.tagsInput = (article.tags || []).map((t) => `#${t}`).join(' ')
             this.imagePreview = null
             this.currentImageUrl = article.featuredImageUrl || null
+            this.coverSourceFile = null
+            this.currentCoverUrl = article.coverImageUrl || null
             this.form = {
                 title: article.title || '',
                 slug: article.slug || '',
@@ -302,6 +340,7 @@ export default {
                 metaDescription: article.metaDescription || '',
                 status: article.status || 'draft',
                 featuredImageFile: null,
+                coverImageFile: null,
                 content: article.content || '',
                 faq: (article.faq || []).map((f) => ({ ...f })),
             }
@@ -313,8 +352,15 @@ export default {
                 .map((t) => t.replace(/^#/, '').trim())
                 .filter(Boolean)
 
+            const coverImageFile = this.coverSourceFile
+                ? await this.$refs.coverCropper.getCroppedFile(
+                      `${this.form.slug || 'cover'}.jpg`,
+                  )
+                : null
+
             const payload = {
                 ...this.form,
+                coverImageFile,
                 slug:
                     this.form.slug.trim() ||
                     this.form.title.trim().toLowerCase().replace(/\s+/g, '-'),
@@ -481,6 +527,24 @@ textarea {
     border-radius: 8px;
     object-fit: cover;
     border: 1px solid #e2e8f0;
+}
+
+.cover-preview {
+    margin-top: 8px;
+    width: 100%;
+    max-width: 320px;
+    aspect-ratio: 16 / 9;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    background: #f1f5f9;
+}
+
+.cover-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 .sub-header {

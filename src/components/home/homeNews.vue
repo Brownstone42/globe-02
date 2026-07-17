@@ -8,7 +8,7 @@
             <div class="column" v-for="(item, i) in items" :key="item.id || i" ref="cards">
                 <div class="news-thumb">
                     <img
-                        :src="item.featuredImageUrl || '/images/example/news01.png'"
+                        :src="item.coverImageUrl || item.featuredImageUrl || '/images/example/news01.png'"
                         :alt="item.title"
                     />
                 </div>

@@ -76,11 +76,8 @@ const router = createRouter({
 router.beforeEach(async (to) => {
     const auth = useAuthStore()
 
-    // เรียก initAuth ครั้งแรกตอนเริ่มแอป
-    if (!auth._init) {
-        auth.initAuth()
-        auth._init = true
-    }
+    // รอให้ Firebase กู้ session จาก storage ให้เสร็จก่อน ไม่งั้นจะเด้งไป login ทุกครั้งที่ refresh
+    await auth.initAuth()
 
     if (to.meta.requiresAdmin) {
         if (!auth.isLoggedIn) {

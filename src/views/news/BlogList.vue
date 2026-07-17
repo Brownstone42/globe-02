@@ -17,7 +17,7 @@
                 >
                     <div class="card-thumb">
                         <img
-                            :src="article.featuredImageUrl || '/images/example/news01.png'"
+                            :src="article.coverImageUrl || article.featuredImageUrl || '/images/example/news01.png'"
                             :alt="article.title"
                         />
                     </div>

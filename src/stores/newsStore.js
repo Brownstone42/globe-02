@@ -14,6 +14,13 @@ import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'fire
 const newsCol = collection(db, 'news')
 const storage = getStorage(app)
 
+async function uploadImage(file, folder) {
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
+    const fileRef = storageRef(storage, `${folder}/${Date.now()}-${safeName}`)
+    const snap = await uploadBytes(fileRef, file)
+    return getDownloadURL(snap.ref)
+}
+
 export const useNewsStore = defineStore('news', {
     state: () => ({
         news: [],
@@ -50,10 +57,12 @@ export const useNewsStore = defineStore('news', {
             try {
                 let featuredImageUrl = null
                 if (form.featuredImageFile) {
-                    const file = form.featuredImageFile
-                    const fileRef = storageRef(storage, `news/${file.name}`)
-                    const snap = await uploadBytes(fileRef, file)
-                    featuredImageUrl = await getDownloadURL(snap.ref)
+                    featuredImageUrl = await uploadImage(form.featuredImageFile, 'news')
+                }
+
+                let coverImageUrl = null
+                if (form.coverImageFile) {
+                    coverImageUrl = await uploadImage(form.coverImageFile, 'news/cover')
                 }
 
                 const data = {
@@ -66,6 +75,7 @@ export const useNewsStore = defineStore('news', {
                     metaDescription: form.metaDescription || '',
                     status: form.status || 'draft',
                     featuredImageUrl,
+                    coverImageUrl,
                     createdAt: serverTimestamp(),
                     updatedAt: serverTimestamp(),
                 }
@@ -86,12 +96,13 @@ export const useNewsStore = defineStore('news', {
             try {
                 const existing = this.news.find((item) => item.id === id) || {}
                 let featuredImageUrl = existing.featuredImageUrl || null
-
                 if (form.featuredImageFile) {
-                    const file = form.featuredImageFile
-                    const fileRef = storageRef(storage, `news/${file.name}`)
-                    const snap = await uploadBytes(fileRef, file)
-                    featuredImageUrl = await getDownloadURL(snap.ref)
+                    featuredImageUrl = await uploadImage(form.featuredImageFile, 'news')
+                }
+
+                let coverImageUrl = existing.coverImageUrl || null
+                if (form.coverImageFile) {
+                    coverImageUrl = await uploadImage(form.coverImageFile, 'news/cover')
                 }
 
                 const data = {
@@ -104,6 +115,7 @@ export const useNewsStore = defineStore('news', {
                     metaDescription: form.metaDescription || '',
                     status: form.status || 'draft',
                     featuredImageUrl,
+                    coverImageUrl,
                     updatedAt: serverTimestamp(),
                 }
 
