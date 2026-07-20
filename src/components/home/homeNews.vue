@@ -180,7 +180,7 @@ export default {
     background: white;
     border-radius: 12px;
     padding: 16px;
-    text-align: center;
+    text-align: left;
 }
 
 /* ——— desktop: คง 4 ใบ/แถว (ยังเลื่อนถ้ามีมากกว่า 4) ——— */
