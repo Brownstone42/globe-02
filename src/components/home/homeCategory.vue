@@ -1,34 +1,45 @@
 <template>
-    <div class="category mt-6 mb-6">
-        <span>สินค้าของเรา</span>
+    <section class="category-section" aria-labelledby="category-heading">
+        <h2 id="category-heading">เลือกสินค้าจากหมวดหมู่</h2>
 
-        <button class="arrow left" :disabled="!canLeft" @click="go(-1)">‹</button>
+        <div v-if="categoryStore.loading" class="category-status">กำลังโหลดหมวดหมู่...</div>
 
-        <div ref="scroller" class="columns scroller mt-4" @scroll.passive="updateCanScroll">
-            <div
-                class="column"
-                v-for="(item, i) in categoryStore.visibleCategories"
-                :key="item.id || i"
-                ref="cards"
+        <div v-else class="category-grid">
+            <article
+                v-for="item in categoryStore.visibleCategories"
+                :key="item.id"
+                class="category-card"
             >
-                <img :src="item.imageUrl || '/images/example/product01.png'" alt="" />
-                <div class="column-content">
-                    <span class="content-topic1 ml-2">
-                        {{ item.name || 'Category Name' }}
-                    </span>
-                    <span class="content-topic2 ml-2">
-                        {{ item.description || '' }}
-                    </span>
+                <div class="category-image">
+                    <img v-if="item.imageUrl" :src="item.imageUrl" :alt="item.name || ''" />
+                    <div v-else class="image-placeholder" aria-hidden="true"></div>
                 </div>
-                <div class="column-content2 mt-5" @click="goToCategory(item)">
-                    <span class="ml-2 content-topic3">ดูสินค้าทั้งหมด</span>
-                    <img class="mr-2 go-button" src="/images/example/button.png" alt="" />
+
+                <div class="category-info">
+                    <div class="category-names">
+                        <h3>{{ item.name || 'Category Name' }}</h3>
+                        <p v-if="item.description">{{ item.description }}</p>
+                    </div>
+
+                    <RouterLink
+                        v-if="item.slug"
+                        class="category-arrow"
+                        :to="{
+                            name: 'product-category',
+                            params: { category: item.slug },
+                        }"
+                        :aria-label="`ดูสินค้าในหมวดหมู่ ${item.name || ''}`"
+                    >
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </RouterLink>
                 </div>
-            </div>
+            </article>
         </div>
 
-        <button class="arrow right" :disabled="!canRight" @click="go(1)">›</button>
-    </div>
+        <RouterLink class="all-products-link" :to="{ name: 'product-all' }">
+            สินค้าทั้งหมด
+        </RouterLink>
+    </section>
 </template>
 
 <script>
@@ -37,224 +48,179 @@ import { useCategoryStore } from '@/stores/categoryStore'
 
 export default {
     name: 'homeCategory',
-
-    data() {
-        return {
-            cardStep: 0,
-            canLeft: false,
-            canRight: false,
-            gapPx: 16,
-        }
-    },
-
     computed: {
         ...mapStores(useCategoryStore),
     },
-
     mounted() {
-        // ✅ โหลด categories ที่นี่ แล้วค่อย measure หลังโหลดเสร็จ
-        this.categoryStore.loadCategories().then(() => {
-            this.$nextTick(() => {
-                this.measure()
-                this.updateCanScroll()
-            })
-        })
-
-        window.addEventListener('resize', this.onResize, { passive: true })
-    },
-
-    beforeUnmount() {
-        window.removeEventListener('resize', this.onResize)
-    },
-
-    methods: {
-        goToCategory(item) {
-            if (!item.slug) return
-            this.$router.push(`/product/${item.slug}`)
-        },
-
-        onResize() {
-            this.measure()
-            this.updateCanScroll()
-        },
-
-        measure() {
-            const cards = this.$refs.cards
-            if (!cards || cards.length === 0) return
-            const w = cards[0].getBoundingClientRect().width
-            this.cardStep = Math.round(w + this.gapPx)
-        },
-
-        go(dir) {
-            const scroller = this.$refs.scroller
-            if (!scroller) return
-
-            scroller.scrollBy({ left: dir * this.cardStep, behavior: 'smooth' })
-
-            // force update after animation
-            setTimeout(() => this.updateCanScroll(), 300)
-        },
-
-        updateCanScroll() {
-            const s = this.$refs.scroller
-            if (!s) return
-
-            const max = s.scrollWidth - s.clientWidth
-            const left = s.scrollLeft
-
-            const threshold = 3 // ป้องกัน floating error
-
-            this.canLeft = left > threshold
-            this.canRight = left < max - threshold
-        },
+        if (!this.categoryStore.categories.length) {
+            this.categoryStore.loadCategories()
+        }
     },
 }
 </script>
 
 <style scoped>
-.content-topic1 {
-    font-size: 14pt;
-    color: #205266;
-    font-weight: bold;
-}
-.content-topic2 {
-    font-size: 11pt;
-    color: #a4a4a4;
-}
-.content-topic3 {
-    color: #205266;
-}
-.column-content {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding-bottom: 12px;
-    border-bottom: 1px solid rgba(128, 128, 128, 0.45);
-}
-.column-content2 {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-}
-.column-content2 span {
-    font-size: 11pt;
-    color: #205266;
-}
-.column-content2 img {
-    width: 35px;
+.category-section {
+    margin: 0 auto;
+    padding: 70px 0 80px;
+    width: min(1180px, 90vw);
 }
 
-.category {
-    position: relative;
-    margin: auto;
-    width: min(1100px, 80vw);
-}
-
-.columns.scroller {
-    display: flex;
-    flex-wrap: nowrap !important;
-    overflow-x: auto;
-    overflow-y: hidden;
-    gap: 1rem;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    user-select: none;
-    cursor: grab;
-}
-.columns.scroller::-webkit-scrollbar {
-    display: none;
-}
-
-.column {
-    flex: 0 0 100%;
-    scroll-snap-align: start;
-    min-height: 140px;
-    background: white;
-    border-radius: 12px;
-    padding: 16px;
+.category-section h2 {
+    color: #205266;
+    font-size: clamp(1.45rem, 2.2vw, 2rem);
+    font-weight: 700;
+    margin: 0 0 32px;
     text-align: center;
 }
-.column img {
+
+.category-grid {
+    display: grid;
+    gap: 22px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.category-card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.15);
+    min-width: 0;
+    overflow: hidden;
+}
+
+.category-image {
+    background: #fff;
+    height: 190px;
+    overflow: hidden;
+    padding: 10px;
+    width: 100%;
+}
+
+.category-image img {
+    display: block;
+    height: 100%;
+    max-height: 100%;
     max-width: 100%;
     object-fit: contain;
+    width: 100%;
 }
 
-@media (min-width: 768px) {
-    .column {
-        flex: 0 0 calc(25% - 0.75rem);
-    }
-    .columns.scroller {
-        padding: 0;
-        scroll-padding: 0;
+.image-placeholder {
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    height: 100%;
+    width: 100%;
+}
+
+.category-info {
+    align-items: center;
+    background: #eef8fc;
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    min-height: 76px;
+    padding: 12px 14px;
+}
+
+.category-names {
+    min-width: 0;
+}
+
+.category-names h3 {
+    color: #25aeb2;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.25;
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.category-names p {
+    color: #64748b;
+    font-size: 0.78rem;
+    line-height: 1.3;
+    margin: 3px 0 0;
+}
+
+.category-arrow {
+    align-items: center;
+    background: #32aeb2;
+    border-radius: 50%;
+    color: #fff;
+    display: inline-flex;
+    flex: 0 0 34px;
+    height: 34px;
+    justify-content: center;
+    text-decoration: none;
+    transition: background 0.18s ease, transform 0.18s ease;
+    width: 34px;
+}
+
+.category-arrow:hover {
+    background: #258e92;
+    color: #fff;
+    transform: translateX(2px);
+}
+
+.category-status {
+    color: #64748b;
+    padding: 48px 0;
+    text-align: center;
+}
+
+.all-products-link {
+    color: #205266;
+    display: block;
+    font-size: 0.95rem;
+    margin: 42px auto 0;
+    text-align: center;
+    text-decoration: none;
+    width: fit-content;
+}
+
+.all-products-link:hover {
+    color: #25aeb2;
+    text-decoration: underline;
+}
+
+@media (max-width: 960px) {
+    .category-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
-@media (max-width: 767.98px) {
-    .columns.scroller {
-        padding: 0 10vw;
-        scroll-padding: 0 10vw;
+@media (max-width: 540px) {
+    .category-section {
+        padding: 54px 0 64px;
+        width: min(88vw, 400px);
     }
-    .column {
-        flex: 0 0 85%;
-        scroll-snap-align: center;
-    }
-}
 
-.arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: white;
-    border: none;
-    border-radius: 999px;
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
-    font-size: 1.5rem;
-    line-height: 1;
-    color: #333;
-    z-index: 5;
-}
-.arrow.left {
-    left: -32px;
-}
-.arrow.right {
-    right: -32px;
-}
-.arrow:disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
-}
+    .category-grid {
+        gap: 16px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 
-@media (max-width: 768px) {
-    .arrow {
-        width: 32px;
-        height: 32px;
-        font-size: 1.6rem;
+    .category-info {
+        min-height: 68px;
+        padding: 9px 10px;
     }
-    .arrow.left {
-        left: -8%;
-    }
-    .arrow.right {
-        right: -8%;
-    }
-}
 
-@media (max-width: 1040px) {
-    .content-topic1 {
-        font-size: 12px;
+    .category-image {
+        height: 122px;
+        padding: 6px;
     }
-    .content-topic2 {
-        font-size: 10px;
+
+    .category-names h3 {
+        font-size: 0.78rem;
     }
-    .content-topic3 {
-        font-size: 12px !important;
+
+    .category-names p {
+        font-size: 0.62rem;
     }
-    .go-button {
-        width: 20% !important;
+
+    .category-arrow {
+        flex-basis: 28px;
+        height: 28px;
+        width: 28px;
     }
 }
 </style>

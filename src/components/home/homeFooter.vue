@@ -1,9 +1,11 @@
 <template>
     <section class="footer-wrap">
-        <img class="footer-logo" src="/images/footer-logo.png" alt="" />
-        <div class="footer-topic">
-            <span>บริการด้วยคุณภาพ สร้างความไว้วางใจอย่างยั่งยืน</span>
-            <span>พร้อมให้คำปรึกษาและดูแลอย่างใกล้ชิด โดยทีมงานผู้เชี่ยวชาญ</span>
+        <div class="footer-brand">
+            <img class="footer-logo" src="/images/footer-logo.png" alt="Ideal Globe" />
+            <div class="footer-topic">
+                <strong>บริการด้วยคุณภาพ สร้างความไว้วางใจอย่างยั่งยืน</strong>
+                <span>พร้อมให้คำปรึกษาและดูแลอย่างใกล้ชิด โดยทีมงานผู้เชี่ยวชาญ</span>
+            </div>
         </div>
 
         <div class="columns">
@@ -131,12 +133,9 @@ export default {
     font-size: 13px;
 }
 .footer-logo {
-    position: absolute;
-    width: 200px;
-    left: calc(50% - 100px);
-    top: -60px;
-    z-index: 2;
-    opacity: 0.75;
+    flex: 0 0 auto;
+    height: auto;
+    width: 92px;
 }
 .credit {
     display: flex;
@@ -193,9 +192,27 @@ i {
     color: white;
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.3;
+    text-align: left;
+}
+.footer-topic strong {
+    color: #ffffff;
+    font-size: clamp(1.35rem, 2.1vw, 2rem);
+    font-weight: 500;
+}
+.footer-topic span {
+    color: #f1f1f1;
+    font-family: 'Sukhumvit-Thin', sans-serif;
+    font-size: clamp(0.9rem, 1.25vw, 1.1rem);
+}
+.footer-brand {
     align-items: center;
-    text-align: center;
-    margin-top: 50px !important;
+    display: flex;
+    gap: 18px;
+    justify-content: center;
+    margin: 0 auto 14px;
+    width: min(900px, 90vw);
 }
 .menu-title {
     font-weight: bold;
@@ -240,6 +257,18 @@ i {
     align-items: flex-start !important;
 }
 @media (max-width: 768px) {
+    .footer-brand {
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 6px;
+    }
+    .footer-logo {
+        width: 76px;
+    }
+    .footer-topic {
+        align-items: center;
+        text-align: center;
+    }
     .column.product {
         padding-left: 25%;
         padding-bottom: 0 !important;

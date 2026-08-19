@@ -1,45 +1,100 @@
 <template>
     <div class="product-category">
-        <!-- Header + pagination controls on one row -->
-        <div class="category-header">
-            <button class="page-btn" :disabled="page === 1" @click="page--">‹</button>
-            <span class="meta">Showing {{ start }}–{{ end }} of {{ baseProducts.length }} results</span>
-            <button class="page-btn" :disabled="end >= baseProducts.length" @click="page++">›</button>
-        </div>
+        <div class="results-toolbar">
+            <span class="result-meta">Showing {{ start }}–{{ end }} of {{ totalResults }} results</span>
 
-        <!-- Product grid -->
-        <div class="columns is-multiline mt-4 mb-8">
-            <div v-for="product in pagedProducts" :key="product.id" class="column is-4">
-                <div class="product-card">
-                    <RouterLink
-                        :to="{
-                            name: 'product-detail',
-                            params: { category: product.category, productId: product.id },
-                        }"
+            <div class="toolbar-controls">
+                <div class="per-page-control">
+                    <span>Show :</span>
+                    <button
+                        v-for="amount in pageSizes"
+                        :key="amount"
+                        type="button"
+                        :class="{ active: perPage === amount }"
+                        @click="setPerPage(amount)"
                     >
-                        <figure class="image is-square">
-                            <img :src="product.mainImageUrl" :alt="product.name" />
-                        </figure>
-                        <div class="product-info pt-1">
-                            <div class="product-text">
-                                <h3>{{ product.name }}</h3>
-                                <p class="short-desc">{{ product.shortDescription }}</p>
-                            </div>
-                            <hr class="desc-divider" />
-                            <div class="product-footer">
-                                <span class="link-more">ดูรายละเอียดสินค้า</span>
-                                <img class="card-arrow" src="/images/example/button.png" alt="" />
-                            </div>
-                        </div>
-                    </RouterLink>
+                        {{ amount }}
+                    </button>
                 </div>
+
+                <select v-model="sortBy" aria-label="เรียงลำดับสินค้า">
+                    <option value="default">Default sorting</option>
+                    <option value="name-asc">Name A–Z</option>
+                    <option value="name-desc">Name Z–A</option>
+                    <option value="newest">Newest</option>
+                </select>
             </div>
         </div>
+
+        <div v-if="productStore.loading" class="product-status">กำลังโหลดสินค้า...</div>
+        <div v-else-if="!pagedProducts.length" class="product-status">ไม่พบสินค้า</div>
+
+        <div v-else class="product-grid">
+            <article v-for="product in pagedProducts" :key="product.id" class="product-card">
+                <RouterLink
+                    class="product-image"
+                    :to="{
+                        name: 'product-detail',
+                        params: { category: product.category, productId: product.id },
+                    }"
+                >
+                    <img v-if="product.mainImageUrl" :src="product.mainImageUrl" :alt="product.name" />
+                    <div v-else class="image-placeholder" aria-hidden="true"></div>
+                </RouterLink>
+
+                <div class="product-info">
+                    <h2>{{ product.name }}</h2>
+                    <p>{{ product.shortDescription || 'รายละเอียดสินค้า' }}</p>
+
+                    <div class="product-link-row">
+                        <RouterLink
+                            :to="{
+                                name: 'product-detail',
+                                params: { category: product.category, productId: product.id },
+                            }"
+                        >
+                            ดูรายละเอียดสินค้า
+                        </RouterLink>
+                        <RouterLink
+                            class="product-arrow"
+                            :to="{
+                                name: 'product-detail',
+                                params: { category: product.category, productId: product.id },
+                            }"
+                            :aria-label="`ดูรายละเอียด ${product.name}`"
+                        >
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </RouterLink>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <nav v-if="totalPages > 1" class="pagination" aria-label="Product pagination">
+            <button type="button" :disabled="page === 1" @click="page--">‹</button>
+            <button
+                v-for="pageNumber in visiblePages"
+                :key="pageNumber"
+                type="button"
+                :class="{ active: page === pageNumber }"
+                @click="page = pageNumber"
+            >
+                {{ pageNumber }}
+            </button>
+            <button type="button" :disabled="page === totalPages" @click="page++">›</button>
+        </nav>
     </div>
 </template>
 
 <script>
 import { useProductStore } from '@/stores/productStore'
+
+function timestampValue(value) {
+    if (!value) return 0
+    if (typeof value.toMillis === 'function') return value.toMillis()
+    if (typeof value.seconds === 'number') return value.seconds * 1000
+    return new Date(value).getTime() || 0
+}
 
 export default {
     name: 'ProductCategory',
@@ -52,47 +107,67 @@ export default {
     data() {
         return {
             page: 1,
-            perPage: 9,
-        }
-    },
-    mounted() {
-        // ถ้ายังไม่มี products เลย → โหลดจาก Firestore
-        if (!this.productStore.products.length) {
-            this.productStore.fetchProducts()
+            perPage: 12,
+            pageSizes: [12, 24, 36],
+            sortBy: 'default',
         }
     },
     computed: {
-        // เอา store มาใช้ใน options API แบบง่าย ๆ
         productStore() {
             return useProductStore()
         },
-
-        // สินค้าพื้นฐานก่อนแบ่งหน้า
         baseProducts() {
-            // ใช้ getter จาก store
-            return this.productStore.productsByCategory(this.category)
-        },
+            let products = [...this.productStore.productsByCategory(this.category)]
+            const subcategory = this.$route.query.sub
 
-        // จำนวนสินค้าหลังกรองเสร็จ
+            if (subcategory) {
+                products = products.filter(
+                    (product) =>
+                        product.subcategory === subcategory ||
+                        product.subcategoryId === subcategory ||
+                        product.group === subcategory,
+                )
+            }
+
+            if (this.sortBy === 'name-asc') {
+                products.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+            } else if (this.sortBy === 'name-desc') {
+                products.sort((a, b) => (b.name || '').localeCompare(a.name || ''))
+            } else if (this.sortBy === 'newest') {
+                products.sort(
+                    (a, b) => timestampValue(b.createdAt) - timestampValue(a.createdAt),
+                )
+            }
+
+            return products
+        },
         totalResults() {
             return this.baseProducts.length
         },
-
-        // index เริ่มต้น/สุดท้ายสำหรับ "Showing x–y of z results"
+        totalPages() {
+            return Math.max(1, Math.ceil(this.totalResults / this.perPage))
+        },
         start() {
-            if (this.totalResults === 0) return 0
-            return (this.page - 1) * this.perPage + 1
+            return this.totalResults ? (this.page - 1) * this.perPage + 1 : 0
         },
         end() {
-            if (this.totalResults === 0) return 0
             return Math.min(this.page * this.perPage, this.totalResults)
         },
-
-        // array สินค้าที่ใช้ render จริง
         pagedProducts() {
-            if (this.totalResults === 0) return []
             return this.baseProducts.slice(this.start - 1, this.end)
         },
+        visiblePages() {
+            const pages = []
+            const first = Math.max(1, Math.min(this.page - 1, this.totalPages - 2))
+            const last = Math.min(this.totalPages, first + 2)
+            for (let number = first; number <= last; number++) pages.push(number)
+            return pages
+        },
+    },
+    mounted() {
+        if (!this.productStore.products.length) {
+            this.productStore.fetchProducts()
+        }
     },
     watch: {
         category() {
@@ -101,7 +176,16 @@ export default {
         '$route.query.sub'() {
             this.page = 1
         },
-        totalResults() {
+        sortBy() {
+            this.page = 1
+        },
+        totalPages(value) {
+            if (this.page > value) this.page = value
+        },
+    },
+    methods: {
+        setPerPage(amount) {
+            this.perPage = amount
             this.page = 1
         },
     },
@@ -109,101 +193,222 @@ export default {
 </script>
 
 <style scoped>
-.category-header {
-    display: flex;
+.results-toolbar {
     align-items: center;
+    color: #555b60;
+    display: flex;
+    font-size: 0.85rem;
     justify-content: space-between;
-    margin-bottom: 1rem;
+    margin-bottom: 28px;
+    min-height: 34px;
 }
-.meta {
-    font-size: 0.9rem;
-    color: #6b7280;
-}
-.page-btn {
-    background: white;
-    border: none;
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
-    font-size: 1.4rem;
-    line-height: 1;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    color: #333;
-    display: flex;
+
+.toolbar-controls,
+.per-page-control {
     align-items: center;
-    justify-content: center;
+    display: flex;
 }
-.page-btn:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
+
+.toolbar-controls {
+    gap: 28px;
 }
+
+.per-page-control {
+    gap: 13px;
+}
+
+.per-page-control button {
+    background: transparent;
+    border: 0;
+    color: #52585d;
+    cursor: pointer;
+    font-family: inherit;
+    padding: 3px 1px;
+}
+
+.per-page-control button.active {
+    border-bottom: 2px solid #2badb1;
+    color: #20a8ac;
+}
+
+.toolbar-controls select {
+    background: transparent;
+    border: 0;
+    color: #555b60;
+    font-family: inherit;
+    outline: none;
+    padding: 5px 0;
+}
+
+.product-grid {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .product-card {
-    background-color: white;
-    padding: 10px;
-    border-radius: 10px;
-    border-bottom-right-radius: 40px;
-    width: 100%;
+    background: #fff;
+    border-radius: 12px 12px 30px 12px;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+    padding: 0;
+}
+
+.product-image {
+    align-items: center;
+    background: #fff;
+    display: flex;
+    height: 190px;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.product-image img {
+    display: block;
     height: 100%;
-    display: flex;
-    flex-direction: column;
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+    width: 100%;
 }
-.product-card a {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
+
+.image-placeholder {
+    background: linear-gradient(135deg, #f8fafc, #e5e7eb);
+    height: 100%;
+    width: 100%;
 }
+
 .product-info {
     display: flex;
-    flex-direction: column;
     flex: 1;
-    padding: 0.25rem 0.25rem 0.5rem;
+    flex-direction: column;
+    padding: 9px 13px 13px;
 }
-.product-text {
-    min-height: 6.5rem;
-}
-.product-info h3 {
-    font-size: 1.05rem;
+
+.product-info h2 {
+    color: #205266;
+    display: -webkit-box;
+    font-size: 0.95rem;
     font-weight: 700;
-    color: #1a5c3a;
-    margin-bottom: 0.3rem;
+    line-height: 1.3;
+    margin: 0;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
 }
-.short-desc {
-    font-size: 0.82rem;
-    color: #6b7280;
-    margin-bottom: 0.6rem;
-    line-height: 1.4;
+
+.product-info p {
+    color: #8a9298;
+    display: -webkit-box;
+    font-size: 0.7rem;
+    line-height: 1.35;
+    margin: 3px 0 9px;
+    min-height: 1.35em;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
 }
-.desc-divider {
-    border: none;
-    border-top: 1px solid #e2e8f0;
-    margin: 0 0 0.6rem;
-}
-.product-footer {
-    display: flex;
+
+.product-link-row {
     align-items: center;
+    border-top: 1px solid #d9dddf;
+    display: flex;
     justify-content: space-between;
+    margin-top: auto;
+    padding-top: 12px;
 }
-.link-more {
-    font-size: 0.82rem;
-    color: #1ab9b4;
-    font-weight: 500;
+
+.product-link-row > a:first-child {
+    color: #25aeb2;
+    font-size: 0.67rem;
+    text-decoration: none;
 }
-.card-arrow {
-    width: 35px;
-    height: 35px;
-    flex-shrink: 0;
+
+.product-arrow {
+    align-items: center;
+    background: #35aeb2;
+    border-radius: 50%;
+    color: #fff;
+    display: inline-flex;
+    flex: 0 0 27px;
+    height: 27px;
+    justify-content: center;
+    text-decoration: none;
+    width: 27px;
 }
-.mb-8 {
-    margin-bottom: 5rem !important;
+
+.product-arrow i {
+    font-size: 0.7rem;
 }
-@media (max-width: 768px) {
-    .product-card {
-        width: 80%;
-        margin: auto;
+
+.pagination {
+    align-items: center;
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    margin-top: 70px;
+}
+
+.pagination button {
+    background: transparent;
+    border: 0;
+    color: #51575c;
+    cursor: pointer;
+    font-family: inherit;
+    height: 30px;
+    min-width: 30px;
+}
+
+.pagination button.active {
+    background: #35aeb2;
+    color: #fff;
+}
+
+.pagination button:disabled {
+    cursor: not-allowed;
+    opacity: 0.35;
+}
+
+.product-status {
+    color: #64748b;
+    padding: 80px 0;
+    text-align: center;
+}
+
+@media (max-width: 800px) {
+    .results-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 13px;
     }
-    .category-header {
-        text-align: center;
+
+    .toolbar-controls {
+        justify-content: space-between;
+        width: 100%;
+    }
+}
+
+@media (max-width: 650px) {
+    .product-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .product-image {
+        height: 150px;
+    }
+
+    .toolbar-controls {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 420px) {
+    .product-grid {
+        grid-template-columns: 1fr;
     }
 }
 </style>

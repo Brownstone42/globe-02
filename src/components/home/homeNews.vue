@@ -1,250 +1,271 @@
 <template>
-    <div class="category mt-6 mb-8">
-        <span>บทความ</span>
-
-        <button class="arrow left" :disabled="!canLeft" @click="go(-1)">‹</button>
-
-        <div ref="scroller" class="columns scroller mt-4" @scroll.passive="updateCanScroll">
-            <div class="column" v-for="(item, i) in items" :key="item.id || i" ref="cards">
-                <div class="news-thumb">
-                    <img
-                        :src="item.coverImageUrl || item.featuredImageUrl || '/images/example/news01.png'"
-                        :alt="item.title"
-                    />
-                </div>
-                <div class="column-content">
-                    <span class="content-topic1 ml-2">{{ item.title }}</span>
-                </div>
-                <div class="column-content2 mt-5" @click="$router.push('/blogs/' + item.id)">
-                    <span class="ml-2">อ่านเพิ่มเติม</span>
-                    <img class="mr-2" src="/images/example/button.png" alt="" />
-                </div>
-            </div>
+    <section class="news-section" aria-labelledby="news-heading">
+        <div class="news-header">
+            <h2 id="news-heading">ข่าวสารจาก ไอเดียล โกลบ</h2>
+            <RouterLink class="read-all-btn" to="/blogs">อ่านทั้งหมด</RouterLink>
         </div>
 
-        <button class="arrow right" :disabled="!canRight" @click="go(1)">›</button>
-    </div>
+        <div v-if="newsStore.loading" class="news-status">กำลังโหลดข่าวสาร...</div>
+        <div v-else-if="!items.length" class="news-status">ยังไม่มีข่าวสารในขณะนี้</div>
+
+        <div v-else class="news-grid">
+            <article v-for="item in items" :key="item.id" class="news-card">
+                <RouterLink class="news-image" :to="`/blogs/${item.id}`">
+                    <img
+                        :src="
+                            item.coverImageUrl ||
+                            item.featuredImageUrl ||
+                            '/images/example/news01.png'
+                        "
+                        :alt="item.title"
+                    />
+                </RouterLink>
+
+                <div class="news-body">
+                    <time v-if="formatDate(item.createdAt)" :datetime="isoDate(item.createdAt)">
+                        {{ formatDate(item.createdAt) }}
+                    </time>
+                    <h3>{{ item.title }}</h3>
+                    <p>{{ articleExcerpt(item) }}</p>
+
+                    <RouterLink class="read-more" :to="`/blogs/${item.id}`">
+                        อ่านเพิ่มเติม
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </RouterLink>
+                </div>
+            </article>
+        </div>
+    </section>
 </template>
 
 <script>
 import { useNewsStore } from '@/stores/newsStore'
 
+function toDate(value) {
+    if (!value) return null
+    if (typeof value.toDate === 'function') return value.toDate()
+    if (typeof value.seconds === 'number') return new Date(value.seconds * 1000)
+    const date = new Date(value)
+    return Number.isNaN(date.getTime()) ? null : date
+}
+
 export default {
-    name: 'homeCategorySimple',
-    data() {
-        return {
-            cardStep: 0,
-            canLeft: false,
-            canRight: false,
-            gapPx: 16,
-        }
-    },
+    name: 'homeNews',
     computed: {
+        newsStore() {
+            return useNewsStore()
+        },
         items() {
-            const store = useNewsStore()
-            return store.publishedNews
+            return [...this.newsStore.publishedNews]
+                .sort((a, b) => (toDate(b.createdAt)?.getTime() || 0) - (toDate(a.createdAt)?.getTime() || 0))
+                .slice(0, 3)
         },
     },
     created() {
-        const store = useNewsStore()
-        if (!store.news.length) {
-            store.fetchNews()
+        if (!this.newsStore.news.length) {
+            this.newsStore.fetchNews()
         }
     },
-    mounted() {
-        this.$nextTick(() => {
-            this.measure()
-            this.updateCanScroll()
-            window.addEventListener('resize', this.onResize, { passive: true })
-        })
-    },
-    beforeUnmount() {
-        window.removeEventListener('resize', this.onResize)
-    },
     methods: {
-        onResize() {
-            this.measure()
-            this.updateCanScroll()
+        formatDate(value) {
+            const date = toDate(value)
+            if (!date) return ''
+            return new Intl.DateTimeFormat('th-TH', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+            }).format(date)
         },
-        measure() {
-            const cards = this.$refs.cards
-            if (!cards || cards.length === 0) return
-            // กำหนดระยะ “เลื่อนทีละใบ”
-            // เอาความกว้างใบแรก + gap (กันกรณี snap-center บนมือถือ)
-            const w = cards[0].getBoundingClientRect().width
-            this.cardStep = Math.round(w + this.gapPx)
+        isoDate(value) {
+            return toDate(value)?.toISOString() || ''
         },
-        go(dir) {
-            const scroller = this.$refs.scroller
-            if (!scroller) return
-            scroller.scrollBy({ left: dir * this.cardStep, behavior: 'smooth' })
-            // อัพเดทสถานะปุ่มหลังเลื่อน (ดีเลย์สั้น ๆ ให้ตำแหน่งขยับก่อน)
-            clearTimeout(this._t)
-            this._t = setTimeout(this.updateCanScroll, 250)
-        },
-        updateCanScroll() {
-            const s = this.$refs.scroller
-            if (!s) return
-            // เช็คสุดซ้าย/สุดขวาแบบตรงไปตรงมา
-            const max = s.scrollWidth - s.clientWidth
-            const left = s.scrollLeft
-            this.canLeft = left > 0
-            this.canRight = left < max - 1
+        articleExcerpt(item) {
+            const source = item.metaDescription || item.content || ''
+            const container = document.createElement('div')
+            container.innerHTML = source
+            return (container.textContent || '').replace(/\s+/g, ' ').trim()
         },
     },
 }
 </script>
 
 <style scoped>
-.mb-8 {
-    margin-bottom: 4rem !important;
-}
-/* ——— thumbnail 16:9 ——— */
-.news-thumb {
-    position: relative;
-    width: 100%;
-    padding-top: 56.25%; /* 9/16 */
-    overflow: hidden;
-    border-radius: 8px;
-    margin-bottom: 12px;
-}
-.news-thumb img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: top;
+.news-section {
+    background: #fff;
+    padding: 68px 0 84px;
 }
 
-/* ——— text parts (เหมือนเดิม) ——— */
-.content-topic1 {
-    font-size: 11pt;
-    color: #205266;
-    font-weight: bold;
+.news-header,
+.news-grid,
+.news-status {
+    margin-left: auto;
+    margin-right: auto;
+    width: min(1160px, 90vw);
 }
-.content-topic2 {
-    font-size: 11pt;
-    color: rgba(128, 128, 128, 0.76);
-}
-.column-content {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding-bottom: 12px;
-    border-bottom: 1px solid rgba(128, 128, 128, 0.45);
-}
-.column-content2 {
+
+.news-header {
+    align-items: center;
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
+    margin-bottom: 28px;
 }
-.column-content2 span {
-    font-size: 11pt;
+
+.news-header h2 {
     color: #205266;
-}
-.column-content2 img {
-    width: 35px;
-}
-
-/* ——— wrapper ——— */
-.category {
-    position: relative;
-    margin: auto;
-    width: min(1100px, 80vw);
+    font-size: clamp(1.45rem, 2.2vw, 2rem);
+    font-weight: 700;
+    margin: 0;
 }
 
-/* ——— scroller ——— */
-.columns.scroller {
-    display: flex;
-    flex-wrap: nowrap !important;
-    overflow-x: auto;
-    overflow-y: hidden;
-    gap: 1rem; /* ตรงกับ gapPx ใน script */
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    user-select: none;
-    cursor: grab;
-}
-.columns.scroller::-webkit-scrollbar {
-    display: none;
+.read-all-btn {
+    border: 1px solid #2eaeb2;
+    border-radius: 7px;
+    color: #259da1;
+    font-size: 0.9rem;
+    min-width: 132px;
+    padding: 9px 20px;
+    text-align: center;
+    text-decoration: none;
+    transition: background 0.18s ease, color 0.18s ease;
 }
 
-/* ——— card ——— */
-.column {
-    flex: 0 0 100%;
-    scroll-snap-align: start; /* มือถือ: เริ่มที่ขอบซ้าย */
-    min-height: 140px;
-    background: white;
+.read-all-btn:hover {
+    background: #2eaeb2;
+    color: #fff;
+}
+
+.news-grid {
+    display: grid;
+    gap: 30px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.news-card {
+    background: #fff;
     border-radius: 12px;
-    padding: 16px;
-    text-align: left;
+    box-shadow: 0 3px 14px rgba(15, 23, 42, 0.14);
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
 }
 
-/* ——— desktop: คง 4 ใบ/แถว (ยังเลื่อนถ้ามีมากกว่า 4) ——— */
-@media (min-width: 768px) {
-    .column {
-        flex: 0 0 calc(33.33% - 0.75rem);
-    }
-    .columns.scroller {
-        padding: 0;
-        scroll-padding: 0;
+.news-image {
+    aspect-ratio: 16 / 9;
+    display: block;
+    overflow: hidden;
+}
+
+.news-image img {
+    display: block;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.25s ease;
+    width: 100%;
+}
+
+.news-image:hover img {
+    transform: scale(1.025);
+}
+
+.news-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 17px 18px 18px;
+}
+
+.news-body time {
+    color: #7b8790;
+    font-size: 0.7rem;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.news-body h3 {
+    color: #26a7ab;
+    display: -webkit-box;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.45;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+}
+
+.news-body p {
+    color: #6b7280;
+    display: -webkit-box;
+    font-size: 0.82rem;
+    line-height: 1.55;
+    margin: 8px 0 14px;
+    min-height: calc(1.55em * 2);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.read-more {
+    align-items: center;
+    color: #239da1;
+    display: inline-flex;
+    font-size: 0.8rem;
+    gap: 8px;
+    margin-top: auto;
+    text-decoration: none;
+    width: fit-content;
+}
+
+.read-more:hover {
+    color: #176f73;
+}
+
+.read-more i {
+    font-size: 0.7rem;
+    transition: transform 0.18s ease;
+}
+
+.read-more:hover i {
+    transform: translateX(3px);
+}
+
+.news-status {
+    color: #64748b;
+    padding: 48px 0;
+    text-align: center;
+}
+
+@media (max-width: 900px) {
+    .news-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
-/* ——— mobile: ให้ “โผล่ข้างๆ” เห็นนิดนึง + snap center ——— */
-@media (max-width: 767.98px) {
-    .columns.scroller {
-        padding: 0 10vw; /* ทำให้มี peek ซ้าย/ขวา */
-        scroll-padding: 0 10vw; /* ให้ snap เผื่อ padding */
+@media (max-width: 600px) {
+    .news-section {
+        padding: 54px 0 68px;
     }
-    .column {
-        flex: 0 0 85%; /* ให้ใบหลักกว้าง 85% ของ viewport */
-        scroll-snap-align: center;
-    }
-}
 
-/* ——— arrows ——— */
-.arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: white;
-    border: none;
-    border-radius: 999px;
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
-    font-size: 1.5rem;
-    line-height: 1;
-    color: #333;
-    z-index: 5;
-}
-.arrow.left {
-    left: -32px;
-}
-.arrow.right {
-    right: -32px;
-}
-.arrow:disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
-}
+    .news-header {
+        align-items: flex-start;
+        gap: 16px;
+    }
 
-@media (max-width: 768px) {
-    .arrow {
-        width: 32px;
-        height: 32px;
-        font-size: 1.6rem;
+    .news-header h2 {
+        font-size: 1.3rem;
     }
-    .arrow.left {
-        left: -8%;
+
+    .read-all-btn {
+        flex-shrink: 0;
+        min-width: 104px;
+        padding: 7px 13px;
     }
-    .arrow.right {
-        right: -8%;
+
+    .news-grid {
+        grid-template-columns: 1fr;
     }
 }
 </style>
