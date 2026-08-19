@@ -112,12 +112,12 @@ export default {
 
 <style scoped>
 .contact-section {
-    background: #22272d;
+    background: #23272d;
     width: 100%;
 }
 
 .stats-strip {
-    background: #22272d;
+    background: #a0805b;
     color: #fff;
     padding: 58px 0 54px;
 }
@@ -139,14 +139,14 @@ export default {
 }
 
 .stat-item strong {
-    color: #55c5c8;
+    color: #fff;
     font-size: clamp(1.75rem, 2.6vw, 2.55rem);
     font-weight: 700;
     line-height: 1.05;
 }
 
 .stat-item span {
-    color: #55c5c8;
+    color: #fff;
     font-size: 1.05rem;
     font-weight: 700;
     line-height: 1.25;
@@ -154,7 +154,7 @@ export default {
 }
 
 .stat-item small {
-    color: #d6d9dd;
+    color: rgba(255, 255, 255, 0.9);
     font-size: 0.72rem;
     line-height: 1.25;
     margin-top: 3px;
@@ -166,11 +166,11 @@ export default {
 
 .order-contact-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .steps-panel {
-    background: #22272d;
+    background: #23272d;
     color: #fff;
     display: flex;
     justify-content: flex-end;
@@ -208,8 +208,8 @@ export default {
 
 .step-number {
     align-items: center;
-    background: #35b2b6;
-    border: 6px solid #152f36;
+    background: #a0805b;
+    border: 6px solid #171a1e;
     border-radius: 50%;
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.28);
     color: #fff;
@@ -221,7 +221,7 @@ export default {
 }
 
 .steps-list h3 {
-    color: #36b8bc;
+    color: #a0805b;
     font-size: 1.18rem;
     font-weight: 500;
     line-height: 1.25;
@@ -238,7 +238,7 @@ export default {
 }
 
 .form-panel {
-    background: #eaf4f8;
+    background: #deddda;
     color: #26343e;
     padding: 56px 5vw 64px;
 }
@@ -297,8 +297,8 @@ export default {
 
 .contact-form input:focus,
 .contact-form textarea:focus {
-    border-color: #35aeb1;
-    box-shadow: 0 0 0 3px rgba(53, 174, 177, 0.13);
+    border-color: #a0805b;
+    box-shadow: 0 0 0 3px rgba(160, 128, 91, 0.15);
 }
 
 .message-field {
@@ -311,7 +311,7 @@ export default {
 }
 
 .contact-form button {
-    background: #35aeb1;
+    background: #a0805b;
     border: 0;
     border-radius: 7px;
     color: #fff;
@@ -325,7 +325,7 @@ export default {
 }
 
 .contact-form button:hover {
-    background: #288f92;
+    background: #896b49;
 }
 
 @media (max-width: 800px) {

@@ -90,9 +90,9 @@ export default {
 
 .category-image {
     background: #fff;
-    height: 190px;
+    height: 210px;
     overflow: hidden;
-    padding: 10px;
+    padding: 20px 10px 10px;
     width: 100%;
 }
 
@@ -113,7 +113,7 @@ export default {
 
 .category-info {
     align-items: center;
-    background: #eef8fc;
+    background: #f5f6f7;
     display: flex;
     gap: 12px;
     justify-content: space-between;
@@ -126,7 +126,7 @@ export default {
 }
 
 .category-names h3 {
-    color: #25aeb2;
+    color: #a0805b;
     font-size: 1rem;
     font-weight: 700;
     line-height: 1.25;
@@ -143,7 +143,7 @@ export default {
 
 .category-arrow {
     align-items: center;
-    background: #32aeb2;
+    background: #a0805b;
     border-radius: 50%;
     color: #fff;
     display: inline-flex;
@@ -156,7 +156,7 @@ export default {
 }
 
 .category-arrow:hover {
-    background: #258e92;
+    background: #896b49;
     color: #fff;
     transform: translateX(2px);
 }
@@ -178,7 +178,7 @@ export default {
 }
 
 .all-products-link:hover {
-    color: #25aeb2;
+    color: #a0805b;
     text-decoration: underline;
 }
 
@@ -205,8 +205,8 @@ export default {
     }
 
     .category-image {
-        height: 122px;
-        padding: 6px;
+        height: 136px;
+        padding: 12px 6px 6px;
     }
 
     .category-names h3 {

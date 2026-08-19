@@ -139,7 +139,7 @@ export default {
 }
 
 .hero-heading p {
-    color: #27aeb1;
+    color: #a0805b;
     font-size: clamp(1rem, 1.45vw, 1.3rem);
     line-height: 1.45;
     margin: 0;
@@ -175,12 +175,12 @@ export default {
 }
 
 .product-btn {
-    background: #fff;
-    color: #27aeb1;
+    background: #23272d;
+    color: #fff;
 }
 
 .quote-btn {
-    background: #35aeb1;
+    background: #a0805b;
     color: #fff;
 }
 
@@ -189,12 +189,27 @@ export default {
 }
 
 .contact-btn {
-    background: #155a6c;
-    color: #fff;
+    background: #fff;
+    color: #a0805b;
 }
 
 .contact-btn .fa-line {
     font-size: 1.15rem;
+}
+
+.product-btn:hover {
+    background: #15171b;
+    color: #fff;
+}
+
+.quote-btn:hover {
+    background: #896b49;
+    color: #fff;
+}
+
+.contact-btn:hover {
+    background: #f7f3ed;
+    color: #896b49;
 }
 
 .hero-trust {

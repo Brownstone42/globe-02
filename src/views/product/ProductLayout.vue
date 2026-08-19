@@ -104,7 +104,7 @@ export default {
 }
 
 .product-sidebar h1 {
-    color: #32aeb2;
+    color: #a0805b;
     font-size: 1.75rem;
     font-weight: 500;
     margin: 0 0 25px;
@@ -133,7 +133,7 @@ export default {
 }
 
 .category-list > li::before {
-    background: #30b1b5;
+    background: #a0805b;
     border-radius: 50%;
     content: '';
     height: 5px;
@@ -157,7 +157,7 @@ export default {
 .subcategory-list a.active,
 .all-category:hover,
 .all-category.active {
-    color: #22a7ab;
+    color: #a0805b;
 }
 
 .subcategory-list {
@@ -170,7 +170,7 @@ export default {
 }
 
 .subcategory-list a {
-    color: #2aadb1;
+    color: #a0805b;
     font-size: 0.78rem;
 }
 

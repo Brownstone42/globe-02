@@ -227,8 +227,8 @@ export default {
 }
 
 .per-page-control button.active {
-    border-bottom: 2px solid #2badb1;
-    color: #20a8ac;
+    border-bottom: 2px solid #a0805b;
+    color: #a0805b;
 }
 
 .toolbar-controls select {
@@ -288,7 +288,7 @@ export default {
 }
 
 .product-info h2 {
-    color: #205266;
+    color: #a0805b;
     display: -webkit-box;
     font-size: 0.95rem;
     font-weight: 700;
@@ -321,14 +321,14 @@ export default {
 }
 
 .product-link-row > a:first-child {
-    color: #25aeb2;
+    color: #a0805b;
     font-size: 0.67rem;
     text-decoration: none;
 }
 
 .product-arrow {
     align-items: center;
-    background: #35aeb2;
+    background: #a0805b;
     border-radius: 50%;
     color: #fff;
     display: inline-flex;
@@ -362,7 +362,7 @@ export default {
 }
 
 .pagination button.active {
-    background: #35aeb2;
+    background: #a0805b;
     color: #fff;
 }
 
