@@ -145,6 +145,7 @@ export default {
     async mounted() {
         // โหลดสินค้าครั้งแรก
         await this.productStore.fetchProducts()
+        await this.productStore.migrateProductSchema()
         // โหลดหมวดหมู่
         if (!this.categoryStore.categories || !this.categoryStore.categories.length) {
             await this.categoryStore.loadCategories()
@@ -167,11 +168,16 @@ export default {
                 this.currentProductId = null
             }
         },
-        handleSaved() {
-            // หลัง save หรือ update เสร็จ → กลับสู่ create mode
+        async handleSaved({ mode, product } = {}) {
+            if (mode === 'update' && product?.id) {
+                // รีเซ็ตฟอร์มจากข้อมูลล่าสุด แต่ยังคงอยู่ในโหมดแก้ไขสินค้าชิ้นเดิม
+                this.currentProductId = null
+                await this.$nextTick()
+                this.currentProductId = product.id
+                return
+            }
+
             this.currentProductId = null
-            // ถ้าอยากแน่นอนก็ reload อีกรอบได้ (แต่ไม่จำเป็นเพราะ state update ใน store แล้ว)
-            // this.productStore.fetchProducts()
         },
     },
 }

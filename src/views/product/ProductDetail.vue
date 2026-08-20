@@ -84,7 +84,7 @@ export default {
     data() {
         return {
             selectedImageIndex: 0,
-            activeTab: 'highlights',
+            activeTab: 'properties',
         }
     },
     computed: {
@@ -155,7 +155,7 @@ export default {
         productId() {
             // เวลาเปลี่ยน product (เช่น จาก relatedProducts) ให้ reset state
             this.selectedImageIndex = 0
-            this.activeTab = 'highlights'
+            this.activeTab = 'properties'
         },
     },
 }

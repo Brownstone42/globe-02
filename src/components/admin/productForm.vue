@@ -15,34 +15,13 @@
             <textarea id="description" v-model="form.description" class="form-textarea" rows="4" placeholder="-"></textarea>
         </div>
 
-        <div class="form-group">
-            <label for="highlights">จุดเด่นสินค้า</label>
-            <textarea id="highlights" v-model="form.highlights" class="form-textarea" rows="2" placeholder="-"></textarea>
-        </div>
-
-        <div class="form-group">
-            <label for="spec">ข้อมูลทางเทคนิค</label>
-            <textarea id="spec" v-model="form.spec" class="form-textarea" rows="2" placeholder="-"></textarea>
-        </div>
-
-        <div class="form-group">
-            <label for="standards">มาตรฐานและการรับรอง</label>
-            <textarea id="standards" v-model="form.standards" class="form-textarea" rows="2" placeholder="-"></textarea>
-        </div>
-
-        <div class="form-group">
-            <label for="suitableIndustries">เหมาะสำหรับอุตสาหกรรมอะไร</label>
-            <textarea id="suitableIndustries" v-model="form.suitableIndustries" class="form-textarea" rows="2" placeholder="-"></textarea>
-        </div>
-
-        <div class="form-group">
-            <label for="usecase">การใช้งานแนะนำ</label>
-            <textarea id="usecase" v-model="form.usecase" class="form-textarea" rows="2" placeholder="-"></textarea>
-        </div>
-
-        <div class="form-group">
-            <label for="protectionProperties">คุณสมบัติการป้องกัน</label>
-            <textarea id="protectionProperties" v-model="form.protectionProperties" class="form-textarea" rows="2" placeholder="-"></textarea>
+        <div v-for="group in listGroups" :key="group.key" class="form-group list-group">
+            <label>{{ group.label }}</label>
+            <div v-for="(item, index) in form[group.key]" :key="`${group.key}-${index}`" class="list-row">
+                <input v-model="form[group.key][index]" type="text" class="form-input" :placeholder="`${group.label} ข้อที่ ${index + 1}`" />
+                <button type="button" class="btn-remove" :aria-label="`ลบ${group.label}ข้อที่ ${index + 1}`" @click="removeListItem(group.key, index)">×</button>
+            </div>
+            <button type="button" class="btn-add" @click="addListItem(group.key)">+ เพิ่ม{{ group.label }}</button>
         </div>
 
         <div class="form-row">
@@ -81,11 +60,12 @@
         </div>
 
         <div class="form-group">
-            <label>รูปภาพเพิ่มเติม</label>
-            <input type="file" accept="image/*" multiple @change="onGalleryChange" class="form-file" />
+            <label>รูปภาพเพิ่มเติม (ไม่เกิน 4 รูป)</label>
+            <input ref="galleryInput" type="file" accept="image/*" multiple @change="onGalleryChange" class="form-file" />
             <div v-if="galleryPreviews.length" class="gallery-preview">
                 <div v-for="(src, index) in galleryPreviews" :key="index" class="thumb">
                     <img :src="src" alt="Gallery preview" />
+                    <button type="button" class="thumb-remove" :aria-label="`ลบรูปที่ ${index + 1}`" @click="removeGalleryImage(index)">×</button>
                 </div>
             </div>
         </div>
@@ -118,22 +98,27 @@ export default {
                 name: '',
                 shortDescription: '',
                 description: '',
-                highlights: '',
-                spec: '',
-                standards: '',
-                suitableIndustries: '',
-                usecase: '',
-                protectionProperties: '',
+                highlights: [''],
+                properties: [''],
+                specifications: [''],
+                standards: [''],
                 brand: '',
                 sku: '',
                 category: '',
                 packing: '',
                 mainImageFile: null,
+                existingGalleryImageUrls: [],
                 galleryImageFiles: [],
             },
             mainImagePreview: null,
-            galleryPreviews: [],
+            newGalleryPreviews: [],
             isEditMode: false,
+            listGroups: [
+                { key: 'highlights', label: 'จุดเด่นสินค้า' },
+                { key: 'properties', label: 'คุณสมบัติ' },
+                { key: 'specifications', label: 'สเปคสินค้า' },
+                { key: 'standards', label: 'มาตรฐานและการรับรอง' },
+            ],
         }
     },
     computed: {
@@ -145,6 +130,9 @@ export default {
         },
         categoryOptions() {
             return this.categoryStore.sortedCategories || []
+        },
+        galleryPreviews() {
+            return [...this.form.existingGalleryImageUrls, ...this.newGalleryPreviews]
         },
     },
     async mounted() {
@@ -161,22 +149,21 @@ export default {
                     this.form.name = newVal.name || ''
                     this.form.shortDescription = newVal.shortDescription || ''
                     this.form.description = newVal.description || ''
-                    this.form.highlights = newVal.highlights || ''
-                    this.form.spec = newVal.spec || ''
-                    this.form.standards = newVal.standards || ''
-                    this.form.suitableIndustries = newVal.suitableIndustries || ''
-                    this.form.usecase = newVal.usecase || ''
-                    this.form.protectionProperties = newVal.protectionProperties || ''
+                    this.form.highlights = this.asEditableList(newVal.highlights)
+                    this.form.properties = this.asEditableList(newVal.properties)
+                    this.form.specifications = this.asEditableList(newVal.specifications)
+                    this.form.standards = this.asEditableList(newVal.standards)
                     this.form.brand = newVal.brand || ''
                     this.form.sku = newVal.sku || ''
                     this.form.packing = newVal.packing || ''
                     this.form.category = newVal.category || ''
                     this.mainImagePreview = newVal.mainImageUrl || null
-                    this.galleryPreviews = Array.isArray(newVal.galleryImageUrls)
+                    this.form.existingGalleryImageUrls = Array.isArray(newVal.galleryImageUrls)
                         ? [...newVal.galleryImageUrls]
                         : []
                     this.form.mainImageFile = null
                     this.form.galleryImageFiles = []
+                    this.newGalleryPreviews = []
                 } else {
                     this.isEditMode = false
                     this.resetForm()
@@ -185,6 +172,16 @@ export default {
         },
     },
     methods: {
+        asEditableList(value) {
+            return Array.isArray(value) && value.length ? [...value] : ['']
+        },
+        addListItem(key) {
+            this.form[key].push('')
+        },
+        removeListItem(key, index) {
+            this.form[key].splice(index, 1)
+            if (!this.form[key].length) this.form[key].push('')
+        },
         onMainImageChange(event) {
             const file = event.target.files && event.target.files[0]
             if (!file) return
@@ -194,33 +191,52 @@ export default {
         onGalleryChange(event) {
             const files = event.target.files
             if (!files || !files.length) return
-            const fileArray = Array.from(files).slice(0, 4)
-            this.form.galleryImageFiles = fileArray
-            this.galleryPreviews = fileArray.map((f) => URL.createObjectURL(f))
+            const availableSlots = 4 - this.galleryPreviews.length
+            const fileArray = Array.from(files).slice(0, Math.max(availableSlots, 0))
+            if (files.length > availableSlots) alert('รูปภาพเพิ่มเติมรวมกันได้ไม่เกิน 4 รูป')
+            this.form.galleryImageFiles.push(...fileArray)
+            this.newGalleryPreviews.push(...fileArray.map((file) => URL.createObjectURL(file)))
+            event.target.value = ''
+        },
+        removeGalleryImage(index) {
+            const existingCount = this.form.existingGalleryImageUrls.length
+            if (index < existingCount) {
+                this.form.existingGalleryImageUrls.splice(index, 1)
+                return
+            }
+            const newIndex = index - existingCount
+            URL.revokeObjectURL(this.newGalleryPreviews[newIndex])
+            this.newGalleryPreviews.splice(newIndex, 1)
+            this.form.galleryImageFiles.splice(newIndex, 1)
         },
         resetForm() {
             this.form = {
                 name: '',
                 shortDescription: '',
                 description: '',
-                highlights: '',
-                spec: '',
-                standards: '',
-                suitableIndustries: '',
-                usecase: '',
-                protectionProperties: '',
+                highlights: [''],
+                properties: [''],
+                specifications: [''],
+                standards: [''],
                 brand: '',
                 sku: '',
                 category: '',
                 packing: '',
                 mainImageFile: null,
+                existingGalleryImageUrls: [],
                 galleryImageFiles: [],
             }
             this.mainImagePreview = null
-            this.galleryPreviews = []
+            this.newGalleryPreviews.forEach((url) => URL.revokeObjectURL(url))
+            this.newGalleryPreviews = []
         },
         async handleSubmit() {
-            if (this.isEditMode && this.editingProduct && this.editingProduct.id) {
+            const wasEditing = this.isEditMode && this.editingProduct && this.editingProduct.id
+            const savedProduct = wasEditing
+                ? { id: this.editingProduct.id, category: this.form.category }
+                : null
+
+            if (wasEditing) {
                 await this.productStore.updateProduct(this.editingProduct.id, this.form)
             } else {
                 await this.productStore.saveProduct(this.form)
@@ -231,7 +247,10 @@ export default {
                 if (!this.isEditMode) {
                     this.resetForm()
                 }
-                this.$emit('saved')
+                this.$emit('saved', {
+                    mode: wasEditing ? 'update' : 'create',
+                    product: savedProduct,
+                })
             } else {
                 alert(this.productStore.error || 'เกิดข้อผิดพลาด')
             }
@@ -323,8 +342,49 @@ label {
     border: 1px solid #e5e7eb;
 }
 
+.thumb { position: relative; }
+.thumb-remove {
+    align-items: center;
+    background: #dc2626;
+    border: 0;
+    border-radius: 50%;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    font-size: 0.9rem;
+    height: 20px;
+    justify-content: center;
+    padding: 0;
+    position: absolute;
+    right: -6px;
+    top: -6px;
+    width: 20px;
+}
+
 .form-actions {
     margin-top: 8px;
+}
+
+.list-group { gap: 7px; }
+.list-row { display: flex; gap: 8px; }
+.btn-add {
+    align-self: flex-start;
+    background: #f5f6f7;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    color: #23272d;
+    cursor: pointer;
+    padding: 6px 11px;
+}
+.btn-add:hover { border-color: #a0805b; color: #a0805b; }
+.btn-remove {
+    background: #fee2e2;
+    border: 0;
+    border-radius: 6px;
+    color: #b91c1c;
+    cursor: pointer;
+    flex: 0 0 34px;
+    font-size: 1.2rem;
 }
 
 .btn-primary {

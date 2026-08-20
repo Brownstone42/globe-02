@@ -42,12 +42,16 @@
 
             <div v-if="product.highlights" class="info-block">
                 <p class="info-label">จุดเด่นสินค้า</p>
-                <p class="info-value">{{ product.highlights }}</p>
+                <ul class="info-list">
+                    <li v-for="(item, index) in listValue(product.highlights)" :key="index">{{ item }}</li>
+                </ul>
             </div>
 
             <div v-if="product.standards" class="info-block">
                 <p class="info-label">มาตรฐานและการรับรอง</p>
-                <p class="info-value">{{ product.standards }}</p>
+                <ul class="info-list">
+                    <li v-for="(item, index) in listValue(product.standards)" :key="index">{{ item }}</li>
+                </ul>
             </div>
         </div>
     </div>
@@ -75,6 +79,12 @@ export default {
         },
     },
     emits: ['update:selected-image-index'],
+    methods: {
+        listValue(value) {
+            if (Array.isArray(value)) return value
+            return value ? [value] : []
+        },
+    },
     computed: {
         // รวม mainImageUrl + galleryImageUrls ให้กลายเป็น array เดียว
         images() {
@@ -182,6 +192,13 @@ export default {
     font-size: 0.9rem;
     color: #1e293b;
     white-space: pre-wrap;
+}
+
+.info-list {
+    color: #1e293b;
+    font-size: 0.9rem;
+    list-style: disc;
+    margin: 0 0 0 1.2rem;
 }
 
 figure {

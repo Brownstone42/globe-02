@@ -1,14 +1,20 @@
 <template>
-    <section class="category-section" aria-labelledby="category-heading">
+    <section
+        ref="revealSection"
+        class="category-section"
+        :class="{ 'is-visible': isVisible }"
+        aria-labelledby="category-heading"
+    >
         <h2 id="category-heading">เลือกสินค้าจากหมวดหมู่</h2>
 
         <div v-if="categoryStore.loading" class="category-status">กำลังโหลดหมวดหมู่...</div>
 
         <div v-else class="category-grid">
             <article
-                v-for="item in categoryStore.visibleCategories"
+                v-for="(item, index) in categoryStore.visibleCategories"
                 :key="item.id"
                 class="category-card"
+                :style="{ '--reveal-delay': `${120 + index * 85}ms` }"
             >
                 <div class="category-image">
                     <img v-if="item.imageUrl" :src="item.imageUrl" :alt="item.name || ''" />
@@ -48,6 +54,12 @@ import { useCategoryStore } from '@/stores/categoryStore'
 
 export default {
     name: 'homeCategory',
+    data() {
+        return {
+            isVisible: false,
+            revealObserver: null,
+        }
+    },
     computed: {
         ...mapStores(useCategoryStore),
     },
@@ -55,6 +67,28 @@ export default {
         if (!this.categoryStore.categories.length) {
             this.categoryStore.loadCategories()
         }
+        this.setupReveal()
+    },
+    beforeUnmount() {
+        this.revealObserver?.disconnect()
+    },
+    methods: {
+        setupReveal() {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                this.isVisible = true
+                return
+            }
+
+            this.revealObserver = new IntersectionObserver(
+                ([entry]) => {
+                    if (!entry.isIntersecting) return
+                    this.isVisible = true
+                    this.revealObserver.disconnect()
+                },
+                { threshold: 0.12 },
+            )
+            this.revealObserver.observe(this.$refs.revealSection)
+        },
     },
 }
 </script>
@@ -72,6 +106,7 @@ export default {
     font-weight: 700;
     margin: 0 0 32px;
     text-align: center;
+    transition-delay: 20ms;
 }
 
 .category-grid {
@@ -86,6 +121,24 @@ export default {
     box-shadow: 0 3px 12px rgba(15, 23, 42, 0.15);
     min-width: 0;
     overflow: hidden;
+    transition-delay: var(--reveal-delay, 120ms);
+}
+
+.category-section h2,
+.category-card,
+.all-products-link {
+    opacity: 0;
+    transform: translateY(30px);
+    transition-duration: 0.7s;
+    transition-property: opacity, transform;
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.category-section.is-visible h2,
+.category-section.is-visible .category-card,
+.category-section.is-visible .all-products-link {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .category-image {
@@ -175,6 +228,17 @@ export default {
     text-align: center;
     text-decoration: none;
     width: fit-content;
+    transition-delay: 420ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .category-section h2,
+    .category-card,
+    .all-products-link {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
 }
 
 .all-products-link:hover {

@@ -32,10 +32,15 @@
                         ขอใบเสนอราคา
                         <i class="fa-solid fa-chevron-right"></i>
                     </button>
-                    <button class="hero-btn contact-btn" type="button" @click="scrollToContact">
+                    <a
+                        class="hero-btn contact-btn"
+                        href="https://line.me/R/ti/p/%40idealglobe"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
                         <i class="fa-brands fa-line"></i>
                         ติดต่อเรา
-                    </button>
+                    </a>
                 </div>
 
                 <p class="hero-trust">มากกว่า 30 ปี ที่ผู้ประกอบการวางใจ</p>

@@ -1,5 +1,10 @@
 <template>
-    <section class="news-section" aria-labelledby="news-heading">
+    <section
+        ref="revealSection"
+        class="news-section"
+        :class="{ 'is-visible': isVisible }"
+        aria-labelledby="news-heading"
+    >
         <div class="news-header">
             <h2 id="news-heading">ข่าวสารจาก ไอเดียล โกลบ</h2>
             <RouterLink class="read-all-btn" to="/blogs">อ่านทั้งหมด</RouterLink>
@@ -8,8 +13,25 @@
         <div v-if="newsStore.loading" class="news-status">กำลังโหลดข่าวสาร...</div>
         <div v-else-if="!items.length" class="news-status">ยังไม่มีข่าวสารในขณะนี้</div>
 
-        <div v-else class="news-grid">
-            <article v-for="item in items" :key="item.id" class="news-card">
+        <div v-else class="news-carousel">
+            <button
+                class="carousel-arrow carousel-arrow--prev"
+                type="button"
+                aria-label="ข่าวก่อนหน้า"
+                :disabled="!canScrollPrev"
+                @click="moveCarousel(-1)"
+            >
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+
+            <div ref="newsViewport" class="news-viewport" @scroll.passive="updateCarouselState">
+                <div class="news-grid">
+                    <article
+                        v-for="(item, index) in items"
+                        :key="item.id"
+                        class="news-card"
+                        :style="{ '--reveal-delay': `${120 + Math.min(index, 2) * 110}ms` }"
+                    >
                 <RouterLink class="news-image" :to="`/blogs/${item.id}`">
                     <img
                         :src="
@@ -32,8 +54,20 @@
                         อ่านเพิ่มเติม
                         <i class="fa-solid fa-arrow-right"></i>
                     </RouterLink>
+                    </div>
+                </article>
                 </div>
-            </article>
+            </div>
+
+            <button
+                class="carousel-arrow carousel-arrow--next"
+                type="button"
+                aria-label="ข่าวถัดไป"
+                :disabled="!canScrollNext"
+                @click="moveCarousel(1)"
+            >
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
         </div>
     </section>
 </template>
@@ -51,6 +85,14 @@ function toDate(value) {
 
 export default {
     name: 'homeNews',
+    data() {
+        return {
+            isVisible: false,
+            revealObserver: null,
+            canScrollPrev: false,
+            canScrollNext: false,
+        }
+    },
     computed: {
         newsStore() {
             return useNewsStore()
@@ -58,7 +100,6 @@ export default {
         items() {
             return [...this.newsStore.publishedNews]
                 .sort((a, b) => (toDate(b.createdAt)?.getTime() || 0) - (toDate(a.createdAt)?.getTime() || 0))
-                .slice(0, 3)
         },
     },
     created() {
@@ -66,7 +107,56 @@ export default {
             this.newsStore.fetchNews()
         }
     },
+    mounted() {
+        this.setupReveal()
+        window.addEventListener('resize', this.updateCarouselState)
+        this.$nextTick(this.updateCarouselState)
+    },
+    beforeUnmount() {
+        this.revealObserver?.disconnect()
+        window.removeEventListener('resize', this.updateCarouselState)
+    },
+    watch: {
+        items() {
+            this.$nextTick(this.updateCarouselState)
+        },
+    },
     methods: {
+        moveCarousel(direction) {
+            const viewport = this.$refs.newsViewport
+            const card = viewport?.querySelector('.news-card')
+            if (!viewport || !card) return
+            const gap = Number.parseFloat(getComputedStyle(viewport.querySelector('.news-grid')).gap) || 0
+            viewport.scrollBy({ left: direction * (card.offsetWidth + gap), behavior: 'smooth' })
+        },
+        updateCarouselState() {
+            const viewport = this.$refs.newsViewport
+            if (!viewport) {
+                this.canScrollPrev = false
+                this.canScrollNext = false
+                return
+            }
+
+            const endPosition = viewport.scrollWidth - viewport.clientWidth
+            this.canScrollPrev = viewport.scrollLeft > 2
+            this.canScrollNext = endPosition > 2 && viewport.scrollLeft < endPosition - 2
+        },
+        setupReveal() {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                this.isVisible = true
+                return
+            }
+
+            this.revealObserver = new IntersectionObserver(
+                ([entry]) => {
+                    if (!entry.isIntersecting) return
+                    this.isVisible = true
+                    this.revealObserver.disconnect()
+                },
+                { threshold: 0.12 },
+            )
+            this.revealObserver.observe(this.$refs.revealSection)
+        },
         formatDate(value) {
             const date = toDate(value)
             if (!date) return ''
@@ -96,7 +186,7 @@ export default {
 }
 
 .news-header,
-.news-grid,
+.news-carousel,
 .news-status {
     margin-left: auto;
     margin-right: auto;
@@ -108,10 +198,11 @@ export default {
     display: flex;
     justify-content: space-between;
     margin-bottom: 28px;
+    transition-delay: 20ms;
 }
 
 .news-header h2 {
-    color: #205266;
+    color: #a0805b;
     font-size: clamp(1.45rem, 2.2vw, 2rem);
     font-weight: 700;
     margin: 0;
@@ -134,10 +225,23 @@ export default {
     color: #fff;
 }
 
+.news-carousel {
+    position: relative;
+}
+
+.news-viewport {
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+}
+
+.news-viewport::-webkit-scrollbar {
+    display: none;
+}
+
 .news-grid {
-    display: grid;
+    display: flex;
     gap: 30px;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .news-card {
@@ -148,6 +252,58 @@ export default {
     flex-direction: column;
     min-width: 0;
     overflow: hidden;
+    flex: 0 0 calc((100% - 60px) / 3);
+    transition-delay: var(--reveal-delay, 120ms);
+}
+
+.carousel-arrow {
+    align-items: center;
+    background: #23272d;
+    border: 0;
+    border-radius: 50%;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    height: 42px;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: background 0.2s ease, transform 0.2s ease;
+    width: 42px;
+    z-index: 2;
+}
+
+.carousel-arrow:hover {
+    background: #a0805b;
+    transform: translateY(-50%) scale(1.06);
+}
+
+.carousel-arrow:disabled {
+    background: #d4d7da;
+    color: #fff;
+    cursor: default;
+    opacity: 0.65;
+    pointer-events: none;
+    transform: translateY(-50%);
+}
+
+.carousel-arrow--prev { left: -21px; }
+.carousel-arrow--next { right: -21px; }
+
+.news-header,
+.news-card {
+    opacity: 0;
+    transform: translateY(30px);
+    transition-duration: 0.7s;
+    transition-property: opacity, transform;
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.news-section.is-visible .news-header,
+.news-section.is-visible .news-card {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .news-image {
@@ -183,7 +339,7 @@ export default {
 }
 
 .news-body h3 {
-    color: #26a7ab;
+    color: #a0805b;
     display: -webkit-box;
     font-size: 1rem;
     font-weight: 700;
@@ -210,7 +366,7 @@ export default {
 
 .read-more {
     align-items: center;
-    color: #239da1;
+    color: #a0805b;
     display: inline-flex;
     font-size: 0.8rem;
     gap: 8px;
@@ -220,7 +376,7 @@ export default {
 }
 
 .read-more:hover {
-    color: #176f73;
+    color: #896b49;
 }
 
 .read-more i {
@@ -238,9 +394,18 @@ export default {
     text-align: center;
 }
 
+@media (prefers-reduced-motion: reduce) {
+    .news-header,
+    .news-card {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+}
+
 @media (max-width: 900px) {
-    .news-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+    .news-card {
+        flex-basis: calc((100% - 30px) / 2);
     }
 }
 
@@ -264,8 +429,12 @@ export default {
         padding: 7px 13px;
     }
 
-    .news-grid {
-        grid-template-columns: 1fr;
+    .news-card {
+        flex-basis: 100%;
     }
+
+    .carousel-arrow { height: 36px; width: 36px; }
+    .carousel-arrow--prev { left: -14px; }
+    .carousel-arrow--next { right: -14px; }
 }
 </style>

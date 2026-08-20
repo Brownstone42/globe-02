@@ -97,14 +97,14 @@ export default {
 }
 
 .nav-item {
-    color: #ead5b7;
+    color: #fff;
     text-decoration: none;
     font-weight: 500;
     font-size: 16px;
 }
 .nav-item:hover {
     opacity: 0.8;
-    color: #3ca9ac;
+    color: #a0805b;
 }
 
 /* Hamburger Button */
@@ -133,12 +133,13 @@ export default {
 
 .mobile-item {
     padding: 12px 20px;
-    color: #ead5b7;
+    color: #fff;
     text-decoration: none;
     font-weight: 500;
 }
 .mobile-item:hover {
     background: rgba(255, 255, 255, 0.1);
+    color: #a0805b;
 }
 
 /* Responsive */

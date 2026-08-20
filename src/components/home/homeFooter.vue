@@ -1,285 +1,442 @@
 <template>
-    <section class="footer-wrap">
-        <div class="footer-brand">
-            <img class="footer-logo" src="/images/footer-logo.png" alt="Ideal Globe" />
-            <div class="footer-topic">
-                <strong>บริการด้วยคุณภาพ สร้างความไว้วางใจอย่างยั่งยืน</strong>
-                <span>พร้อมให้คำปรึกษาและดูแลอย่างใกล้ชิด โดยทีมงานผู้เชี่ยวชาญ</span>
-            </div>
-        </div>
-
-        <div class="columns">
-            <div class="column product mt-6 pb-6">
-                <span class="menu-title">สินค้าทั้งหมด</span>
-                <ul class="menu">
-                    <li>
-                        ถุงมือ
-                        <ul class="submenu">
-                            <li>- ถุงมือใช้แล้วทิ้ง</li>
-                            <li>- ถุงมือเฉพาะทาง</li>
-                        </ul>
-                    </li>
-                    <li>อุปกรณ์ควบคุมการปนเปื้อน</li>
-                    <li>ผลิตภัณฑ์ ESD</li>
-                    <li>รองเท้า ESD</li>
-                    <li>แผ่นรองและผ้า ESD</li>
-                    <li>วัสดุยึดติดและทำความสะอาด</li>
-                </ul>
-            </div>
-
-            <div class="column contact mt-6 pb-6">
-                <div class="menu-topic">
-                    <div class="logo">
-                        <i class="fa-solid fa-mobile-screen-button"></i>
-                    </div>
-                    <div class="left">
-                        <span class="menu-title">Call Center</span>
-                    </div>
-                </div>
-                <div class="menu-topic mt-2">
-                    <div class="logo"></div>
-                    <div class="left">
-                        <span>แผนกบริการลูกค้า</span>
-                    </div>
-                    <div class="right">
-                        <span>: 02-860-1525</span>
-                    </div>
-                </div>
-                <div class="menu-topic mt-2">
-                    <div class="logo"></div>
-                    <div class="left">
-                        <span>ฝ่ายขาย</span>
-                    </div>
-                    <div class="right call-center">
-                        <span>: 091-010-8349</span>
-                        <span>: 097-294-7975</span>
-                    </div>
-                </div>
-                <div class="menu-topic mt-2">
-                    <div class="logo"></div>
-                    <div class="all">
-                        <span>ติดต่อได้ วันจันทร์ - วันศุกร์ 08.00 - 17.00 น.</span>
-                    </div>
-                </div>
-                <div class="menu-topic mt-4">
-                    <div class="logo">
-                        <i class="fa-solid fa-envelope"></i>
-                    </div>
-                    <div class="left">
-                        <span class="menu-title">Email</span>
-                    </div>
-                </div>
-                <div class="menu-topic mt-2">
-                    <div class="logo"></div>
-                    <div class="all">
-                        <span>admin@idealglobe.com</span>
-                    </div>
-                </div>
-                <div class="menu-topic mt-5">
-                    <img src="/images/footer-contact.png" alt="" />
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <img src="/images/footer-logo.png" alt="Ideal Globe" />
+                <div>
+                    <strong>บริการด้วยคุณภาพ สร้างความไว้วางใจอย่างยั่งยืน</strong>
+                    <span>พร้อมให้คำปรึกษาและดูแลอย่างใกล้ชิด โดยทีมงานผู้เชี่ยวชาญ</span>
                 </div>
             </div>
 
-            <div class="column map mt-6 pb-6">
-                <div class="menu-topic">
-                    <div class="logo">
-                        <i class="fa-solid fa-location-dot"></i>
+            <div class="footer-grid">
+                <section class="footer-column product-column">
+                    <h2>
+                        <RouterLink :to="{ name: 'product-all' }">สินค้าทั้งหมด</RouterLink>
+                    </h2>
+                    <ul class="product-menu">
+                        <li v-for="category in visibleCategories" :key="category.id">
+                            <RouterLink
+                                :to="{
+                                    name: 'product-category',
+                                    params: { category: category.slug },
+                                }"
+                            >
+                                {{ category.name }}
+                            </RouterLink>
+                        </li>
+                    </ul>
+                </section>
+
+                <section class="footer-column contact-column">
+                    <h2>Call Center</h2>
+                    <p class="contact-line">สำนักงานใหญ่ : <a href="tel:028601525">02-860-1525</a></p>
+                    <small>ติดต่อได้ วันจันทร์ - วันศุกร์ 08.00 - 17.00 น.</small>
+
+                    <div class="footer-divider"></div>
+
+                    <div class="sales-list">
+                        <span>ฝ่ายขาย :</span>
+                        <div>
+                            <p><a href="tel:0972204888">097-220-4888</a> <small>(คุณบราวน์)</small></p>
+                            <p><a href="tel:0910108349">091-010-8349</a> <small>(คุณนิด)</small></p>
+                            <p><a href="tel:0972947975">097-294-7975</a> <small>(คุณแอน)</small></p>
+                        </div>
                     </div>
-                    <div class="left">
-                        <span class="menu-title">Address</span>
-                    </div>
-                </div>
-                <div class="menu-topic mt-2">
-                    <div class="logo"></div>
-                    <div class="all">
-                        <span>46 Soi Pracha Uthit 27, Bangmod</span>
-                    </div>
-                </div>
-                <div class="menu-topic mt-2">
-                    <div class="logo"></div>
-                    <div class="all">
-                        <span>Thungkru, Bangkok 10140</span>
-                    </div>
-                </div>
-                <div class="menu-topic mt-4">
+
+                    <div class="footer-divider"></div>
+
+                    <h2>Email</h2>
+                    <a class="email-link" href="mailto:admin@idealglobe.com">
+                        admin@idealglobe.com
+                    </a>
+                </section>
+
+                <section class="footer-column address-column">
+                    <h2>Address</h2>
+                    <address>
+                        46 ซอยประชาอุทิศ 27 แขวงบางมด<br />
+                        เขตทุ่งครุ กรุงเทพฯ 10140
+                    </address>
                     <iframe
+                        title="แผนที่ Ideal Globe"
                         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3877.0019418603474!2d100.50394717455727!3d13.657645599467553!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e2a3c05ecfe141%3A0xbd9fa16b85a649f4!2zaWRlYWwgR2xvYmUgQ28uLEx0ZC7guIjguLHguJTguIjguLPguKvguJnguYjguLLguKLguK3guLjguJvguIHguKPguJPguYwgQ2xlYW5yb29tIEVTRCDguYHguJrguJrguITguKPguJrguKfguIfguIjguKM!5e0!3m2!1sen!2sth!4v1762496582219!5m2!1sen!2sth"
-                        width="325"
-                        height="225"
-                        style="border: 0"
-                        allowfullscreen=""
                         loading="lazy"
                         referrerpolicy="no-referrer-when-downgrade"
+                        allowfullscreen
                     ></iframe>
-                </div>
+                </section>
+
+                <section class="footer-column line-column">
+                    <a
+                        class="qr-link"
+                        href="https://line.me/R/ti/p/%40idealglobe"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="เพิ่มเพื่อน LINE Ideal Globe"
+                    >
+                        <img src="/images/example/qr.png" alt="LINE QR Code @idealglobe" />
+                    </a>
+                    <small>LINE OA</small>
+                    <p>@ <strong>IDEAL GLOBE</strong> (มี@)</p>
+                    <a
+                        class="add-friend-btn"
+                        href="https://line.me/R/ti/p/%40idealglobe"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <i class="fa-brands fa-line"></i>
+                        Add Friends
+                    </a>
+
+                    <div class="social-row" aria-label="Social media">
+                        <span><i class="fa-brands fa-facebook-f"></i></span>
+                        <span><i class="fa-brands fa-line"></i></span>
+                        <span><i class="fa-brands fa-youtube"></i></span>
+                        <span><i class="fa-solid fa-envelope"></i></span>
+                    </div>
+                </section>
             </div>
         </div>
-    </section>
-    <div class="credit pb-2">
-        <span>© 2026 idealglobe.com All Rights Reserved.</span>
-    </div>
+
+        <button class="back-to-top" type="button" aria-label="กลับขึ้นด้านบน" @click="scrollToTop">
+            <i class="fa-solid fa-chevron-up"></i>
+        </button>
+
+        <div class="footer-credit">© 2026 idealglobe.com All Rights Reserved.</div>
+    </footer>
 </template>
 
 <script>
+import { mapStores } from 'pinia'
+import { useCategoryStore } from '@/stores/categoryStore'
+
 export default {
     name: 'homeFooter',
+    computed: {
+        ...mapStores(useCategoryStore),
+        visibleCategories() {
+            return [...this.categoryStore.visibleCategories].sort(
+                (a, b) => (a.order || 0) - (b.order || 0),
+            )
+        },
+    },
+    created() {
+        if (!this.categoryStore.categories.length && !this.categoryStore.loading) {
+            this.categoryStore.loadCategories()
+        }
+    },
+    methods: {
+        scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+        },
+    },
 }
 </script>
 
 <style scoped>
-.contact,
-.map {
-    color: white;
-    font-size: 13px;
-}
-.footer-logo {
-    flex: 0 0 auto;
-    height: auto;
-    width: 92px;
-}
-.credit {
-    display: flex;
-    background-color: black;
-    color: rgba(255, 255, 255, 0.705);
-    justify-content: center;
-    padding-top: 10px;
-    font-size: 18px;
-}
-iframe {
-    padding-left: 10px;
-}
-img {
-    width: 70%;
-}
-.right {
-    width: 45%;
-}
-.left {
-    width: 40%;
-}
-.logo {
-    width: 15%;
-}
-.all {
-    width: 87%;
-}
-.menu-content {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    width: 100%;
-}
-.column {
-    padding-left: 2%;
-}
-.menu-topic {
-    display: flex;
-}
-.menu-topic > div {
-    display: flex;
-    align-items: center;
-}
-i {
-    font-size: 20px;
-}
-.footer-wrap {
-    background: linear-gradient(to bottom, #000 0%, #3d3b3b 100%);
-    color: #ead5b7;
-    padding: 40px 20px 20px 20px;
+.site-footer {
+    background: #23272d;
+    color: #f4f4f4;
     position: relative;
 }
-.footer-topic {
-    color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    line-height: 1.3;
-    text-align: left;
+
+.footer-inner {
+    margin: 0 auto;
+    padding: 48px 0 66px;
+    width: min(1380px, 90vw);
 }
-.footer-topic strong {
-    color: #ffffff;
-    font-size: clamp(1.35rem, 2.1vw, 2rem);
-    font-weight: 500;
-}
-.footer-topic span {
-    color: #f1f1f1;
-    font-family: 'Sukhumvit-Thin', sans-serif;
-    font-size: clamp(0.9rem, 1.25vw, 1.1rem);
-}
+
 .footer-brand {
     align-items: center;
     display: flex;
     gap: 18px;
     justify-content: center;
-    margin: 0 auto 14px;
-    width: min(900px, 90vw);
+    margin: 0 auto 70px;
 }
-.menu-title {
-    font-weight: bold;
-    font-size: 16px;
-    color: #ead5b7;
+
+.footer-brand > img {
+    height: auto;
+    width: 112px;
 }
-.menu {
-    list-style: none;
-    padding: 0;
-    margin-top: 10px;
-}
-.menu > li {
-    position: relative;
-    margin-bottom: 8px;
-    padding-left: 15px;
-    color: white;
-}
-.menu > li::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 7px;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: radial-gradient(circle, #3ca9ac 0%, #3ca9ac 60%, #3ca9ac 100%);
-}
-.submenu {
-    list-style: none;
-    padding-left: 15px; /* เว้นระยะให้เห็นเป็นชั้น */
-    margin-top: 5px;
-}
-.submenu li {
-    font-size: 0.9em;
-    color: #3ca9ac;
-}
-.column.product {
-    padding-left: 50px;
-}
-.call-center {
+
+.footer-brand > div {
+    display: flex;
     flex-direction: column;
-    align-items: flex-start !important;
 }
-@media (max-width: 768px) {
+
+.footer-brand strong {
+    color: #fff;
+    font-size: clamp(1.55rem, 2.25vw, 2.25rem);
+    font-weight: 400;
+    line-height: 1.25;
+}
+
+.footer-brand span {
+    color: #fff;
+    font-family: 'Sukhumvit-Thin', sans-serif;
+    font-size: clamp(1rem, 1.45vw, 1.35rem);
+    text-align: center;
+}
+
+.footer-grid {
+    display: grid;
+    gap: 48px;
+    grid-template-columns: 0.95fr 1.2fr 1.1fr 0.85fr;
+}
+
+.footer-column {
+    min-width: 0;
+}
+
+.footer-column h2 {
+    color: #c2a783;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0 0 12px;
+}
+
+.product-column h2 {
+    color: #fff;
+}
+
+.product-column h2 a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.product-column h2 a:hover {
+    color: #a0805b;
+}
+
+.product-menu,
+.product-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.product-menu > li {
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+    padding-left: 14px;
+    position: relative;
+}
+
+.product-menu > li a {
+    color: #f4f4f4;
+    text-decoration: none;
+    transition: color 0.18s ease;
+}
+
+.product-menu > li a:hover {
+    color: #a0805b;
+}
+
+.product-menu > li::before {
+    color: #c2a783;
+    content: '•';
+    left: 0;
+    position: absolute;
+}
+
+.product-menu ul {
+    color: #c2a783;
+    font-size: 0.88rem;
+    margin: 4px 0 0 12px;
+}
+
+.contact-line,
+.email-link,
+.address-column address {
+    color: #f4f4f4;
+    font-size: 1rem;
+    font-style: normal;
+    line-height: 1.55;
+    margin: 0;
+}
+
+.contact-line a,
+.email-link {
+    color: #f4f4f4;
+    text-decoration: none;
+}
+
+.contact-column small {
+    color: #c2a783;
+    display: block;
+    font-size: 0.75rem;
+}
+
+.sales-list {
+    display: grid;
+    font-size: 1rem;
+    gap: 10px;
+    grid-template-columns: auto minmax(0, 1fr);
+}
+
+.sales-list p {
+    margin: 0 0 7px;
+}
+
+.sales-list a {
+    color: #f4f4f4;
+    text-decoration: none;
+}
+
+.sales-list small {
+    color: #c2a783;
+    display: inline;
+    font-size: 0.78rem;
+}
+
+.footer-divider {
+    background: #c2a783;
+    height: 1px;
+    margin: 14px 0;
+    opacity: 0.9;
+    width: 100%;
+}
+
+.address-column iframe {
+    border: 0;
+    display: block;
+    height: 180px;
+    margin-top: 14px;
+    width: 100%;
+}
+
+.line-column {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+}
+
+.qr-link img {
+    border-radius: 22px;
+    display: block;
+    height: auto;
+    width: min(190px, 100%);
+}
+
+.qr-link {
+    cursor: pointer;
+    display: block;
+    position: relative;
+    z-index: 2;
+}
+
+.line-column > small {
+    color: #fff;
+    font-size: 0.72rem;
+    margin-top: 12px;
+}
+
+.line-column > p {
+    color: #c2a783;
+    font-size: 0.95rem;
+    margin: 2px 0 8px;
+}
+
+.line-column > p strong {
+    color: #c2a783;
+    font-size: 1.2rem;
+}
+
+.add-friend-btn {
+    align-items: center;
+    background: #66bd46;
+    border-radius: 6px;
+    color: #fff;
+    display: inline-flex;
+    font-size: 0.82rem;
+    gap: 5px;
+    padding: 6px 10px;
+    text-decoration: none;
+}
+
+.social-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.social-row span {
+    align-items: center;
+    background: #fff;
+    border-radius: 50%;
+    color: #23272d;
+    display: inline-flex;
+    height: 42px;
+    justify-content: center;
+    width: 42px;
+}
+
+.back-to-top {
+    align-items: center;
+    background: #80796e;
+    border: 0;
+    border-radius: 50%;
+    bottom: 48px;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    font-size: 1.55rem;
+    height: 58px;
+    justify-content: center;
+    position: absolute;
+    right: 24px;
+    width: 58px;
+}
+
+.footer-credit {
+    background: #111317;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.75rem;
+    padding: 10px 80px;
+    text-align: center;
+}
+
+@media (max-width: 1050px) {
+    .footer-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .footer-inner {
+        padding: 42px 0 70px;
+        width: min(86vw, 460px);
+    }
+
     .footer-brand {
         flex-direction: column;
-        gap: 10px;
-        margin-bottom: 6px;
-    }
-    .footer-logo {
-        width: 76px;
-    }
-    .footer-topic {
-        align-items: center;
+        margin-bottom: 50px;
         text-align: center;
     }
-    .column.product {
-        padding-left: 25%;
-        padding-bottom: 0 !important;
+
+    .footer-brand > img {
+        width: 88px;
     }
-    .column.contact {
-        padding-left: 10%;
-        padding-bottom: 0 !important;
+
+    .footer-grid {
+        gap: 42px;
+        grid-template-columns: 1fr;
     }
-    .column.map {
-        padding-left: 10%;
-        padding-bottom: 20px;
+
+    .line-column {
+        align-items: center;
+    }
+
+    .back-to-top {
+        bottom: 54px;
+        height: 48px;
+        right: 14px;
+        width: 48px;
+    }
+
+    .footer-credit {
+        padding: 10px 62px;
     }
 }
 </style>
