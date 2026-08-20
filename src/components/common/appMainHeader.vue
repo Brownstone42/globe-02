@@ -14,6 +14,19 @@
                 <a href="#" class="nav-item" @click="navigate('/product')">PRODUCT</a>
                 <a href="#" class="nav-item" @click.prevent="navigate('/blogs')">BLOGS</a>
                 <a href="#" class="nav-item">CONTACT US</a>
+                <a
+                    href="https://lin.ee/qyMmToF"
+                    class="line-add-button"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="เพิ่มเพื่อน LINE @idealglobe"
+                >
+                    <img
+                        src="https://scdn.line-apps.com/n/line_add_friends/btn/th.png"
+                        alt="LINE @idealglobe"
+                        height="36"
+                    />
+                </a>
             </nav>
 
             <!-- Hamburger Button (Mobile) -->
@@ -31,6 +44,20 @@
             <a href="#" class="mobile-item" @click.prevent="navigate('/blogs')">BLOGS</a>
             <a href="#" class="mobile-item">CONTACT US</a>
         </nav>
+
+        <a
+            href="https://lin.ee/qyMmToF"
+            class="mobile-line-floating"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="เพิ่มเพื่อน LINE @idealglobe"
+        >
+            <img
+                src="https://scdn.line-apps.com/n/line_add_friends/btn/th.png"
+                alt="LINE @idealglobe"
+                height="36"
+            />
+        </a>
     </div>
 </template>
 
@@ -92,8 +119,9 @@ export default {
 
 /* Desktop Menu */
 .desktop-menu {
+    align-items: center;
     display: flex;
-    gap: 50px;
+    gap: 38px;
 }
 
 .nav-item {
@@ -105,6 +133,24 @@ export default {
 .nav-item:hover {
     opacity: 0.8;
     color: #a0805b;
+}
+
+.line-add-button {
+    display: inline-flex;
+    flex-shrink: 0;
+    line-height: 0;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.line-add-button img {
+    display: block;
+    height: 36px;
+    width: auto;
+}
+
+.line-add-button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
 }
 
 /* Hamburger Button */
@@ -142,6 +188,10 @@ export default {
     color: #a0805b;
 }
 
+.mobile-line-floating {
+    display: none;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .desktop-menu {
@@ -150,6 +200,28 @@ export default {
 
     .hamburger {
         display: flex; /* แสดงปุ่ม Hamburger */
+    }
+
+    .mobile-line-floating {
+        display: block;
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.24));
+        line-height: 0;
+        position: fixed;
+        right: 27px;
+        bottom: 34px;
+        transition: opacity 0.18s ease, transform 0.18s ease;
+        z-index: 999;
+    }
+
+    .mobile-line-floating img {
+        display: block;
+        height: 36px;
+        width: auto;
+    }
+
+    .mobile-line-floating:active {
+        opacity: 0.86;
+        transform: scale(0.96);
     }
 }
 </style>

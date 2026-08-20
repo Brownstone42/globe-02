@@ -426,6 +426,23 @@ export default {
 
     .line-column {
         align-items: center;
+        text-align: center;
+        width: 100%;
+    }
+
+    .line-column .qr-link {
+        align-self: center;
+        margin-left: auto;
+        margin-right: auto;
+        width: min(190px, 100%);
+    }
+
+    .line-column .qr-link img {
+        width: 100%;
+    }
+
+    .line-column .social-row {
+        justify-content: center;
     }
 
     .back-to-top {

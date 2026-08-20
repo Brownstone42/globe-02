@@ -5,7 +5,7 @@
         :class="{ 'is-visible': isVisible }"
         aria-labelledby="category-heading"
     >
-        <h2 id="category-heading">เลือกสินค้าจากหมวดหมู่</h2>
+        <h2 id="category-heading" ref="revealTrigger">เลือกสินค้าจากหมวดหมู่</h2>
 
         <div v-if="categoryStore.loading" class="category-status">กำลังโหลดหมวดหมู่...</div>
 
@@ -85,9 +85,14 @@ export default {
                     this.isVisible = true
                     this.revealObserver.disconnect()
                 },
-                { threshold: 0.12 },
+                {
+                    threshold: 0.01,
+                    rootMargin: '0px 0px -8% 0px',
+                },
             )
-            this.revealObserver.observe(this.$refs.revealSection)
+            // ใช้หัวข้อเป็นจุดเริ่ม animation แทน section ทั้งก้อน เพราะบน Mobile
+            // section สูงมากจน intersection ratio อาจไม่ถึงค่าที่กำหนด
+            this.revealObserver.observe(this.$refs.revealTrigger)
         },
     },
 }

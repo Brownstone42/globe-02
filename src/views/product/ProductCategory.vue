@@ -1,6 +1,6 @@
 <template>
     <div class="product-category">
-        <div class="results-toolbar">
+        <div ref="resultsToolbar" class="results-toolbar">
             <span class="result-meta">Showing {{ start }}–{{ end }} of {{ totalResults }} results</span>
 
             <div class="toolbar-controls">
@@ -26,6 +26,20 @@
             </div>
         </div>
 
+        <nav ref="topPagination" v-if="totalPages > 1" class="pagination pagination--top" aria-label="Product pagination ด้านบน">
+            <button type="button" :disabled="page === 1" @click="page--">‹</button>
+            <button
+                v-for="pageNumber in visiblePages"
+                :key="pageNumber"
+                type="button"
+                :class="{ active: page === pageNumber }"
+                @click="page = pageNumber"
+            >
+                {{ pageNumber }}
+            </button>
+            <button type="button" :disabled="page === totalPages" @click="page++">›</button>
+        </nav>
+
         <div v-if="productStore.loading" class="product-status">กำลังโหลดสินค้า...</div>
         <div v-else-if="!pagedProducts.length" class="product-status">ไม่พบสินค้า</div>
 
@@ -48,6 +62,7 @@
 
                     <div class="product-link-row">
                         <RouterLink
+                            class="product-detail-btn"
                             :to="{
                                 name: 'product-detail',
                                 params: { category: product.category, productId: product.id },
@@ -55,34 +70,31 @@
                         >
                             ดูรายละเอียดสินค้า
                         </RouterLink>
-                        <RouterLink
-                            class="product-arrow"
-                            :to="{
-                                name: 'product-detail',
-                                params: { category: product.category, productId: product.id },
-                            }"
-                            :aria-label="`ดูรายละเอียด ${product.name}`"
+                        <button
+                            class="quote-btn"
+                            type="button"
                         >
-                            <i class="fa-solid fa-arrow-right"></i>
-                        </RouterLink>
+                            ขอใบเสนอราคา
+                        </button>
                     </div>
                 </div>
             </article>
         </div>
 
-        <nav v-if="totalPages > 1" class="pagination" aria-label="Product pagination">
-            <button type="button" :disabled="page === 1" @click="page--">‹</button>
+        <nav v-if="totalPages > 1" class="pagination pagination--bottom" aria-label="Product pagination ด้านล่าง">
+            <button type="button" :disabled="page === 1" @click="goToPage(page - 1)">‹</button>
             <button
                 v-for="pageNumber in visiblePages"
                 :key="pageNumber"
                 type="button"
                 :class="{ active: page === pageNumber }"
-                @click="page = pageNumber"
+                @click="goToPage(pageNumber)"
             >
                 {{ pageNumber }}
             </button>
-            <button type="button" :disabled="page === totalPages" @click="page++">›</button>
+            <button type="button" :disabled="page === totalPages" @click="goToPage(page + 1)">›</button>
         </nav>
+
     </div>
 </template>
 
@@ -184,6 +196,38 @@ export default {
         },
     },
     methods: {
+        async goToPage(pageNumber) {
+            if (pageNumber < 1 || pageNumber > this.totalPages) return
+            this.page = pageNumber
+            await this.$nextTick()
+            this.scrollToResults()
+        },
+        scrollToResults() {
+            const toolbar = this.$refs.resultsToolbar
+            if (!toolbar) return
+
+            const target = toolbar.getBoundingClientRect().top + window.scrollY - 90
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                window.scrollTo(0, target)
+                return
+            }
+
+            const start = window.scrollY
+            const distance = target - start
+            const duration = 950
+            const startedAt = performance.now()
+            const easeInOut = (progress) =>
+                progress < 0.5
+                    ? 4 * progress * progress * progress
+                    : 1 - Math.pow(-2 * progress + 2, 3) / 2
+
+            const animate = (now) => {
+                const progress = Math.min((now - startedAt) / duration, 1)
+                window.scrollTo(0, start + distance * easeInOut(progress))
+                if (progress < 1) window.requestAnimationFrame(animate)
+            }
+            window.requestAnimationFrame(animate)
+        },
         setPerPage(amount) {
             this.perPage = amount
             this.page = 1
@@ -312,35 +356,51 @@ export default {
 }
 
 .product-link-row {
-    align-items: center;
     border-top: 1px solid #d9dddf;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 7px;
     margin-top: auto;
     padding-top: 12px;
 }
 
-.product-link-row > a:first-child {
-    color: #a0805b;
-    font-size: 0.67rem;
-    text-decoration: none;
-}
-
-.product-arrow {
+.product-detail-btn,
+.quote-btn {
     align-items: center;
-    background: #a0805b;
-    border-radius: 50%;
-    color: #fff;
-    display: inline-flex;
-    flex: 0 0 27px;
-    height: 27px;
+    border-radius: 6px;
+    display: flex;
     justify-content: center;
+    min-height: 32px;
+    padding: 6px 8px;
+    text-align: center;
     text-decoration: none;
-    width: 27px;
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+    width: 100%;
 }
 
-.product-arrow i {
-    font-size: 0.7rem;
+.product-detail-btn {
+    border: 1px solid #a0805b;
+    color: #a0805b;
+    font-size: 0.72rem;
+}
+
+.product-detail-btn:hover {
+    background: #f5f6f7;
+    color: #896b49;
+}
+
+.quote-btn {
+    background: #a0805b;
+    border: 0;
+    color: #fff;
+    cursor: default;
+    font-family: inherit;
+    font-size: 0.72rem;
+}
+
+.quote-btn:hover {
+    background: #896b49;
+    color: #fff;
 }
 
 .pagination {
@@ -348,8 +408,13 @@ export default {
     display: flex;
     gap: 5px;
     justify-content: center;
-    margin-top: 70px;
 }
+
+.pagination--top {
+    margin: -8px 0 24px;
+    scroll-margin-top: 92px;
+}
+.pagination--bottom { margin: 54px 0 0; }
 
 .pagination button {
     background: transparent;
@@ -391,6 +456,21 @@ export default {
 }
 
 @media (max-width: 650px) {
+    .results-toolbar {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(35, 39, 45, 0.07);
+        gap: 10px;
+        margin-bottom: 20px;
+        padding: 12px 14px;
+    }
+
+    .result-meta {
+        border-bottom: 1px solid #eceeef;
+        padding-bottom: 9px;
+        width: 100%;
+    }
+
     .product-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -400,15 +480,41 @@ export default {
     }
 
     .toolbar-controls {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 12px;
+        align-items: center;
+        flex-direction: row;
+        gap: 10px;
+        justify-content: space-between;
+    }
+
+    .per-page-control {
+        flex-shrink: 0;
+        gap: 9px;
+        white-space: nowrap;
+    }
+
+    .toolbar-controls select {
+        background: #f5f6f7;
+        border: 1px solid #dfe2e4;
+        border-radius: 6px;
+        max-width: 145px;
+        min-width: 0;
+        padding: 7px 8px;
+        width: 100%;
     }
 }
 
 @media (max-width: 420px) {
-    .product-grid {
-        grid-template-columns: 1fr;
+    .results-toolbar {
+        padding-left: 11px;
+        padding-right: 11px;
+    }
+
+    .per-page-control {
+        gap: 7px;
+    }
+
+    .toolbar-controls select {
+        max-width: 132px;
     }
 }
 </style>
