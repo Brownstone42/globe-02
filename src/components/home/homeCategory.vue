@@ -13,8 +13,12 @@
             <article
                 v-for="(item, index) in categoryStore.visibleCategories"
                 :key="item.id"
+                v-category-reveal
                 class="category-card"
-                :style="{ '--reveal-delay': `${120 + index * 85}ms` }"
+                :style="{
+                    '--category-desktop-delay': `${(index % 4) * 85}ms`,
+                    '--category-mobile-delay': `${(index % 2) * 110}ms`,
+                }"
             >
                 <div class="category-image">
                     <img v-if="item.imageUrl" :src="item.imageUrl" :alt="item.name || ''" />
@@ -52,8 +56,47 @@
 import { mapStores } from 'pinia'
 import { useCategoryStore } from '@/stores/categoryStore'
 
+const categoryRevealDirective = {
+    mounted(element) {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            element.classList.add('is-revealed')
+            return
+        }
+
+        let frameId = null
+        const checkPosition = () => {
+            frameId = null
+            const rect = element.getBoundingClientRect()
+            if (rect.top <= window.innerHeight * 0.88 && rect.bottom >= 0) {
+                element.classList.add('is-revealed')
+                window.removeEventListener('scroll', requestCheck)
+                window.removeEventListener('resize', requestCheck)
+            }
+        }
+        const requestCheck = () => {
+            if (frameId !== null) return
+            frameId = window.requestAnimationFrame(checkPosition)
+        }
+
+        window.addEventListener('scroll', requestCheck, { passive: true })
+        window.addEventListener('resize', requestCheck, { passive: true })
+        element._categoryRevealCleanup = () => {
+            window.removeEventListener('scroll', requestCheck)
+            window.removeEventListener('resize', requestCheck)
+            if (frameId !== null) window.cancelAnimationFrame(frameId)
+        }
+        window.requestAnimationFrame(() => window.requestAnimationFrame(requestCheck))
+    },
+    unmounted(element) {
+        element._categoryRevealCleanup?.()
+    },
+}
+
 export default {
     name: 'homeCategory',
+    directives: {
+        categoryReveal: categoryRevealDirective,
+    },
     data() {
         return {
             isVisible: false,
@@ -126,11 +169,16 @@ export default {
     box-shadow: 0 3px 12px rgba(15, 23, 42, 0.15);
     min-width: 0;
     overflow: hidden;
-    transition-delay: var(--reveal-delay, 120ms);
+    --category-reveal-delay: var(--category-desktop-delay, 0ms);
+    opacity: 0;
+    transform: translateY(34px) scale(0.97);
+    transition:
+        opacity 0.72s cubic-bezier(0.22, 1, 0.36, 1) var(--category-reveal-delay),
+        transform 0.72s cubic-bezier(0.22, 1, 0.36, 1) var(--category-reveal-delay),
+        box-shadow 0.2s ease;
 }
 
 .category-section h2,
-.category-card,
 .all-products-link {
     opacity: 0;
     transform: translateY(30px);
@@ -140,10 +188,14 @@ export default {
 }
 
 .category-section.is-visible h2,
-.category-section.is-visible .category-card,
 .category-section.is-visible .all-products-link {
     opacity: 1;
     transform: translateY(0);
+}
+
+.category-card.is-revealed {
+    opacity: 1;
+    transform: translateY(0) scale(1);
 }
 
 .category-image {
@@ -238,8 +290,14 @@ export default {
 
 @media (prefers-reduced-motion: reduce) {
     .category-section h2,
-    .category-card,
     .all-products-link {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+
+
+    .category-card {
         opacity: 1;
         transform: none;
         transition: none;
@@ -266,6 +324,10 @@ export default {
     .category-grid {
         gap: 16px;
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .category-card {
+        --category-reveal-delay: var(--category-mobile-delay, 0ms);
     }
 
     .category-info {

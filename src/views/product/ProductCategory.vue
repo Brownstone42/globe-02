@@ -30,7 +30,16 @@
         <div v-else-if="!pagedProducts.length" class="product-status">ไม่พบสินค้า</div>
 
         <div v-else class="product-grid">
-            <article v-for="product in pagedProducts" :key="product.id" class="product-card">
+            <article
+                v-for="(product, index) in pagedProducts"
+                :key="product.id"
+                v-product-reveal
+                class="product-card"
+                :style="{
+                    '--product-desktop-delay': `${(index % 4) * 85}ms`,
+                    '--product-mobile-delay': `${(index % 2) * 110}ms`,
+                }"
+            >
                 <RouterLink
                     class="product-image"
                     :to="{
@@ -87,6 +96,44 @@
 <script>
 import { useProductStore } from '@/stores/productStore'
 
+const productRevealDirective = {
+    mounted(element) {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            element.classList.add('is-revealed')
+            return
+        }
+
+        let frameId = null
+        const checkPosition = () => {
+            frameId = null
+            const rect = element.getBoundingClientRect()
+            const revealLine = window.innerHeight * 0.88
+            if (rect.top <= revealLine && rect.bottom >= 0) {
+                element.classList.add('is-revealed')
+                window.removeEventListener('scroll', requestCheck)
+                window.removeEventListener('resize', requestCheck)
+            }
+        }
+        const requestCheck = () => {
+            if (frameId !== null) return
+            frameId = window.requestAnimationFrame(checkPosition)
+        }
+
+        window.addEventListener('scroll', requestCheck, { passive: true })
+        window.addEventListener('resize', requestCheck, { passive: true })
+        element._productRevealCleanup = () => {
+            window.removeEventListener('scroll', requestCheck)
+            window.removeEventListener('resize', requestCheck)
+            if (frameId !== null) window.cancelAnimationFrame(frameId)
+        }
+        // รอให้ Grid และรูปภาพกำหนดตำแหน่งเสร็จก่อนตรวจแถวแรก
+        window.requestAnimationFrame(() => window.requestAnimationFrame(requestCheck))
+    },
+    unmounted(element) {
+        element._productRevealCleanup?.()
+    },
+}
+
 function timestampValue(value) {
     if (!value) return 0
     if (typeof value.toMillis === 'function') return value.toMillis()
@@ -96,6 +143,9 @@ function timestampValue(value) {
 
 export default {
     name: 'ProductCategory',
+    directives: {
+        productReveal: productRevealDirective,
+    },
     props: {
         category: {
             type: String,
@@ -284,6 +334,18 @@ export default {
     min-width: 0;
     overflow: hidden;
     padding: 0;
+    --product-reveal-delay: var(--product-desktop-delay, 0ms);
+    opacity: 0;
+    transform: translateY(34px) scale(0.97);
+    transition:
+        opacity 0.72s cubic-bezier(0.22, 1, 0.36, 1) var(--product-reveal-delay, 0ms),
+        transform 0.72s cubic-bezier(0.22, 1, 0.36, 1) var(--product-reveal-delay, 0ms),
+        box-shadow 0.2s ease;
+}
+
+.product-card.is-revealed {
+    opacity: 1;
+    transform: translateY(0) scale(1);
 }
 
 .product-image {
@@ -424,6 +486,14 @@ export default {
     text-align: center;
 }
 
+@media (prefers-reduced-motion: reduce) {
+    .product-card {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+}
+
 @media (max-width: 800px) {
     .results-toolbar {
         align-items: flex-start;
@@ -438,6 +508,9 @@ export default {
 }
 
 @media (max-width: 650px) {
+    .product-card {
+        --product-reveal-delay: var(--product-mobile-delay, 0ms);
+    }
     .results-toolbar {
         background: #fff;
         border-radius: 10px;

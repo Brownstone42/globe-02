@@ -205,11 +205,12 @@ export default {
     }
 
     .mobile-line-floating {
+        animation: line-button-enter 0.72s cubic-bezier(0.22, 1, 0.36, 1) both;
         border-radius: 10px;
         display: block;
         filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.24));
         line-height: 0;
-        overflow: hidden;
+        overflow: visible;
         position: fixed;
         right: 27px;
         bottom: 34px;
@@ -218,14 +219,65 @@ export default {
     }
 
     .mobile-line-floating img {
+        border-radius: 10px;
         display: block;
         height: 36px;
         width: auto;
     }
 
+    .mobile-line-floating::before,
+    .mobile-line-floating::after {
+        border: 2px solid rgba(6, 199, 85, 0.72);
+        border-radius: 13px;
+        content: '';
+        inset: -3px;
+        opacity: 0;
+        pointer-events: none;
+        position: absolute;
+        z-index: -1;
+        animation: line-button-aura 2.2s ease-out 0.9s infinite;
+    }
+
+    .mobile-line-floating::after {
+        animation-delay: 2s;
+    }
+
     .mobile-line-floating:active {
         opacity: 0.86;
         transform: scale(0.96);
+    }
+
+    @keyframes line-button-enter {
+        from {
+            opacity: 0;
+            transform: translateX(48px) scale(0.88);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+        }
+    }
+
+    @keyframes line-button-aura {
+        0% {
+            opacity: 0.7;
+            transform: scale(0.96);
+        }
+        75%, 100% {
+            opacity: 0;
+            transform: scale(1.42);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .mobile-line-floating {
+            animation: none;
+        }
+
+        .mobile-line-floating::before,
+        .mobile-line-floating::after {
+            animation: none;
+        }
     }
 }
 </style>
