@@ -22,10 +22,12 @@
                         />
                     </div>
                     <div class="card-body">
-                        <span v-if="article.category" class="card-category">{{ article.category }}</span>
                         <h2 class="card-title">{{ article.title }}</h2>
                         <p v-if="article.metaDescription" class="card-desc">{{ article.metaDescription }}</p>
-                        <span class="card-link">อ่านเพิ่มเติม →</span>
+                        <div class="card-footer-row">
+                            <span class="card-category">{{ article.category || '-' }}</span>
+                            <span class="card-link">อ่านเพิ่มเติม →</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -156,10 +158,19 @@ export default {
     letter-spacing: 0.05em;
 }
 
+.card-footer-row {
+    align-items: center;
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: 4px;
+}
+
 .card-title {
     font-size: 1rem;
     font-weight: 700;
-    color: #205266;
+    color: #a0805b;
     line-height: 1.4;
     margin: 0;
 }
@@ -178,7 +189,8 @@ export default {
 .card-link {
     font-size: 0.85rem;
     font-weight: 600;
-    color: #3cabae;
-    margin-top: 4px;
+    color: #a0805b;
+    flex-shrink: 0;
+    margin-left: auto;
 }
 </style>

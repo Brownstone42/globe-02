@@ -209,9 +209,9 @@ export default {
 }
 
 .read-all-btn {
-    border: 1px solid #2eaeb2;
+    border: 1px solid #a0805b;
     border-radius: 7px;
-    color: #259da1;
+    color: #a0805b;
     font-size: 0.9rem;
     min-width: 132px;
     padding: 9px 20px;
@@ -221,7 +221,7 @@ export default {
 }
 
 .read-all-btn:hover {
-    background: #2eaeb2;
+    background: #a0805b;
     color: #fff;
 }
 
@@ -230,7 +230,9 @@ export default {
 }
 
 .news-viewport {
+    box-sizing: border-box;
     overflow-x: auto;
+    padding: 6px 0 20px;
     scroll-behavior: smooth;
     scrollbar-width: none;
 }

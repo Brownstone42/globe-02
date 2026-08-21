@@ -136,9 +136,11 @@ export default {
 }
 
 .line-add-button {
+    border-radius: 10px;
     display: inline-flex;
     flex-shrink: 0;
     line-height: 0;
+    overflow: hidden;
     transition: opacity 0.18s ease, transform 0.18s ease;
 }
 
@@ -203,9 +205,11 @@ export default {
     }
 
     .mobile-line-floating {
+        border-radius: 10px;
         display: block;
         filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.24));
         line-height: 0;
+        overflow: hidden;
         position: fixed;
         right: 27px;
         bottom: 34px;

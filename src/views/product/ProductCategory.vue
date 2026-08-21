@@ -26,20 +26,6 @@
             </div>
         </div>
 
-        <nav ref="topPagination" v-if="totalPages > 1" class="pagination pagination--top" aria-label="Product pagination ด้านบน">
-            <button type="button" :disabled="page === 1" @click="page--">‹</button>
-            <button
-                v-for="pageNumber in visiblePages"
-                :key="pageNumber"
-                type="button"
-                :class="{ active: page === pageNumber }"
-                @click="page = pageNumber"
-            >
-                {{ pageNumber }}
-            </button>
-            <button type="button" :disabled="page === totalPages" @click="page++">›</button>
-        </nav>
-
         <div v-if="productStore.loading" class="product-status">กำลังโหลดสินค้า...</div>
         <div v-else-if="!pagedProducts.length" class="product-status">ไม่พบสินค้า</div>
 
@@ -410,10 +396,6 @@ export default {
     justify-content: center;
 }
 
-.pagination--top {
-    margin: -8px 0 24px;
-    scroll-margin-top: 92px;
-}
 .pagination--bottom { margin: 54px 0 0; }
 
 .pagination button {

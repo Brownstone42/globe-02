@@ -30,7 +30,6 @@
                     </RouterLink>
                     <button class="hero-btn quote-btn" type="button" @click="scrollToContact">
                         ขอใบเสนอราคา
-                        <i class="fa-solid fa-chevron-right"></i>
                     </button>
                     <a
                         class="hero-btn contact-btn"
@@ -38,7 +37,7 @@
                         target="_blank"
                         rel="noopener noreferrer"
                     >
-                        <i class="fa-brands fa-line"></i>
+                        <img class="contact-line-icon" src="/images/line_icon.png" alt="" />
                         ติดต่อเรา
                     </a>
                 </div>
@@ -189,17 +188,16 @@ export default {
     color: #fff;
 }
 
-.quote-btn .fa-chevron-right {
-    font-size: 0.85rem;
-}
-
 .contact-btn {
     background: #fff;
     color: #a0805b;
 }
 
-.contact-btn .fa-line {
-    font-size: 1.15rem;
+.contact-line-icon {
+    display: block;
+    height: 20px;
+    object-fit: contain;
+    width: 20px;
 }
 
 .product-btn:hover {

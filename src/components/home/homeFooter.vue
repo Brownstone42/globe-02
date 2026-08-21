@@ -4,8 +4,14 @@
             <div class="footer-brand">
                 <img src="/images/footer-logo.png" alt="Ideal Globe" />
                 <div>
-                    <strong>บริการด้วยคุณภาพ สร้างความไว้วางใจอย่างยั่งยืน</strong>
-                    <span>พร้อมให้คำปรึกษาและดูแลอย่างใกล้ชิด โดยทีมงานผู้เชี่ยวชาญ</span>
+                    <strong>
+                        <span class="slogan-line">บริการด้วยคุณภาพ</span>
+                        <span class="slogan-line">สร้างความไว้วางใจอย่างยั่งยืน</span>
+                    </strong>
+                    <span class="slogan-subtitle">
+                        <span class="slogan-line">พร้อมให้คำปรึกษาและดูแลอย่างใกล้ชิด</span>
+                        <span class="slogan-line">โดยทีมงานผู้เชี่ยวชาญ</span>
+                    </span>
                 </div>
             </div>
 
@@ -81,12 +87,16 @@
                     <p>@ <strong>IDEAL GLOBE</strong> (มี@)</p>
                     <a
                         class="add-friend-btn"
-                        href="https://line.me/R/ti/p/%40idealglobe"
+                        href="https://lin.ee/qyMmToF"
                         target="_blank"
                         rel="noopener noreferrer"
+                        aria-label="เพิ่มเพื่อน LINE @idealglobe"
                     >
-                        <i class="fa-brands fa-line"></i>
-                        Add Friends
+                        <img
+                            src="https://scdn.line-apps.com/n/line_add_friends/btn/th.png"
+                            alt="LINE @idealglobe"
+                            height="36"
+                        />
                     </a>
 
                     <div class="social-row" aria-label="Social media">
@@ -177,6 +187,16 @@ export default {
     font-family: 'Sukhumvit-Thin', sans-serif;
     font-size: clamp(1rem, 1.45vw, 1.35rem);
     text-align: center;
+}
+
+.slogan-line + .slogan-line::before {
+    content: ' ';
+}
+
+.footer-brand strong .slogan-line {
+    font-family: inherit;
+    font-size: inherit;
+    text-align: inherit;
 }
 
 .footer-grid {
@@ -344,15 +364,23 @@ export default {
 }
 
 .add-friend-btn {
-    align-items: center;
-    background: #66bd46;
-    border-radius: 6px;
-    color: #fff;
     display: inline-flex;
-    font-size: 0.82rem;
-    gap: 5px;
-    padding: 6px 10px;
+    border-radius: 10px;
+    line-height: 0;
+    overflow: hidden;
     text-decoration: none;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.add-friend-btn img {
+    display: block;
+    height: 36px;
+    width: auto;
+}
+
+.add-friend-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
 }
 
 .social-row {
@@ -417,6 +445,14 @@ export default {
 
     .footer-brand > img {
         width: 88px;
+    }
+
+    .footer-brand .slogan-line {
+        display: block;
+    }
+
+    .footer-brand .slogan-line + .slogan-line::before {
+        content: none;
     }
 
     .footer-grid {

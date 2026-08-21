@@ -140,7 +140,7 @@ export default {
 .back-btn {
     background: none;
     border: none;
-    color: #3cabae;
+    color: #a0805b;
     font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
