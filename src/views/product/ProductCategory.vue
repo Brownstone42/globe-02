@@ -77,17 +77,18 @@
         </div>
 
         <nav v-if="totalPages > 1" class="pagination pagination--bottom" aria-label="Product pagination ด้านล่าง">
-            <button type="button" :disabled="page === 1" @click="goToPage(page - 1)">‹</button>
+            <button type="button" :disabled="page === 1 || isChangingPage" @click="goToPage(page - 1)">‹</button>
             <button
                 v-for="pageNumber in visiblePages"
                 :key="pageNumber"
                 type="button"
                 :class="{ active: page === pageNumber }"
+                :disabled="isChangingPage"
                 @click="goToPage(pageNumber)"
             >
                 {{ pageNumber }}
             </button>
-            <button type="button" :disabled="page === totalPages" @click="goToPage(page + 1)">›</button>
+            <button type="button" :disabled="page === totalPages || isChangingPage" @click="goToPage(page + 1)">›</button>
         </nav>
 
     </div>
@@ -158,6 +159,7 @@ export default {
             perPage: 12,
             pageSizes: [12, 24, 36],
             sortBy: 'default',
+            isChangingPage: false,
         }
     },
     computed: {
@@ -233,19 +235,27 @@ export default {
     },
     methods: {
         async goToPage(pageNumber) {
-            if (pageNumber < 1 || pageNumber > this.totalPages) return
+            if (
+                this.isChangingPage ||
+                pageNumber < 1 ||
+                pageNumber > this.totalPages ||
+                pageNumber === this.page
+            ) return
+
+            this.isChangingPage = true
+            await this.scrollToResults()
             this.page = pageNumber
             await this.$nextTick()
-            this.scrollToResults()
+            this.isChangingPage = false
         },
         scrollToResults() {
             const toolbar = this.$refs.resultsToolbar
-            if (!toolbar) return
+            if (!toolbar) return Promise.resolve()
 
             const target = toolbar.getBoundingClientRect().top + window.scrollY - 90
             if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
                 window.scrollTo(0, target)
-                return
+                return Promise.resolve()
             }
 
             const start = window.scrollY
@@ -257,12 +267,18 @@ export default {
                     ? 4 * progress * progress * progress
                     : 1 - Math.pow(-2 * progress + 2, 3) / 2
 
-            const animate = (now) => {
-                const progress = Math.min((now - startedAt) / duration, 1)
-                window.scrollTo(0, start + distance * easeInOut(progress))
-                if (progress < 1) window.requestAnimationFrame(animate)
-            }
-            window.requestAnimationFrame(animate)
+            return new Promise((resolve) => {
+                const animate = (now) => {
+                    const progress = Math.min((now - startedAt) / duration, 1)
+                    window.scrollTo(0, start + distance * easeInOut(progress))
+                    if (progress < 1) {
+                        window.requestAnimationFrame(animate)
+                    } else {
+                        resolve()
+                    }
+                }
+                window.requestAnimationFrame(animate)
+            })
         },
         setPerPage(amount) {
             this.perPage = amount
