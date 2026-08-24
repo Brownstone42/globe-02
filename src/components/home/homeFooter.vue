@@ -28,7 +28,7 @@
                                     params: { category: category.slug },
                                 }"
                             >
-                                {{ category.name }}
+                                {{ categoryLabelThai(category) }}
                             </RouterLink>
                         </li>
                     </ul>
@@ -36,7 +36,11 @@
 
                 <section class="footer-column contact-column">
                     <h2>Call Center</h2>
-                    <p class="contact-line">สำนักงานใหญ่ : <a href="tel:028601525">02-860-1525</a></p>
+                    <p class="contact-line">
+                        สำนักงานใหญ่ :
+                        <a href="tel:028601525">02-860-1525</a>,
+                        <a href="tel:0972204888">097-220-4888</a>
+                    </p>
                     <small>ติดต่อได้ วันจันทร์ - วันศุกร์ 08.00 - 17.00 น.</small>
 
                     <div class="footer-divider"></div>
@@ -44,7 +48,6 @@
                     <div class="sales-list">
                         <span>ฝ่ายขาย :</span>
                         <div>
-                            <p><a href="tel:0972204888">097-220-4888</a> <small>(คุณบราวน์)</small></p>
                             <p><a href="tel:0910108349">091-010-8349</a> <small>(คุณนิด)</small></p>
                             <p><a href="tel:0972947975">097-294-7975</a> <small>(คุณแอน)</small></p>
                         </div>
@@ -120,6 +123,7 @@
 <script>
 import { mapStores } from 'pinia'
 import { useCategoryStore } from '@/stores/categoryStore'
+import { categoryLabelThai } from '@/utils/categoryLabels'
 
 export default {
     name: 'homeFooter',
@@ -137,6 +141,7 @@ export default {
         }
     },
     methods: {
+        categoryLabelThai,
         scrollToTop() {
             window.scrollTo({ top: 0, behavior: 'smooth' })
         },

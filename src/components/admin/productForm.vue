@@ -53,7 +53,7 @@
 
         <div class="form-group">
             <label>รูปภาพหลัก</label>
-            <input type="file" accept="image/*" @change="onMainImageChange" class="form-file" />
+            <input ref="mainImageInput" type="file" accept="image/*" @change="onMainImageChange" class="form-file" />
             <div v-if="mainImagePreview" class="image-preview">
                 <img :src="mainImagePreview" alt="Main preview" />
             </div>
@@ -164,6 +164,7 @@ export default {
                     this.form.mainImageFile = null
                     this.form.galleryImageFiles = []
                     this.newGalleryPreviews = []
+                    this.$nextTick(() => this.clearFileInputs())
                 } else {
                     this.isEditMode = false
                     this.resetForm()
@@ -172,6 +173,10 @@ export default {
         },
     },
     methods: {
+        clearFileInputs() {
+            if (this.$refs.mainImageInput) this.$refs.mainImageInput.value = ''
+            if (this.$refs.galleryInput) this.$refs.galleryInput.value = ''
+        },
         asEditableList(value) {
             return Array.isArray(value) && value.length ? [...value] : ['']
         },
@@ -229,6 +234,7 @@ export default {
             this.mainImagePreview = null
             this.newGalleryPreviews.forEach((url) => URL.revokeObjectURL(url))
             this.newGalleryPreviews = []
+            this.$nextTick(() => this.clearFileInputs())
         },
         async handleSubmit() {
             const wasEditing = this.isEditMode && this.editingProduct && this.editingProduct.id

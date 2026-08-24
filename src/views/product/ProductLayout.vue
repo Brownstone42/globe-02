@@ -21,7 +21,7 @@
                             }"
                             :class="{ active: isCategoryActive(cat.slug) && !$route.query.sub }"
                         >
-                            {{ cat.name }}
+                            {{ categoryLabelThai(cat) }}
                         </RouterLink>
 
                         <ul v-if="cat.subcategories?.length" class="subcategory-list">
@@ -59,6 +59,7 @@
 <script>
 import { mapStores } from 'pinia'
 import { useCategoryStore } from '@/stores/categoryStore'
+import { categoryLabelThai } from '@/utils/categoryLabels'
 
 export default {
     name: 'ProductLayout',
@@ -76,6 +77,7 @@ export default {
         }
     },
     methods: {
+        categoryLabelThai,
         visibleSubcategories(category) {
             return [...(category.subcategories || [])]
                 .filter((sub) => sub.visibility !== false)

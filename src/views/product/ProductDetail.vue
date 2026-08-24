@@ -63,6 +63,7 @@ import { useCategoryStore } from '@/stores/categoryStore'
 import ProductMain from '@/components/product/ProductMain.vue'
 import ProductTabs from '@/components/product/ProductTabs.vue'
 import RelatedProducts from '@/components/product/RelatedProducts.vue'
+import { categoryLabelThai } from '@/utils/categoryLabels'
 
 export default {
     name: 'ProductDetail',
@@ -107,7 +108,7 @@ export default {
             const categories = this.categoryStore.sortedCategories || []
             const found = categories.find((cat) => cat.slug === slug)
 
-            return found ? found.name : 'สินค้า'
+            return found ? categoryLabelThai(found) : 'สินค้า'
         },
 
         // รวม mainImage + gallery เข้ามาเป็น array เดียว ใช้กับ currentImage
