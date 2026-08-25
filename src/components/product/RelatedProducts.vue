@@ -8,28 +8,36 @@
                 :key="item.id"
                 class="column is-3-desktop is-6-tablet is-6-mobile"
             >
-                <div class="related-card">
+                <article class="related-card">
                     <RouterLink
+                        class="related-image"
                         :to="{
                             name: 'product-detail',
                             params: { category: item.category, productId: item.id },
                         }"
                     >
-                        <figure class="image related-image">
-                            <img :src="item.mainImageUrl" :alt="item.name" />
-                        </figure>
-
-                        <div class="related-info">
-                            <h3 class="is-size-6 has-text-weight-semibold">
-                                {{ item.name }}
-                            </h3>
-
-                            <p class="is-size-7">
-                                {{ shortText(item.description) }}
-                            </p>
-                        </div>
+                        <img v-if="item.mainImageUrl" :src="item.mainImageUrl" :alt="item.name" />
+                        <div v-else class="image-placeholder" aria-hidden="true"></div>
                     </RouterLink>
-                </div>
+
+                    <div class="related-info">
+                        <h3>{{ item.name }}</h3>
+                        <p>{{ item.shortDescription || shortText(item.description) || 'รายละเอียดสินค้า' }}</p>
+
+                        <div class="related-link-row">
+                            <RouterLink
+                                class="product-detail-btn"
+                                :to="{
+                                    name: 'product-detail',
+                                    params: { category: item.category, productId: item.id },
+                                }"
+                            >
+                                ดูรายละเอียดสินค้า
+                            </RouterLink>
+                            <button class="quote-btn" type="button">ขอใบเสนอราคา</button>
+                        </div>
+                    </div>
+                </article>
             </div>
         </div>
     </div>
@@ -57,32 +65,114 @@ export default {
 <style scoped>
 .related-card {
     background: #fff;
-    padding: 1rem;
-    border-radius: 6px;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-.related-card > a {
-    color: inherit;
+    border-radius: 12px 12px 30px 12px;
     display: flex;
     flex-direction: column;
     height: 100%;
+    overflow: hidden;
+    padding: 0;
 }
 
 .related-image {
-    margin-bottom: 0.75rem;
+    align-items: center;
+    background: #fff;
+    display: flex;
+    height: 190px;
+    justify-content: center;
+    overflow: hidden;
 }
 
 .related-image img {
-    width: 100%;
-    height: auto;
+    display: block;
+    height: 100%;
+    max-height: 100%;
+    max-width: 100%;
     object-fit: contain;
+    width: 100%;
+}
+
+.image-placeholder {
+    background: linear-gradient(135deg, #f8fafc, #e5e7eb);
+    height: 100%;
+    width: 100%;
+}
+
+.related-info {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 9px 13px 13px;
 }
 
 .related-info h3 {
-    margin-bottom: 0.25rem;
+    color: #a0805b;
+    display: -webkit-box;
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin: 0;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+}
+
+.related-info p {
+    color: #8a9298;
+    display: -webkit-box;
+    font-size: 0.7rem;
+    line-height: 1.35;
+    margin: 3px 0 9px;
+    min-height: 1.35em;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+}
+
+.related-link-row {
+    border-top: 1px solid #d9dddf;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-top: auto;
+    padding-top: 12px;
+}
+
+.product-detail-btn,
+.quote-btn {
+    align-items: center;
+    border-radius: 6px;
+    display: flex;
+    font-family: inherit;
+    font-size: 0.72rem;
+    justify-content: center;
+    min-height: 32px;
+    padding: 6px 8px;
+    text-align: center;
+    text-decoration: none;
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+    width: 100%;
+}
+
+.product-detail-btn {
+    border: 1px solid #a0805b;
+    color: #a0805b;
+}
+
+.product-detail-btn:hover {
+    background: #f5f6f7;
+    color: #896b49;
+}
+
+.quote-btn {
+    background: #a0805b;
+    border: 0;
+    color: #fff;
+    cursor: default;
+}
+
+.quote-btn:hover {
+    background: #896b49;
+    color: #fff;
 }
 
 @media (max-width: 768px) {
@@ -103,13 +193,12 @@ export default {
     }
 
     .related-card {
-        border-radius: 8px;
-        padding: 10px;
+        border-radius: 10px 10px 22px 10px;
     }
 
     .related-image {
         aspect-ratio: 1 / 1;
-        margin-bottom: 8px;
+        height: auto;
     }
 
     .related-image img {
@@ -118,22 +207,28 @@ export default {
     }
 
     .related-info h3 {
-        display: -webkit-box;
-        font-size: 0.9rem !important;
+        font-size: 0.82rem;
         line-height: 1.35;
-        min-height: 2.7em;
-        overflow: hidden;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
     }
 
     .related-info p {
-        display: -webkit-box;
-        font-size: 0.75rem !important;
-        line-height: 1.4;
-        overflow: hidden;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
+        font-size: 0.65rem;
+    }
+
+    .related-info {
+        padding: 8px 9px 10px;
+    }
+
+    .related-link-row {
+        gap: 6px;
+        padding-top: 9px;
+    }
+
+    .product-detail-btn,
+    .quote-btn {
+        font-size: 0.64rem;
+        min-height: 30px;
+        padding: 5px 4px;
     }
 }
 </style>

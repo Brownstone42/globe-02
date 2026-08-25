@@ -87,7 +87,7 @@
                         <img src="/images/example/qr.png" alt="LINE QR Code @idealglobe" />
                     </a>
                     <small>LINE OA</small>
-                    <p>@ <strong>IDEAL GLOBE</strong> (มี@)</p>
+                    <p><strong>@IDEALGLOBE</strong> (มี@)</p>
                     <a
                         class="add-friend-btn"
                         href="https://lin.ee/qyMmToF"

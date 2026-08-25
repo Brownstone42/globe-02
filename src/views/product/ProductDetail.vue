@@ -170,12 +170,16 @@ export default {
     padding-bottom: 3rem;
 }
 
+.breadcrumb {
+    padding-inline: 20px;
+}
+
 .breadcrumb :deep(a) {
-    color: #a0805b;
+    color: #777;
 }
 
 .breadcrumb :deep(li.is-active a) {
-    color: #777;
+    color: #a0805b;
 }
 
 .breadcrumb :deep(a:hover) {
