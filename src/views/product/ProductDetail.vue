@@ -8,7 +8,9 @@
                         <RouterLink to="/">หน้าแรก</RouterLink>
                     </li>
                     <li>
-                        <RouterLink :to="{ name: 'product-all' }"> ผลิตภัณฑ์ </RouterLink>
+                        <RouterLink :to="{ name: 'product-all' }">
+                            ผลิตภัณฑ์
+                        </RouterLink>
                     </li>
                     <li>
                         <RouterLink
@@ -166,5 +168,27 @@ export default {
 .product-detail-page {
     background: #f7f7f7;
     padding-bottom: 3rem;
+}
+
+.breadcrumb :deep(a) {
+    color: #a0805b;
+}
+
+.breadcrumb :deep(li.is-active a) {
+    color: #777;
+}
+
+.breadcrumb :deep(a:hover) {
+    color: #a0805b;
+}
+
+.breadcrumb :deep(li + li::before) {
+    color: #777;
+}
+
+@media (max-width: 768px) {
+    .breadcrumb {
+        padding-inline: 16px;
+    }
 }
 </style>

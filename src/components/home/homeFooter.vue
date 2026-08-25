@@ -460,6 +460,20 @@ export default {
         content: none;
     }
 
+    .footer-brand .slogan-subtitle {
+        display: block;
+        white-space: nowrap;
+    }
+
+    .footer-brand .slogan-subtitle .slogan-line {
+        display: inline;
+        font-size: clamp(0.72rem, 3.1vw, 0.9rem);
+    }
+
+    .footer-brand .slogan-subtitle .slogan-line + .slogan-line::before {
+        content: ' ';
+    }
+
     .footer-grid {
         gap: 42px;
         grid-template-columns: 1fr;

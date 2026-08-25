@@ -73,6 +73,11 @@ export default {
     min-width: 120px;
     justify-content: center;
 }
+.product-tabs .tabs.is-toggle ul li.is-active a {
+    background-color: #a0805b;
+    border-color: #a0805b;
+    color: #fff;
+}
 .product-ul {
     justify-content: center;
 }

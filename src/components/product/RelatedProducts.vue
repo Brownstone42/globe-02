@@ -6,7 +6,7 @@
             <div
                 v-for="item in items"
                 :key="item.id"
-                class="column is-3-desktop is-6-tablet is-12-mobile"
+                class="column is-3-desktop is-6-tablet is-6-mobile"
             >
                 <div class="related-card">
                     <RouterLink
@@ -64,6 +64,13 @@ export default {
     flex-direction: column;
 }
 
+.related-card > a {
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
 .related-image {
     margin-bottom: 0.75rem;
 }
@@ -76,5 +83,57 @@ export default {
 
 .related-info h3 {
     margin-bottom: 0.25rem;
+}
+
+@media (max-width: 768px) {
+    .related-products {
+        padding-inline: 16px;
+    }
+
+    .related-products .columns {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        margin: 0;
+    }
+
+    .related-products .column {
+        padding: 0;
+        width: auto;
+    }
+
+    .related-card {
+        border-radius: 8px;
+        padding: 10px;
+    }
+
+    .related-image {
+        aspect-ratio: 1 / 1;
+        margin-bottom: 8px;
+    }
+
+    .related-image img {
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .related-info h3 {
+        display: -webkit-box;
+        font-size: 0.9rem !important;
+        line-height: 1.35;
+        min-height: 2.7em;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+
+    .related-info p {
+        display: -webkit-box;
+        font-size: 0.75rem !important;
+        line-height: 1.4;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
 }
 </style>

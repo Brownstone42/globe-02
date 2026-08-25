@@ -2,7 +2,7 @@
     <div class="header">
         <div class="row">
             <img
-                src="/images/logo4.png"
+                src="/images/logo-header1.png"
                 alt="Company Logo"
                 class="header-logo"
                 @click="navigate('/')"
