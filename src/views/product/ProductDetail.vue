@@ -1,6 +1,6 @@
 <template>
     <section class="product-detail-page">
-        <div class="container is-max-desktop">
+        <div class="product-detail-shell">
             <!-- Breadcrumb -->
             <nav class="breadcrumb mt-4" aria-label="breadcrumbs">
                 <ul>
@@ -87,7 +87,7 @@ export default {
     data() {
         return {
             selectedImageIndex: 0,
-            activeTab: 'properties',
+            activeTab: 'details',
         }
     },
     computed: {
@@ -158,7 +158,7 @@ export default {
         productId() {
             // เวลาเปลี่ยน product (เช่น จาก relatedProducts) ให้ reset state
             this.selectedImageIndex = 0
-            this.activeTab = 'properties'
+            this.activeTab = 'details'
         },
     },
 }
@@ -168,6 +168,11 @@ export default {
 .product-detail-page {
     background: #f7f7f7;
     padding-bottom: 3rem;
+}
+
+.product-detail-shell {
+    margin: 0 auto;
+    width: min(1180px, 92vw);
 }
 
 .breadcrumb {

@@ -10,19 +10,39 @@
                     </figure>
                 </div>
 
-                <!-- รูปเล็ก -->
-                <div class="image-thumbs">
+                <!-- รูปเล็กแนวนอน -->
+                <div v-if="images.length" class="thumb-carousel">
+                    <button
+                        class="carousel-arrow"
+                        type="button"
+                        aria-label="รูปก่อนหน้า"
+                        :disabled="selectedImageIndex === 0"
+                        @click="selectImage(selectedImageIndex - 1)"
+                    >
+                        ‹
+                    </button>
+                    <div class="image-thumbs">
                     <button
                         v-for="(img, index) in images"
                         :key="img + index"
                         class="thumb-button"
                         :class="{ 'is-active': index === selectedImageIndex }"
                         type="button"
-                        @click="$emit('update:selected-image-index', index)"
+                        @click="selectImage(index)"
                     >
                         <figure class="image is-64x64">
                             <img :src="img" :alt="product.name + ' thumbnail ' + (index + 1)" />
                         </figure>
+                    </button>
+                    </div>
+                    <button
+                        class="carousel-arrow"
+                        type="button"
+                        aria-label="รูปถัดไป"
+                        :disabled="selectedImageIndex === images.length - 1"
+                        @click="selectImage(selectedImageIndex + 1)"
+                    >
+                        ›
                     </button>
                 </div>
             </div>
@@ -47,11 +67,28 @@
                 </ul>
             </div>
 
-            <div v-if="product.standards" class="info-block">
-                <p class="info-label">มาตรฐานและการรับรอง</p>
-                <ul class="info-list">
-                    <li v-for="(item, index) in listValue(product.standards)" :key="index">{{ item }}</li>
-                </ul>
+            <div class="sku-row">
+                <span class="sku-chip">SKU: {{ product.sku || '-' }}</span>
+            </div>
+
+            <div class="product-actions">
+                <a
+                    class="action-btn line-btn"
+                    href="https://lin.ee/qyMmToF"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    <img src="/images/line_icon.png" alt="" />
+                    สอบถามและสั่งซื้อสินค้า<br />@idealglobe
+                </a>
+                <button class="action-btn quote-action" type="button">
+                    <i class="fa-regular fa-file-lines"></i>
+                    ขอใบเสนอราคา
+                </button>
+                <a class="action-btn phone-btn" href="tel:0972204888">
+                    <i class="fa-solid fa-phone"></i>
+                    โทรสอบถาม<br />097-220-4888
+                </a>
             </div>
         </div>
     </div>
@@ -80,6 +117,10 @@ export default {
     },
     emits: ['update:selected-image-index'],
     methods: {
+        selectImage(index) {
+            if (index < 0 || index >= this.images.length) return
+            this.$emit('update:selected-image-index', index)
+        },
         listValue(value) {
             if (Array.isArray(value)) return value
             return value ? [value] : []
@@ -106,42 +147,64 @@ export default {
 </script>
 
 <style scoped>
-/* desktop: thumbs ซ้าย / main ขวา */
 .image-wrapper {
-    display: grid;
-    grid-template-columns: 80px 1fr;
-    grid-template-areas: 'thumbs main';
-    column-gap: 1rem;
-    align-items: start;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .image-main {
-    grid-area: main;
     background: #fff;
-    padding: 1.5rem;
-    border-radius: 6px;
+    border-radius: 8px;
+    height: 420px;
+    overflow: hidden;
+    padding: 1.25rem;
+}
+
+.image-main figure {
+    align-items: center;
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    overflow: hidden;
+    width: 100%;
 }
 
 .image-main img {
-    width: 100%;
-    height: auto;
+    display: block;
+    height: 100%;
+    max-height: 100%;
+    max-width: 100%;
     object-fit: contain;
+    width: 100%;
+}
+
+.thumb-carousel {
+    align-items: center;
+    display: grid;
+    gap: 8px;
+    grid-template-columns: 26px minmax(0, 1fr) 26px;
 }
 
 .image-thumbs {
-    grid-area: thumbs;
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    gap: 10px;
+    justify-content: center;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
 }
+.image-thumbs::-webkit-scrollbar { display: none; }
 
 .thumb-button {
-    border: none;
-    padding: 0;
-    background: transparent;
+    background: #fff;
+    border: 1px solid transparent;
+    border-radius: 5px;
     cursor: pointer;
-    border-radius: 4px;
+    flex: 0 0 72px;
+    height: 72px;
     overflow: hidden;
+    padding: 4px;
 }
 
 .thumb-button img {
@@ -152,7 +215,22 @@ export default {
 }
 
 .thumb-button.is-active {
-    outline: 2px solid #00b894;
+    border-color: #a0805b;
+    box-shadow: 0 0 0 1px #a0805b;
+}
+
+.carousel-arrow {
+    background: transparent;
+    border: 0;
+    color: #a0805b;
+    cursor: pointer;
+    font-size: 1.75rem;
+    padding: 0;
+}
+
+.carousel-arrow:disabled {
+    cursor: default;
+    opacity: 0.25;
 }
 
 /* กล่องรายละเอียดขวา */
@@ -161,10 +239,12 @@ export default {
     border-radius: 6px;
 }
 
+.product-info :deep(.title) { color: #23272d; }
+
 .short-desc {
     font-size: 1rem;
     font-weight: 600;
-    color: #1e293b;
+    color: #a0805b;
     margin-bottom: 0.5rem;
 }
 
@@ -182,7 +262,7 @@ export default {
 .info-label {
     font-size: 0.8rem;
     font-weight: 700;
-    color: #64748b;
+    color: #a0805b;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-bottom: 0.15rem;
@@ -201,32 +281,62 @@ export default {
     margin: 0 0 0 1.2rem;
 }
 
+.sku-chip {
+    background: #e7e1d8;
+    border: 1px solid #cdbb9f;
+    border-radius: 3px;
+    color: #5f4a31;
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 5px 10px;
+}
+
+.sku-row {
+    display: block;
+    margin: 7px 0 12px;
+}
+
+.product-actions {
+    display: grid;
+    gap: 9px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.action-btn {
+    align-items: center;
+    border: 0;
+    border-radius: 7px;
+    color: #fff;
+    display: flex;
+    font-family: inherit;
+    font-size: 0.72rem;
+    justify-content: center;
+    line-height: 1.25;
+    min-height: 48px;
+    padding: 7px 9px;
+    text-align: left;
+    text-decoration: none;
+}
+
+.action-btn i,
+.action-btn img { margin-right: 7px; }
+.action-btn img { height: 21px; width: 21px; }
+.line-btn { background: #43ba46; }
+.quote-action { background: #23272d; cursor: default; }
+.phone-btn { background: #a0805b; }
+
 figure {
     margin: auto;
 }
 
-/* mobile: main บน / thumbs ล่าง */
 @media screen and (max-width: 768px) {
     .product-main {
         flex-direction: column-reverse;
     }
 
-    .image-wrapper {
-        grid-template-columns: 1fr;
-        grid-template-areas:
-            'main'
-            'thumbs';
-        row-gap: 0.75rem;
-    }
-
-    .image-thumbs {
-        flex-direction: row;
-        justify-content: center;
-    }
-
-    .thumb-button {
-        width: 64px;
-        height: 64px;
-    }
+    .image-main { height: 330px; }
+    .thumb-button { flex-basis: 60px; height: 60px; }
+    .product-actions { grid-template-columns: 1fr; }
 }
 </style>

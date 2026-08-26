@@ -1,5 +1,5 @@
 <template>
-    <form class="product-form" @submit.prevent="handleSubmit">
+    <form id="admin-product-form" class="product-form" @submit.prevent="handleSubmit">
         <div class="form-group">
             <label for="name">ชื่อสินค้า</label>
             <input id="name" type="text" v-model="form.name" class="form-input" placeholder="-" required />
@@ -70,12 +70,6 @@
             </div>
         </div>
 
-        <div class="form-actions">
-            <button type="submit" class="btn-primary" :disabled="productStore.loading">
-                <span v-if="productStore.loading">Saving...</span>
-                <span v-else>{{ isEditMode ? 'อัปเดตสินค้า' : 'บันทึกสินค้า' }}</span>
-            </button>
-        </div>
     </form>
 </template>
 
@@ -367,10 +361,6 @@ label {
     width: 20px;
 }
 
-.form-actions {
-    margin-top: 8px;
-}
-
 .list-group { gap: 7px; }
 .list-row { display: flex; gap: 8px; }
 .btn-add {
@@ -393,24 +383,4 @@ label {
     font-size: 1.2rem;
 }
 
-.btn-primary {
-    padding: 8px 16px;
-    border-radius: 6px;
-    border: none;
-    background: #2563eb;
-    color: white;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.15s ease, opacity 0.15s ease;
-}
-
-.btn-primary:hover {
-    background: #1d4ed8;
-}
-
-.btn-primary:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
 </style>

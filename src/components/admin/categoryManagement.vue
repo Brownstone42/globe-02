@@ -29,12 +29,17 @@
                         </div>
 
                         <div class="form-group">
-                            <label>Image (URL or path)</label>
+                            <label>Category Image</label>
                             <input
-                                v-model="form.image"
-                                type="text"
-                                placeholder="เช่น categories/gloves.png"
+                                ref="categoryImageInput"
+                                type="file"
+                                accept="image/*"
+                                class="form-file"
+                                @change="onImageChange"
                             />
+                            <div v-if="imagePreview" class="image-preview">
+                                <img :src="imagePreview" :alt="form.name || 'Category preview'" />
+                            </div>
                         </div>
 
                         <div class="form-group inline">
@@ -101,7 +106,7 @@
                         </div>
 
                         <div class="form-actions">
-                            <button type="submit" class="btn-primary">
+                            <button type="submit" class="btn-primary" :disabled="loading">
                                 {{ editingId ? 'Update Category' : 'Create Category' }}
                             </button>
                             <button
@@ -135,6 +140,7 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
+                                    <th>Image</th>
                                     <th>Name</th>
                                     <th>Slug</th>
                                     <th>Order</th>
@@ -146,6 +152,10 @@
                             <tbody>
                                 <tr v-for="(cat, index) in sortedCategories" :key="cat.id">
                                     <td>{{ index + 1 }}</td>
+                                    <td class="category-image-cell">
+                                        <img v-if="cat.imageUrl" :src="cat.imageUrl" :alt="cat.name" />
+                                        <span v-else class="image-placeholder">No image</span>
+                                    </td>
                                     <td>{{ cat.name }}</td>
                                     <td>{{ cat.slug }}</td>
                                     <td>{{ cat.order }}</td>
@@ -188,10 +198,13 @@ export default {
                 slug: '',
                 description: '',
                 image: '',
+                imageFile: null,
                 order: 0,
                 visibility: true,
                 subcategories: [],
             },
+            imagePreview: null,
+            imagePreviewObjectUrl: null,
         }
     },
     computed: {
@@ -213,18 +226,25 @@ export default {
             this.categoryStore.loadCategories()
         }
     },
+    beforeUnmount() {
+        this.revokeImagePreview()
+    },
     methods: {
         resetForm() {
+            this.revokeImagePreview()
             this.editingId = null
             this.form = {
                 name: '',
                 slug: '',
                 description: '',
                 image: '',
+                imageFile: null,
                 order: 0,
                 visibility: true,
                 subcategories: [],
             }
+            this.imagePreview = null
+            this.$nextTick(() => this.clearImageInput())
         },
 
         reload() {
@@ -232,16 +252,20 @@ export default {
         },
 
         startEdit(cat) {
+            this.revokeImagePreview()
             this.editingId = cat.id
             this.form = {
                 name: cat.name || '',
                 slug: cat.slug || '',
                 description: cat.description || '',
                 image: cat.image || '',
+                imageFile: null,
                 order: cat.order || 0,
                 visibility: cat.visibility ?? true,
                 subcategories: (cat.subcategories || []).map((s) => ({ ...s })),
             }
+            this.imagePreview = cat.imageUrl || null
+            this.$nextTick(() => this.clearImageInput())
         },
 
         async onSubmit() {
@@ -252,6 +276,7 @@ export default {
                     this.form.name.trim().toLowerCase().replace(/\s+/g, '-'),
                 description: this.form.description.trim(),
                 image: this.form.image.trim(),
+                imageFile: this.form.imageFile,
                 order: this.form.order ?? 0,
                 visibility: this.form.visibility,
                 subcategories: this.form.subcategories.map((s, index) => ({
@@ -282,6 +307,23 @@ export default {
                 order: this.form.subcategories.length,
                 visibility: true,
             })
+        },
+        onImageChange(event) {
+            const file = event.target.files?.[0]
+            if (!file) return
+            this.revokeImagePreview()
+            this.form.imageFile = file
+            this.imagePreviewObjectUrl = URL.createObjectURL(file)
+            this.imagePreview = this.imagePreviewObjectUrl
+        },
+        revokeImagePreview() {
+            if (this.imagePreviewObjectUrl) {
+                URL.revokeObjectURL(this.imagePreviewObjectUrl)
+                this.imagePreviewObjectUrl = null
+            }
+        },
+        clearImageInput() {
+            if (this.$refs.categoryImageInput) this.$refs.categoryImageInput.value = ''
         },
 
         removeSubcategory(index) {
@@ -419,6 +461,51 @@ textarea {
     transition: border-color 0.2s;
 }
 
+.form-file {
+    font-family: inherit;
+    font-size: 0.85rem;
+}
+
+.image-preview {
+    align-items: center;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    display: flex;
+    height: 180px;
+    justify-content: center;
+    overflow: hidden;
+    padding: 8px;
+}
+
+.image-preview img {
+    height: 100%;
+    object-fit: contain;
+    width: 100%;
+}
+
+.category-image-cell {
+    width: 72px;
+}
+
+.category-image-cell img,
+.category-image-cell .image-placeholder {
+    align-items: center;
+    background: #f8fafc;
+    border-radius: 6px;
+    display: flex;
+    height: 52px;
+    justify-content: center;
+    object-fit: contain;
+    width: 52px;
+}
+
+.category-image-cell .image-placeholder {
+    color: #94a3b8;
+    font-size: 0.65rem;
+    text-align: center;
+}
+
 input:focus,
 textarea:focus {
     outline: none;
@@ -532,6 +619,11 @@ textarea {
 
 .btn-primary:hover {
     background: #1d4ed8;
+}
+
+.btn-primary:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
 .btn-secondary {

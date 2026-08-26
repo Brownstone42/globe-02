@@ -10,6 +10,7 @@ import AdminLogin from '@/views/admin/AdminLogin.vue'
 import AdminHome from '@/views/admin/AdminHome.vue'
 import BlogList from '@/views/news/BlogList.vue'
 import BlogDetail from '@/views/news/BlogDetail.vue'
+import About from '@/views/About.vue'
 
 const routes = [
     {
@@ -27,6 +28,11 @@ const routes = [
         path: '/',
         name: 'home',
         component: Home,
+    },
+    {
+        path: '/about',
+        name: 'about',
+        component: About,
     },
     {
         path: '/blogs',

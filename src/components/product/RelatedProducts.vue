@@ -1,6 +1,6 @@
 <template>
     <div class="related-products">
-        <h2 class="title is-5 mb-4">สินค้าในหมวดเดียวกัน</h2>
+        <h2 class="related-title">สินค้าที่เกี่ยวข้อง</h2>
 
         <div class="columns is-multiline">
             <div
@@ -63,6 +63,13 @@ export default {
 </script>
 
 <style scoped>
+.related-title {
+    color: #a0805b;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 18px;
+}
+
 .related-card {
     background: #fff;
     border-radius: 12px 12px 30px 12px;

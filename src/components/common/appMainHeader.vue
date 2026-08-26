@@ -10,7 +10,7 @@
 
             <!-- Desktop Menu -->
             <nav class="nav-menu desktop-menu">
-                <a href="#" class="nav-item">ABOUT US</a>
+                <a href="/about" class="nav-item" @click.prevent="navigate('/about')">ABOUT US</a>
                 <a href="#" class="nav-item" @click="navigate('/product')">PRODUCT</a>
                 <a href="#" class="nav-item" @click.prevent="navigate('/blogs')">BLOGS</a>
                 <a href="#" class="nav-item">CONTACT US</a>
@@ -39,7 +39,7 @@
 
         <!-- Mobile Menu -->
         <nav class="mobile-menu" v-if="isOpen">
-            <a href="#" class="mobile-item">ABOUT US</a>
+            <a href="/about" class="mobile-item" @click.prevent="navigate('/about')">ABOUT US</a>
             <a href="#" class="mobile-item" @click="navigate('/product')">PRODUCT</a>
             <a href="#" class="mobile-item" @click.prevent="navigate('/blogs')">BLOGS</a>
             <a href="#" class="mobile-item">CONTACT US</a>

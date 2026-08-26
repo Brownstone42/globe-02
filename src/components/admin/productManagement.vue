@@ -8,14 +8,29 @@
                     <h2 class="pm-section-title">
                         {{ currentProductId ? 'Edit Product' : 'Create Product' }}
                     </h2>
-                    <button
-                        v-if="currentProductId"
-                        type="button"
-                        class="btn-secondary small"
-                        @click="startCreate"
-                    >
-                        + สร้างสินค้าใหม่
-                    </button>
+                    <div class="pm-form-actions">
+                        <button
+                            v-if="currentProductId"
+                            type="button"
+                            class="btn-secondary small"
+                            :disabled="productStore.loading"
+                            @click="startCreate"
+                        >
+                            + สร้างสินค้าใหม่
+                        </button>
+                        <button
+                            type="submit"
+                            form="admin-product-form"
+                            class="btn-primary small"
+                            :disabled="productStore.loading"
+                        >
+                            {{ productStore.loading
+                                ? 'Saving...'
+                                : currentProductId
+                                    ? 'อัปเดตสินค้า'
+                                    : 'บันทึกสินค้า' }}
+                        </button>
+                    </div>
                 </div>
                 <section class="pm-form">
                     <product-form
@@ -298,6 +313,35 @@ export default {
     align-items: center;
     margin-bottom: 12px;
     flex-shrink: 0;
+}
+
+.pm-form-actions {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+}
+
+.btn-primary.small {
+    background: #2563eb;
+    border: 0;
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 7px 14px;
+    transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.btn-primary.small:hover:not(:disabled) {
+    background: #1d4ed8;
+}
+
+.btn-primary.small:disabled,
+.btn-secondary.small:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
 .pm-list-placeholder {

@@ -12,7 +12,21 @@ import {
     serverTimestamp,
 } from 'firebase/firestore'
 import { db, app } from '@/firebase'
-import { getStorage, ref as storageRef, getDownloadURL } from 'firebase/storage'
+import { getStorage, ref as storageRef, getDownloadURL, uploadBytes } from 'firebase/storage'
+
+const storage = getStorage(app)
+
+async function uploadCategoryImage(file) {
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '-')
+    const uniqueName = `${Date.now()}-${crypto.randomUUID()}-${safeName}`
+    const path = `categories/${uniqueName}`
+    const snapshot = await uploadBytes(storageRef(storage, path), file)
+
+    return {
+        path: snapshot.ref.fullPath,
+        url: await getDownloadURL(snapshot.ref),
+    }
+}
 
 export const useCategoryStore = defineStore('category', {
     state: () => ({
@@ -41,7 +55,6 @@ export const useCategoryStore = defineStore('category', {
                 const q = query(collection(db, 'categories'), orderBy('order', 'asc'))
                 const snap = await getDocs(q)
 
-                const storage = getStorage(app)
                 const result = []
 
                 for (const d of snap.docs) {
@@ -75,12 +88,18 @@ export const useCategoryStore = defineStore('category', {
         },
         async createCategory(payload) {
             // payload คาดหวัง: { name, slug, description, image, order, visibility, subcategories }
+            this.loading = true
+            this.error = null
             try {
+                const uploadedImage = payload.imageFile
+                    ? await uploadCategoryImage(payload.imageFile)
+                    : null
+                const image = uploadedImage?.path || payload.image || ''
                 const ref = await addDoc(collection(db, 'categories'), {
                     name: payload.name || '',
                     slug: payload.slug || '',
                     description: payload.description || '',
-                    image: payload.image || '',
+                    image,
                     order: Number(payload.order) || 0,
                     visibility: payload.visibility ?? true,
                     subcategories: payload.subcategories || [],
@@ -92,21 +111,32 @@ export const useCategoryStore = defineStore('category', {
                 this.categories.push({
                     id: ref.id,
                     ...payload,
-                    imageUrl: '',
+                    image,
+                    imageFile: undefined,
+                    imageUrl: uploadedImage?.url || '',
                 })
             } catch (err) {
                 console.error('createCategory error:', err)
+                this.error = 'บันทึกหมวดหมู่ล้มเหลว'
                 throw err
+            } finally {
+                this.loading = false
             }
         },
         async updateCategory(id, payload) {
+            this.loading = true
+            this.error = null
             try {
+                const uploadedImage = payload.imageFile
+                    ? await uploadCategoryImage(payload.imageFile)
+                    : null
+                const image = uploadedImage?.path || payload.image || ''
                 const ref = doc(db, 'categories', id)
                 await updateDoc(ref, {
                     name: payload.name,
                     slug: payload.slug,
                     description: payload.description,
-                    image: payload.image,
+                    image,
                     order: Number(payload.order) || 0,
                     visibility: payload.visibility,
                     subcategories: payload.subcategories || [],
@@ -119,12 +149,17 @@ export const useCategoryStore = defineStore('category', {
                     this.categories[idx] = {
                         id,
                         ...payload,
-                        imageUrl: this.categories[idx].imageUrl || '',
+                        image,
+                        imageFile: undefined,
+                        imageUrl: uploadedImage?.url || this.categories[idx].imageUrl || '',
                     }
                 }
             } catch (err) {
                 console.error('updateCategory error:', err)
+                this.error = 'อัปเดตหมวดหมู่ล้มเหลว'
                 throw err
+            } finally {
+                this.loading = false
             }
         },
         async toggleVisibility(id) {
