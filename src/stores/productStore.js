@@ -19,7 +19,7 @@ const storage = getStorage(app)
 
 const PRODUCT_FIELDS = new Set([
     'name', 'shortDescription', 'description', 'highlights', 'properties',
-    'specifications', 'standards', 'suitable', 'documents', 'faq', 'brand', 'sku', 'category', 'packing',
+    'specifications', 'standards', 'suitable', 'documents', 'faq', 'hashtags', 'brand', 'sku', 'category', 'packing',
     'mainImageUrl', 'galleryImageUrls', 'createdAt', 'updatedAt',
 ])
 
@@ -47,6 +47,12 @@ function normalizeFaq(value) {
             answer: String(item?.answer || '').trim(),
         }))
         .filter((item) => item.question || item.answer)
+}
+
+function normalizeHashtags(value) {
+    return toItemList(value)
+        .map((item) => item.replace(/^#+/, '').trim())
+        .filter(Boolean)
 }
 
 async function uploadProductDocuments(items) {
@@ -157,6 +163,7 @@ export const useProductStore = defineStore('product', {
                     suitable: toItemList(form.suitable),
                     documents,
                     faq: normalizeFaq(form.faq),
+                    hashtags: normalizeHashtags(form.hashtags),
                     brand: form.brand || '',
                     sku: form.sku || '',
                     packing: form.packing || '',
@@ -230,6 +237,7 @@ export const useProductStore = defineStore('product', {
                     suitable: toItemList(form.suitable),
                     documents,
                     faq: normalizeFaq(form.faq),
+                    hashtags: normalizeHashtags(form.hashtags),
                     brand: form.brand || '',
                     sku: form.sku || '',
                     packing: form.packing || '',
@@ -267,6 +275,7 @@ export const useProductStore = defineStore('product', {
                     !Array.isArray(product.suitable) ||
                     !Array.isArray(product.documents) ||
                     !Array.isArray(product.faq) ||
+                    !Array.isArray(product.hashtags) ||
                     !Array.isArray(product.galleryImageUrls) ||
                     product.galleryImageUrls.length > 4
             })
@@ -286,6 +295,7 @@ export const useProductStore = defineStore('product', {
                         suitable: toItemList(product.suitable),
                         documents: normalizeDocuments(product.documents),
                         faq: normalizeFaq(product.faq),
+                        hashtags: normalizeHashtags(product.hashtags),
                         galleryImageUrls: Array.isArray(product.galleryImageUrls)
                             ? product.galleryImageUrls.slice(0, 4)
                             : [],

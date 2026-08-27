@@ -1,5 +1,6 @@
 <template>
-    <div class="columns product-main">
+    <div class="product-main">
+        <div class="columns product-columns">
         <!-- ซ้าย: รูป + carousel -->
         <div class="column is-6">
             <div class="image-wrapper">
@@ -79,17 +80,18 @@
                     rel="noopener noreferrer"
                 >
                     <img src="/images/line_icon.png" alt="" />
-                    สอบถามและสั่งซื้อสินค้า<br />@idealglobe
+                    <span>สอบถามและสั่งซื้อผ่านไลน์<br /><strong>@idealglobe</strong> <small>(มี@)</small></span>
                 </a>
                 <button class="action-btn quote-action" type="button">
                     <i class="fa-regular fa-file-lines"></i>
-                    ขอใบเสนอราคา
+                    <span>ขอใบเสนอราคา</span>
                 </button>
                 <a class="action-btn phone-btn" href="tel:0972204888">
                     <i class="fa-solid fa-phone"></i>
-                    โทรสอบถาม<br />097-220-4888
+                    <span>โทรสอบถาม<br /><strong>097-220-4888</strong></span>
                 </a>
             </div>
+        </div>
         </div>
     </div>
 </template>
@@ -309,41 +311,50 @@ export default {
 .action-btn {
     align-items: center;
     border: 0;
-    border-radius: 7px;
+    border-radius: 8px;
     color: #fff;
     display: flex;
     font-family: inherit;
     font-size: 0.82rem;
     justify-content: center;
     line-height: 1.25;
-    min-height: 48px;
+    min-height: 50px;
     padding: 7px 9px;
     text-align: left;
     text-decoration: none;
 }
 
 .action-btn i,
-.action-btn img { margin-right: 7px; }
+.action-btn img { flex: 0 0 auto; margin-right: 7px; }
+.action-btn i { font-size: 1.35rem; }
 .action-btn img {
     filter: brightness(0) invert(1);
-    height: 21px;
-    width: 21px;
+    height: 24px;
+    width: 24px;
 }
-.line-btn { background: #43ba46; }
-.quote-action { background: #23272d; cursor: default; }
-.phone-btn { background: #a0805b; }
+.action-btn strong { color: inherit; font-size: 1.2em; }
+.action-btn small { font-size: 0.7em; }
+.line-btn { background: #4cbd2f; }
+.line-btn > span {
+    font-size: clamp(0.66rem, 0.82vw, 0.78rem);
+    white-space: nowrap;
+}
+.quote-action { background: #364052; cursor: default; }
+.phone-btn { background: #ad9975; }
 
 figure {
     margin: auto;
 }
 
 @media screen and (max-width: 768px) {
-    .product-main {
+    .product-columns {
         flex-direction: column-reverse;
     }
 
     .image-main { height: 330px; }
     .thumb-button { flex-basis: 60px; height: 60px; }
     .product-actions { grid-template-columns: 1fr; }
+    .action-btn { min-height: 54px; }
+    .line-btn > span { font-size: 0.82rem; }
 }
 </style>

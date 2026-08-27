@@ -67,6 +67,26 @@
             </div>
         </div>
 
+        <div class="form-group list-group">
+            <div class="list-header">
+                <label>Hashtag</label>
+                <button type="button" class="btn-add" :disabled="!hashtagInput.trim()" @click="addHashtags">+ เพิ่ม Hashtag</button>
+            </div>
+            <input
+                v-model="hashtagInput"
+                type="text"
+                class="form-input"
+                placeholder="พิมพ์ Hashtag เช่น Cleanroom, ESD, Safety แล้วกดเพิ่ม"
+                @keydown.enter.prevent="addHashtags"
+            />
+            <div v-if="form.hashtags.length" class="hashtag-admin-list">
+                <span v-for="(hashtag, index) in form.hashtags" :key="`${hashtag}-${index}`" class="hashtag-admin-chip">
+                    #{{ hashtag }}
+                    <button type="button" :aria-label="`ลบ Hashtag ${hashtag}`" @click="removeHashtag(index)">×</button>
+                </span>
+            </div>
+        </div>
+
         <div class="form-row">
             <div class="form-group">
                 <label for="brand">ยี่ห้อ</label>
@@ -142,6 +162,7 @@ export default {
                 suitable: [''],
                 documents: [],
                 faq: [],
+                hashtags: [],
                 brand: '',
                 sku: '',
                 category: '',
@@ -153,6 +174,7 @@ export default {
             mainImagePreview: null,
             newGalleryPreviews: [],
             faqRawInput: '',
+            hashtagInput: '',
             isEditMode: false,
             listGroups: [
                 { key: 'highlights', label: 'จุดเด่นสินค้า' },
@@ -198,7 +220,9 @@ export default {
                     this.form.suitable = this.asEditableList(newVal.suitable)
                     this.form.documents = this.asEditableDocuments(newVal.documents)
                     this.form.faq = this.asEditableFaq(newVal.faq)
+                    this.form.hashtags = this.asEditableHashtags(newVal.hashtags)
                     this.faqRawInput = ''
+                    this.hashtagInput = ''
                     this.form.brand = newVal.brand || ''
                     this.form.sku = newVal.sku || ''
                     this.form.packing = newVal.packing || ''
@@ -245,6 +269,12 @@ export default {
                 question: item?.question || '',
                 answer: item?.answer || '',
             }))
+        },
+        asEditableHashtags(value) {
+            if (!Array.isArray(value)) return []
+            return value
+                .map((item) => String(item || '').replace(/^#+/, '').trim())
+                .filter(Boolean)
         },
         addListItem(key) {
             this.form[key].push('')
@@ -302,6 +332,22 @@ export default {
         removeFaq(index) {
             this.form.faq.splice(index, 1)
         },
+        addHashtags() {
+            const hashtags = this.hashtagInput
+                .split(/[,，\n]+/)
+                .map((item) => item.replace(/^#+/, '').trim())
+                .filter(Boolean)
+            hashtags.forEach((hashtag) => {
+                const exists = this.form.hashtags.some(
+                    (item) => String(item).toLocaleLowerCase() === hashtag.toLocaleLowerCase(),
+                )
+                if (!exists) this.form.hashtags.push(hashtag)
+            })
+            this.hashtagInput = ''
+        },
+        removeHashtag(index) {
+            this.form.hashtags.splice(index, 1)
+        },
         parseFaq() {
             const lines = this.faqRawInput.split('\n').map((line) => line.trim()).filter(Boolean)
             const pairs = []
@@ -330,6 +376,7 @@ export default {
                 suitable: [''],
                 documents: [],
                 faq: [],
+                hashtags: [],
                 brand: '',
                 sku: '',
                 category: '',
@@ -342,6 +389,7 @@ export default {
             this.newGalleryPreviews.forEach((url) => URL.revokeObjectURL(url))
             this.newGalleryPreviews = []
             this.faqRawInput = ''
+            this.hashtagInput = ''
             this.$nextTick(() => this.clearFileInputs())
         },
         async handleSubmit() {
@@ -491,6 +539,7 @@ label {
     transition: all 0.2s;
 }
 .btn-add:hover { background: #eff6ff; border-color: #3b82f6; }
+.btn-add:disabled { cursor: not-allowed; opacity: 0.45; }
 .btn-remove {
     background: #fee2e2;
     border: 0;
@@ -555,5 +604,33 @@ label {
     padding: 10px;
 }
 .faq-inputs { display: flex; flex: 1; flex-direction: column; gap: 6px; min-width: 0; }
+.hashtag-admin-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 3px; }
+.hashtag-admin-chip {
+    align-items: center;
+    background: #a0805b;
+    border-radius: 999px;
+    color: #fff;
+    display: inline-flex;
+    font-size: 0.82rem;
+    font-weight: 600;
+    gap: 7px;
+    padding: 6px 7px 6px 12px;
+}
+.hashtag-admin-chip button {
+    align-items: center;
+    background: rgba(255, 255, 255, 0.22);
+    border: 0;
+    border-radius: 50%;
+    color: #fff;
+    cursor: pointer;
+    display: inline-flex;
+    font-size: 1rem;
+    height: 20px;
+    justify-content: center;
+    line-height: 1;
+    padding: 0;
+    width: 20px;
+}
+.hashtag-admin-chip button:hover { background: rgba(255, 255, 255, 0.38); }
 
 </style>
