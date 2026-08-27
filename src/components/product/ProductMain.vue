@@ -260,12 +260,10 @@ export default {
 }
 
 .info-label {
-    font-size: 0.8rem;
+    font-size: 1.15rem;
     font-weight: 700;
     color: #a0805b;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 0.15rem;
+    margin-bottom: 0.35rem;
 }
 
 .info-value {
@@ -279,6 +277,11 @@ export default {
     font-size: 0.9rem;
     list-style: disc;
     margin: 0 0 0 1.2rem;
+}
+
+.info-list li::marker {
+    color: #a0805b;
+    font-size: 0.7em;
 }
 
 .sku-chip {
@@ -310,7 +313,7 @@ export default {
     color: #fff;
     display: flex;
     font-family: inherit;
-    font-size: 0.72rem;
+    font-size: 0.82rem;
     justify-content: center;
     line-height: 1.25;
     min-height: 48px;
@@ -321,7 +324,11 @@ export default {
 
 .action-btn i,
 .action-btn img { margin-right: 7px; }
-.action-btn img { height: 21px; width: 21px; }
+.action-btn img {
+    filter: brightness(0) invert(1);
+    height: 21px;
+    width: 21px;
+}
 .line-btn { background: #43ba46; }
 .quote-action { background: #23272d; cursor: default; }
 .phone-btn { background: #a0805b; }

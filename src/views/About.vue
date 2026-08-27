@@ -87,16 +87,15 @@
 
         <section v-about-reveal class="trust-section about-reveal">
             <img src="/images/footer-logo.png" alt="Ideal Globe" />
-            <div>
+            <div class="trust-desktop-content">
                 <h2>พันธมิตรที่คุณเชื่อมั่นได้</h2>
                 <p>ด้วยประสบการณ์ยาวนาน ความพร้อมด้านสินค้า และการบริการที่ใส่ใจในทุกขั้นตอน</p>
                 <p>ทำให้ไอเดียลโกลบ เป็นผู้ให้บริการที่องค์กรข้ามชาติและโรงงานชั้นนำไว้วางใจเลือกใช้ตลอดกว่า 30 ปี</p>
             </div>
-        </section>
-
-        <section class="better-protection">
-            <p>BETTER PROTECTION <strong>BETTER PRODUCTION</strong></p>
-            <h2>ยกระดับการป้องกัน สู่มาตรฐานการผลิตที่เหนือกว่า</h2>
+            <div class="trust-mobile-content">
+                <p>BETTER PROTECTION <strong>BETTER PRODUCTION</strong></p>
+                <h2>ยกระดับการป้องกัน สู่มาตรฐานการผลิตที่เหนือกว่า</h2>
+            </div>
         </section>
     </main>
 </template>
@@ -232,22 +231,21 @@ export default {
 .history-card { position: absolute; z-index: 1; }
 .history-card h2 { color: #f6f1e8; font-size: 2rem; font-weight: 700; line-height: 1; margin: 0 0 10px; }
 .history-card p { font-size: 1rem; font-weight: 600; line-height: 1.5; margin: 0; }
-.history-card img { border: 2px solid #d9ba7e; display: block; object-fit: cover; }
-.year-2001 { left: 0; top: 78px; }.year-2001 img { border-radius: 22px; margin-top: 10px; width: 235px; }
+.history-card img { display: block; object-fit: cover; }
+.year-2001 { left: 0; top: 78px; }.year-2001 img { margin-top: 10px; width: 235px; }
 .year-2003 { left: 39%; top: 78px; }
-.year-2007 { right: 0; top: 58px; width: 245px; }.year-2007 img { border-radius: 22px; height: 132px; margin: 10px 0 14px; width: 230px; }
+.year-2007 { right: 0; top: 58px; width: 245px; }.year-2007 img { height: 132px; margin: 10px 0 14px; width: 230px; }
 .year-2018 { left: -5%; text-align: right; top: 365px; width: 220px; }
 .year-2017 { left: 23%; top: 365px; }
 .year-2011 { left: 62%; top: 365px; }
 .year-2022 { left: 17%; top: 655px; }.year-2023 { left: 48%; top: 655px; }.year-future { left: 75%; top: 650px; }
 .mobile-history { display: none; }
-.trust-section { align-items: center; background: #23272d; display: flex; gap: 44px; justify-content: center; margin: 0 auto; max-width: 1280px; padding: 18px 4vw 74px; }
-.trust-section img { height: 130px; object-fit: contain; width: 210px; }
-.trust-section > div { max-width: 880px; }
-.trust-section h2 { color: #c6a36e; font-size: 1.65rem; font-weight: 500; margin: 0 0 8px; }
-.trust-section p { color: #e8ded0; font-size: 1.15rem; line-height: 1.45; margin: 0; }
-.better-protection { background: #fff; color: #48515e; display: none; padding: 48px 20px; text-align: center; }
-.better-protection p { font-size: 1rem; margin: 0; }.better-protection h2 { font-size: 1.25rem; font-weight: 700; margin: 4px 0 0; }
+.trust-section { background: #ae8c62; display: block; margin: 0; max-width: none; padding: 58px 28px; text-align: center; }
+.trust-section img,
+.trust-desktop-content { display: none; }
+.trust-mobile-content { display: block; margin: 0 auto; max-width: 880px; }
+.trust-mobile-content p { color: #fff; font-size: 1.15rem; line-height: 1.35; margin: 0; }
+.trust-mobile-content h2 { color: #fff; font-size: 1.5rem; font-weight: 700; line-height: 1.4; margin: 6px 0 0; }
 .sr-only { height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px; clip: rect(0, 0, 0, 0); }
 
 @media (min-width: 1201px) {
@@ -309,12 +307,12 @@ export default {
         top: 7px;
         width: 3px;
     }
-    .mobile-history-row:last-child::after { height: 36px; }
+    .mobile-history-row:last-child::after { height: calc(100% + 53px); }
     .mobile-history-row h2 { font-size: 1.7rem; font-weight: 700; line-height: 1; margin: 0; text-align: right; }
     .mobile-history-row:last-child h2 { font-size: 1.15rem; white-space: nowrap; }
     .timeline-dot { background: #d8b574; border-radius: 50%; height: var(--dot-size); position: relative; width: var(--dot-size); z-index: 1; }
     .mobile-history-row p { font-size: 1rem; font-weight: 600; line-height: 1.5; margin: -4px 0 14px; }
-    .mobile-history-row img { border: 2px solid #d8b574; border-radius: 18px; display: block; height: 128px; object-fit: cover; width: min(100%, 280px); }
+    .mobile-history-row img { display: block; height: 128px; object-fit: cover; width: min(100%, 280px); }
 }
 
 @media (max-width: 768px) {
@@ -349,12 +347,11 @@ export default {
     }
     .mobile-history-row h2 { font-size: 1.55rem; font-weight: 700; line-height: 1; margin: 0; text-align: right; }
     .mobile-history-row:last-child h2 { font-size: 0.9rem; }
+    .mobile-history-row:last-child::after { height: calc(100% + 31px); }
     .mobile-history-row p { font-size: 0.85rem; font-weight: 600; line-height: 1.45; margin: -2px 0 12px; }
-    .mobile-history-row img { border: 2px solid #d8b574; border-radius: 18px; display: block; height: 108px; object-fit: cover; width: min(100%, 230px); }
-    .trust-section { background: #ae8c62; display: block; max-width: none; padding: 52px 28px; text-align: center; }
-    .trust-section img { display: none; }
-    .trust-section h2 { color: #fff; font-size: 1.5rem; }
-    .trust-section p { color: #f6eee3; font-size: 0.86rem; line-height: 1.45; }
-    .better-protection { display: block; }
+    .mobile-history-row img { display: block; height: 108px; object-fit: cover; width: min(100%, 230px); }
+    .trust-section { padding: 52px 28px; }
+    .trust-mobile-content p { color: #fff; font-size: 1rem; line-height: 1.35; }
+    .trust-mobile-content h2 { color: #fff; font-size: 1.25rem; font-weight: 700; line-height: 1.4; margin: 6px 0 0; }
 }
 </style>

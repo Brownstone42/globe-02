@@ -367,10 +367,12 @@ export default {
 .product-image {
     align-items: center;
     background: #fff;
+    box-sizing: border-box;
     display: flex;
     height: 190px;
     justify-content: center;
     overflow: hidden;
+    padding-top: 12px;
 }
 
 .product-image img {
