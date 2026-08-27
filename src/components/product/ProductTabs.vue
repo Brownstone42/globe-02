@@ -22,26 +22,20 @@
                 </ul>
                 <p v-else>-</p>
 
-                <div v-if="hashtags.length" class="hashtag-list">
-                    <span v-for="hashtag in hashtags" :key="hashtag" class="hashtag-chip">#{{ hashtag }}</span>
-                </div>
             </div>
             <div v-else-if="internalActive === 'specifications'">
-                <h3>สเปคสินค้า</h3>
                 <ul v-if="listValue(product.specifications).length" class="content-list">
                     <li v-for="(item, index) in listValue(product.specifications)" :key="index">{{ item }}</li>
                 </ul>
                 <p v-else>-</p>
             </div>
             <div v-else-if="internalActive === 'suitable'">
-                <h3>เหมาะกับ</h3>
                 <ul v-if="listValue(product.suitable).length" class="content-list">
                     <li v-for="(item, index) in listValue(product.suitable)" :key="index">{{ item }}</li>
                 </ul>
                 <p v-else>-</p>
             </div>
             <div v-else-if="internalActive === 'documents'">
-                <h3>เอกสารที่เกี่ยวข้อง</h3>
                 <div v-if="documents.length" class="document-buttons">
                     <a
                         v-for="(document, index) in documents"
@@ -59,7 +53,6 @@
                 <p v-else>-</p>
             </div>
             <div v-else-if="internalActive === 'faq'">
-                <h3>คำถามที่พบบ่อย</h3>
                 <div v-if="faqItems.length" class="faq-list">
                     <section v-for="(item, index) in faqItems" :key="index" class="faq-item" :class="{ 'is-open': isFaqExpanded(index) }">
                         <button type="button" class="faq-question" :aria-expanded="isFaqExpanded(index)" @click="toggleFaq(index)">
@@ -111,26 +104,20 @@
                                 </ul>
                                 <p v-else>-</p>
 
-                                <div v-if="hashtags.length" class="hashtag-list">
-                                    <span v-for="hashtag in hashtags" :key="hashtag" class="hashtag-chip">#{{ hashtag }}</span>
-                                </div>
                             </template>
                             <template v-else-if="tab.key === 'specifications'">
-                                <h3>สเปคสินค้า</h3>
                                 <ul v-if="listValue(product.specifications).length" class="content-list">
                                     <li v-for="(item, index) in listValue(product.specifications)" :key="index">{{ item }}</li>
                                 </ul>
                                 <p v-else>-</p>
                             </template>
                             <template v-else-if="tab.key === 'suitable'">
-                                <h3>เหมาะกับ</h3>
                                 <ul v-if="listValue(product.suitable).length" class="content-list">
                                     <li v-for="(item, index) in listValue(product.suitable)" :key="index">{{ item }}</li>
                                 </ul>
                                 <p v-else>-</p>
                             </template>
                             <template v-else-if="tab.key === 'documents'">
-                                <h3>เอกสารที่เกี่ยวข้อง</h3>
                                 <div v-if="documents.length" class="document-buttons">
                                     <a
                                         v-for="(document, index) in documents"
@@ -148,7 +135,6 @@
                                 <p v-else>-</p>
                             </template>
                             <template v-else-if="tab.key === 'faq'">
-                                <h3>คำถามที่พบบ่อย</h3>
                                 <div v-if="faqItems.length" class="faq-list">
                                     <section v-for="(item, index) in faqItems" :key="index" class="faq-item" :class="{ 'is-open': isFaqExpanded(index) }">
                                         <button type="button" class="faq-question" :aria-expanded="isFaqExpanded(index)" @click="toggleFaq(index)">
@@ -167,6 +153,10 @@
                     </div>
                 </div>
             </section>
+        </div>
+
+        <div v-if="hashtags.length" class="hashtag-list hashtag-section-footer">
+            <span v-for="hashtag in hashtags" :key="hashtag" class="hashtag-chip">#{{ hashtag }}</span>
         </div>
     </div>
 </template>
@@ -287,6 +277,7 @@ export default {
 .content-list { list-style: disc; margin-left: 1.25rem; }
 .content-list li::marker { color: #a0805b; font-size: 0.7em; }
 .hashtag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+.hashtag-section-footer { margin: 18px 42px 6px; }
 .hashtag-chip {
     background: #a0805b;
     border-radius: 999px;
@@ -407,5 +398,6 @@ export default {
         padding: 2px 16px 20px;
     }
     .accordion-content h3 { color: #a0805b; font-size: 1.15rem; font-weight: 700; margin-bottom: 10px; }
+    .hashtag-section-footer { margin: 18px 16px 4px; }
 }
 </style>

@@ -99,11 +99,6 @@ import { useProductStore } from '@/stores/productStore'
 
 const productRevealDirective = {
     mounted(element) {
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            element.classList.add('is-revealed')
-            return
-        }
-
         let frameId = null
         const checkPosition = () => {
             frameId = null
@@ -253,11 +248,6 @@ export default {
             if (!toolbar) return Promise.resolve()
 
             const target = toolbar.getBoundingClientRect().top + window.scrollY - 90
-            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-                window.scrollTo(0, target)
-                return Promise.resolve()
-            }
-
             const start = window.scrollY
             const distance = target - start
             const duration = 950
@@ -502,14 +492,6 @@ export default {
     color: #64748b;
     padding: 80px 0;
     text-align: center;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .product-card {
-        opacity: 1;
-        transform: none;
-        transition: none;
-    }
 }
 
 @media (max-width: 800px) {

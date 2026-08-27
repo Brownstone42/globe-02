@@ -20,7 +20,15 @@
                     '--category-mobile-delay': `${(index % 2) * 110}ms`,
                 }"
             >
-                <div class="category-image">
+                <div
+                    class="category-image"
+                    :class="{ 'is-clickable': item.slug }"
+                    :role="item.slug ? 'link' : undefined"
+                    :tabindex="item.slug ? 0 : undefined"
+                    :aria-label="item.slug ? `ดูสินค้าในหมวดหมู่ ${item.name || ''}` : undefined"
+                    @click="openCategory(item)"
+                    @keydown.enter.prevent="openCategory(item)"
+                >
                     <img v-if="item.imageUrl" :src="item.imageUrl" :alt="item.name || ''" />
                     <div v-else class="image-placeholder" aria-hidden="true"></div>
                 </div>
@@ -58,11 +66,6 @@ import { useCategoryStore } from '@/stores/categoryStore'
 
 const categoryRevealDirective = {
     mounted(element) {
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            element.classList.add('is-revealed')
-            return
-        }
-
         let frameId = null
         const checkPosition = () => {
             frameId = null
@@ -116,12 +119,14 @@ export default {
         this.revealObserver?.disconnect()
     },
     methods: {
+        openCategory(item) {
+            if (!item?.slug) return
+            this.$router.push({
+                name: 'product-category',
+                params: { category: item.slug },
+            })
+        },
         setupReveal() {
-            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-                this.isVisible = true
-                return
-            }
-
             this.revealObserver = new IntersectionObserver(
                 ([entry]) => {
                     if (!entry.isIntersecting) return
@@ -206,6 +211,8 @@ export default {
     width: 100%;
 }
 
+.category-image.is-clickable { cursor: pointer; }
+
 .category-image img {
     display: block;
     height: 100%;
@@ -286,22 +293,6 @@ export default {
     text-decoration: none;
     width: fit-content;
     transition-delay: 420ms;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .category-section h2,
-    .all-products-link {
-        opacity: 1;
-        transform: none;
-        transition: none;
-    }
-
-
-    .category-card {
-        opacity: 1;
-        transform: none;
-        transition: none;
-    }
 }
 
 .all-products-link:hover {

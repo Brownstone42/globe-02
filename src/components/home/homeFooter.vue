@@ -463,14 +463,21 @@ export default {
 
 .social-row span {
     align-items: center;
-    background: #fff;
+    background: #a0805b;
     border-radius: 50%;
-    color: #23272d;
+    color: #fff;
     display: inline-flex;
     height: 42px;
     justify-content: center;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
     width: 42px;
 }
+
+.social-row span:hover { color: #fff; transform: translateY(-3px); }
+.social-row span:nth-child(1):hover { background: #1877f2; }
+.social-row span:nth-child(2):hover { background: #06c755; }
+.social-row span:nth-child(3):hover { background: #ff0000; }
+.social-row span:nth-child(4):hover { background: #52687a; }
 
 .back-to-top {
     align-items: center;

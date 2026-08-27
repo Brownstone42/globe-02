@@ -104,9 +104,7 @@
 const aboutRevealDirective = {
     mounted(element) {
         const isDesktop = window.matchMedia('(min-width: 1201px)').matches
-        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
-        if (!isDesktop || reduceMotion) {
+        if (!isDesktop) {
             element.classList.add('is-revealed')
             return
         }
@@ -134,9 +132,7 @@ const aboutRevealDirective = {
 const mobileYearRevealDirective = {
     mounted(element) {
         const usesVerticalTimeline = window.matchMedia('(max-width: 1200px)').matches
-        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
-        if (!usesVerticalTimeline || reduceMotion) {
+        if (!usesVerticalTimeline) {
             element.classList.add('is-revealed')
             return
         }

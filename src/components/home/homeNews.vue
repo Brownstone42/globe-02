@@ -142,11 +142,6 @@ export default {
             this.canScrollNext = endPosition > 2 && viewport.scrollLeft < endPosition - 2
         },
         setupReveal() {
-            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-                this.isVisible = true
-                return
-            }
-
             this.revealObserver = new IntersectionObserver(
                 ([entry]) => {
                     if (!entry.isIntersecting) return
@@ -394,15 +389,6 @@ export default {
     color: #64748b;
     padding: 48px 0;
     text-align: center;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .news-header,
-    .news-card {
-        opacity: 1;
-        transform: none;
-        transition: none;
-    }
 }
 
 @media (max-width: 900px) {

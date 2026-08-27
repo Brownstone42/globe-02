@@ -11,6 +11,7 @@ import AdminHome from '@/views/admin/AdminHome.vue'
 import BlogList from '@/views/news/BlogList.vue'
 import BlogDetail from '@/views/news/BlogDetail.vue'
 import About from '@/views/About.vue'
+import Contact from '@/views/Contact.vue'
 
 const routes = [
     {
@@ -33,6 +34,11 @@ const routes = [
         path: '/about',
         name: 'about',
         component: About,
+    },
+    {
+        path: '/contact',
+        name: 'contact',
+        component: Contact,
     },
     {
         path: '/blogs',

@@ -13,7 +13,7 @@
                 <a href="/about" class="nav-item" @click.prevent="navigate('/about')">ABOUT US</a>
                 <a href="#" class="nav-item" @click="navigate('/product')">PRODUCT</a>
                 <a href="#" class="nav-item" @click.prevent="navigate('/blogs')">BLOGS</a>
-                <a href="#" class="nav-item">CONTACT US</a>
+                <a href="/contact" class="nav-item" @click.prevent="navigate('/contact')">CONTACT US</a>
                 <a
                     href="https://lin.ee/qyMmToF"
                     class="line-add-button"
@@ -42,7 +42,7 @@
             <a href="/about" class="mobile-item" @click.prevent="navigate('/about')">ABOUT US</a>
             <a href="#" class="mobile-item" @click="navigate('/product')">PRODUCT</a>
             <a href="#" class="mobile-item" @click.prevent="navigate('/blogs')">BLOGS</a>
-            <a href="#" class="mobile-item">CONTACT US</a>
+            <a href="/contact" class="mobile-item" @click.prevent="navigate('/contact')">CONTACT US</a>
         </nav>
 
         <a
@@ -269,15 +269,5 @@ export default {
         }
     }
 
-    @media (prefers-reduced-motion: reduce) {
-        .mobile-line-floating {
-            animation: none;
-        }
-
-        .mobile-line-floating::before,
-        .mobile-line-floating::after {
-            animation: none;
-        }
-    }
 }
 </style>
