@@ -28,6 +28,43 @@
                 </ul>
                 <p v-else>-</p>
             </div>
+            <div v-else-if="internalActive === 'suitable'">
+                <ul v-if="listValue(product.suitable).length" class="content-list">
+                    <li v-for="(item, index) in listValue(product.suitable)" :key="index">{{ item }}</li>
+                </ul>
+                <p v-else>-</p>
+            </div>
+            <div v-else-if="internalActive === 'documents'">
+                <div v-if="documents.length" class="document-buttons">
+                    <a
+                        v-for="(document, index) in documents"
+                        :key="document.url + index"
+                        class="document-download"
+                        :href="document.url"
+                        :download="document.name"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <i class="fa-solid fa-download" aria-hidden="true"></i>
+                        {{ document.name }}
+                    </a>
+                </div>
+                <p v-else>-</p>
+            </div>
+            <div v-else-if="internalActive === 'faq'">
+                <div v-if="faqItems.length" class="faq-list">
+                    <section v-for="(item, index) in faqItems" :key="index" class="faq-item" :class="{ 'is-open': isFaqExpanded(index) }">
+                        <button type="button" class="faq-question" :aria-expanded="isFaqExpanded(index)" @click="toggleFaq(index)">
+                            <span>{{ item.question }}</span>
+                            <span class="faq-arrow" aria-hidden="true"></span>
+                        </button>
+                        <div class="faq-answer-panel">
+                            <p>{{ item.answer || '-' }}</p>
+                        </div>
+                    </section>
+                </div>
+                <p v-else>-</p>
+            </div>
             <div v-else>
                 <p>-</p>
             </div>
@@ -72,6 +109,43 @@
                                 </ul>
                                 <p v-else>-</p>
                             </template>
+                            <template v-else-if="tab.key === 'suitable'">
+                                <ul v-if="listValue(product.suitable).length" class="content-list">
+                                    <li v-for="(item, index) in listValue(product.suitable)" :key="index">{{ item }}</li>
+                                </ul>
+                                <p v-else>-</p>
+                            </template>
+                            <template v-else-if="tab.key === 'documents'">
+                                <div v-if="documents.length" class="document-buttons">
+                                    <a
+                                        v-for="(document, index) in documents"
+                                        :key="document.url + index"
+                                        class="document-download"
+                                        :href="document.url"
+                                        :download="document.name"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        <i class="fa-solid fa-download" aria-hidden="true"></i>
+                                        {{ document.name }}
+                                    </a>
+                                </div>
+                                <p v-else>-</p>
+                            </template>
+                            <template v-else-if="tab.key === 'faq'">
+                                <div v-if="faqItems.length" class="faq-list">
+                                    <section v-for="(item, index) in faqItems" :key="index" class="faq-item" :class="{ 'is-open': isFaqExpanded(index) }">
+                                        <button type="button" class="faq-question" :aria-expanded="isFaqExpanded(index)" @click="toggleFaq(index)">
+                                            <span>{{ item.question }}</span>
+                                            <span class="faq-arrow" aria-hidden="true"></span>
+                                        </button>
+                                        <div class="faq-answer-panel">
+                                            <p>{{ item.answer || '-' }}</p>
+                                        </div>
+                                    </section>
+                                </div>
+                                <p v-else>-</p>
+                            </template>
                             <p v-else>-</p>
                         </div>
                     </div>
@@ -99,10 +173,21 @@ export default {
         internalActive() {
             return this.activeTab || 'details'
         },
+        documents() {
+            if (!Array.isArray(this.product.documents)) return []
+            return this.product.documents
+                .filter((item) => item && item.url)
+                .map((item) => ({ name: item.name || item.fileName || 'ดาวน์โหลดเอกสาร', url: item.url }))
+        },
+        faqItems() {
+            if (!Array.isArray(this.product.faq)) return []
+            return this.product.faq.filter((item) => item && (item.question || item.answer))
+        },
     },
     data() {
         return {
             expandedTabs: [],
+            expandedFaqItems: [],
             tabs: [
                 { key: 'details', label: 'รายละเอียด' },
                 { key: 'specifications', label: 'สเปคสินค้า' },
@@ -131,6 +216,14 @@ export default {
         },
         isExpanded(tab) {
             return this.expandedTabs.includes(tab)
+        },
+        toggleFaq(index) {
+            const position = this.expandedFaqItems.indexOf(index)
+            if (position === -1) this.expandedFaqItems.push(index)
+            else this.expandedFaqItems.splice(position, 1)
+        },
+        isFaqExpanded(index) {
+            return this.expandedFaqItems.includes(index)
         },
     },
 }
@@ -171,6 +264,58 @@ export default {
 }
 .content-list { list-style: disc; margin-left: 1.25rem; }
 .content-list li::marker { color: #a0805b; font-size: 0.7em; }
+.document-buttons { align-items: flex-start; display: flex; flex-direction: column; gap: 10px; }
+.document-download {
+    align-items: center;
+    background: #a0805b;
+    border-radius: 6px;
+    color: #fff;
+    display: inline-flex;
+    gap: 9px;
+    padding: 10px 16px;
+    text-decoration: none;
+}
+.document-download:hover { background: #876a4a; color: #fff; }
+.faq-list { border-top: 1px solid #ddd8d0; }
+.faq-item { border-bottom: 1px solid #ddd8d0; }
+.faq-question {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    color: #23272d;
+    cursor: pointer;
+    display: flex;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    justify-content: space-between;
+    padding: 15px 4px;
+    text-align: left;
+    width: 100%;
+}
+.faq-item.is-open .faq-question { color: #a0805b; }
+.faq-arrow {
+    border-bottom: 2px solid currentColor;
+    border-right: 2px solid currentColor;
+    flex: 0 0 8px;
+    height: 8px;
+    margin: 0 7px 0 14px;
+    transform: rotate(45deg) translateY(-2px);
+    transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+    width: 8px;
+}
+.faq-item.is-open .faq-arrow { transform: rotate(225deg) translate(-2px, -2px); }
+.faq-answer-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition:
+        grid-template-rows 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.42s ease;
+}
+.faq-answer-panel p { color: #59636d; line-height: 1.6; margin: 0; min-height: 0; overflow: hidden; white-space: pre-wrap; }
+.faq-item.is-open .faq-answer-panel { grid-template-rows: 1fr; opacity: 1; }
+.faq-item.is-open .faq-answer-panel p { padding: 0 4px 16px; }
 .mobile-accordion { display: none; }
 @media (max-width: 768px) {
     .product-tab-nav,

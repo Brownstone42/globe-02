@@ -16,12 +16,55 @@
         </div>
 
         <div v-for="group in listGroups" :key="group.key" class="form-group list-group">
-            <label>{{ group.label }}</label>
+            <div class="list-header">
+                <label>{{ group.label }}</label>
+                <button type="button" class="btn-add" @click="addListItem(group.key)">+ เพิ่ม{{ group.label }}</button>
+            </div>
             <div v-for="(item, index) in form[group.key]" :key="`${group.key}-${index}`" class="list-row">
                 <input v-model="form[group.key][index]" type="text" class="form-input" :placeholder="`${group.label} ข้อที่ ${index + 1}`" />
                 <button type="button" class="btn-remove" :aria-label="`ลบ${group.label}ข้อที่ ${index + 1}`" @click="removeListItem(group.key, index)">×</button>
             </div>
-            <button type="button" class="btn-add" @click="addListItem(group.key)">+ เพิ่ม{{ group.label }}</button>
+        </div>
+
+        <div class="form-group document-group">
+            <label>เอกสารที่เกี่ยวข้อง</label>
+            <input ref="documentInput" type="file" multiple class="form-file" @change="onDocumentsChange" />
+            <div v-for="(document, index) in form.documents" :key="document.key" class="document-row">
+                <div class="document-fields">
+                    <input
+                        v-model="document.name"
+                        type="text"
+                        class="form-input"
+                        :placeholder="`ชื่อเอกสารไฟล์ที่ ${index + 1}`"
+                    />
+                    <small>{{ document.fileName }}</small>
+                </div>
+                <button type="button" class="btn-remove" :aria-label="`ลบเอกสารไฟล์ที่ ${index + 1}`" @click="removeDocument(index)">×</button>
+            </div>
+        </div>
+
+        <div class="form-group faq-group">
+            <div class="faq-header">
+                <label>คำถามที่พบบ่อย (FAQ)</label>
+                <button type="button" class="btn-add" @click="addFaq">+ Add Q&amp;A</button>
+            </div>
+            <div class="faq-paste-area">
+                <textarea
+                    v-model="faqRawInput"
+                    class="form-textarea"
+                    rows="4"
+                    placeholder="วางข้อความรูปแบบ Q: คำถาม และ A: คำตอบ จากนั้นกด Parse & Add"
+                ></textarea>
+                <button type="button" class="btn-parse" :disabled="!faqRawInput.trim()" @click="parseFaq">Parse &amp; Add</button>
+            </div>
+            <div v-if="!form.faq.length" class="empty-faq">ยังไม่มีคำถามที่พบบ่อย กด + Add Q&amp;A เพื่อเพิ่มคำถามและคำตอบ</div>
+            <div v-for="(item, index) in form.faq" :key="index" class="faq-row">
+                <div class="faq-inputs">
+                    <input v-model="item.question" type="text" class="form-input" placeholder="กรอกคำถาม" />
+                    <textarea v-model="item.answer" class="form-textarea" rows="2" placeholder="กรอกคำตอบ"></textarea>
+                </div>
+                <button type="button" class="btn-remove" :aria-label="`ลบคำถามข้อที่ ${index + 1}`" @click="removeFaq(index)">×</button>
+            </div>
         </div>
 
         <div class="form-row">
@@ -96,6 +139,9 @@ export default {
                 properties: [''],
                 specifications: [''],
                 standards: [''],
+                suitable: [''],
+                documents: [],
+                faq: [],
                 brand: '',
                 sku: '',
                 category: '',
@@ -106,12 +152,14 @@ export default {
             },
             mainImagePreview: null,
             newGalleryPreviews: [],
+            faqRawInput: '',
             isEditMode: false,
             listGroups: [
                 { key: 'highlights', label: 'จุดเด่นสินค้า' },
                 { key: 'properties', label: 'คุณสมบัติ' },
-                { key: 'specifications', label: 'สเปคสินค้า' },
                 { key: 'standards', label: 'มาตรฐานและการรับรอง' },
+                { key: 'specifications', label: 'สเปคสินค้า' },
+                { key: 'suitable', label: 'เหมาะกับ' },
             ],
         }
     },
@@ -147,6 +195,10 @@ export default {
                     this.form.properties = this.asEditableList(newVal.properties)
                     this.form.specifications = this.asEditableList(newVal.specifications)
                     this.form.standards = this.asEditableList(newVal.standards)
+                    this.form.suitable = this.asEditableList(newVal.suitable)
+                    this.form.documents = this.asEditableDocuments(newVal.documents)
+                    this.form.faq = this.asEditableFaq(newVal.faq)
+                    this.faqRawInput = ''
                     this.form.brand = newVal.brand || ''
                     this.form.sku = newVal.sku || ''
                     this.form.packing = newVal.packing || ''
@@ -170,9 +222,29 @@ export default {
         clearFileInputs() {
             if (this.$refs.mainImageInput) this.$refs.mainImageInput.value = ''
             if (this.$refs.galleryInput) this.$refs.galleryInput.value = ''
+            if (this.$refs.documentInput) this.$refs.documentInput.value = ''
         },
         asEditableList(value) {
             return Array.isArray(value) && value.length ? [...value] : ['']
+        },
+        asEditableDocuments(value) {
+            if (!Array.isArray(value)) return []
+            return value
+                .filter((item) => item && item.url)
+                .map((item, index) => ({
+                    key: `existing-${index}-${item.url}`,
+                    name: item.name || item.fileName || 'ดาวน์โหลดเอกสาร',
+                    fileName: item.fileName || item.name || 'ไฟล์เดิม',
+                    url: item.url,
+                    file: null,
+                }))
+        },
+        asEditableFaq(value) {
+            if (!Array.isArray(value)) return []
+            return value.map((item) => ({
+                question: item?.question || '',
+                answer: item?.answer || '',
+            }))
         },
         addListItem(key) {
             this.form[key].push('')
@@ -208,6 +280,44 @@ export default {
             this.newGalleryPreviews.splice(newIndex, 1)
             this.form.galleryImageFiles.splice(newIndex, 1)
         },
+        onDocumentsChange(event) {
+            const files = Array.from(event.target.files || [])
+            files.forEach((file) => {
+                this.form.documents.push({
+                    key: `new-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+                    name: file.name.replace(/\.[^.]+$/, ''),
+                    fileName: file.name,
+                    url: '',
+                    file,
+                })
+            })
+            event.target.value = ''
+        },
+        removeDocument(index) {
+            this.form.documents.splice(index, 1)
+        },
+        addFaq() {
+            this.form.faq.push({ question: '', answer: '' })
+        },
+        removeFaq(index) {
+            this.form.faq.splice(index, 1)
+        },
+        parseFaq() {
+            const lines = this.faqRawInput.split('\n').map((line) => line.trim()).filter(Boolean)
+            const pairs = []
+            let current = null
+            for (const line of lines) {
+                if (/^Q:/i.test(line)) {
+                    if (current) pairs.push(current)
+                    current = { question: line.replace(/^Q:\s*/i, '').trim(), answer: '' }
+                } else if (/^A:/i.test(line) && current) {
+                    current.answer = line.replace(/^A:\s*/i, '').trim()
+                }
+            }
+            if (current) pairs.push(current)
+            this.form.faq.push(...pairs)
+            this.faqRawInput = ''
+        },
         resetForm() {
             this.form = {
                 name: '',
@@ -217,6 +327,9 @@ export default {
                 properties: [''],
                 specifications: [''],
                 standards: [''],
+                suitable: [''],
+                documents: [],
+                faq: [],
                 brand: '',
                 sku: '',
                 category: '',
@@ -228,6 +341,7 @@ export default {
             this.mainImagePreview = null
             this.newGalleryPreviews.forEach((url) => URL.revokeObjectURL(url))
             this.newGalleryPreviews = []
+            this.faqRawInput = ''
             this.$nextTick(() => this.clearFileInputs())
         },
         async handleSubmit() {
@@ -362,17 +476,21 @@ label {
 }
 
 .list-group { gap: 7px; }
+.list-header { align-items: center; display: flex; justify-content: space-between; }
 .list-row { display: flex; gap: 8px; }
 .btn-add {
     align-self: flex-start;
-    background: #f5f6f7;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    color: #23272d;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 999px;
+    color: #3b82f6;
     cursor: pointer;
-    padding: 6px 11px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    transition: all 0.2s;
 }
-.btn-add:hover { border-color: #a0805b; color: #a0805b; }
+.btn-add:hover { background: #eff6ff; border-color: #3b82f6; }
 .btn-remove {
     background: #fee2e2;
     border: 0;
@@ -382,5 +500,60 @@ label {
     flex: 0 0 34px;
     font-size: 1.2rem;
 }
+
+.document-group { gap: 8px; }
+.document-row {
+    align-items: stretch;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 7px;
+    display: flex;
+    gap: 8px;
+    padding: 9px;
+}
+.document-fields { flex: 1; min-width: 0; }
+.document-fields small {
+    color: #64748b;
+    display: block;
+    margin-top: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.faq-group { gap: 8px; }
+.faq-header { align-items: center; display: flex; justify-content: space-between; }
+.faq-paste-area {
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    padding: 10px;
+}
+.btn-parse {
+    align-self: flex-start;
+    background: #eff6ff;
+    border: 1px solid #3b82f6;
+    border-radius: 999px;
+    color: #2563eb;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 5px 14px;
+    transition: all 0.2s;
+}
+.btn-parse:hover:not(:disabled) { background: #dbeafe; }
+.btn-parse:disabled { cursor: not-allowed; opacity: 0.45; }
+.empty-faq { color: #64748b; font-size: 0.85rem; }
+.faq-row {
+    align-items: stretch;
+    background: #f8fafc;
+    border-radius: 8px;
+    display: flex;
+    gap: 8px;
+    padding: 10px;
+}
+.faq-inputs { display: flex; flex: 1; flex-direction: column; gap: 6px; min-width: 0; }
 
 </style>

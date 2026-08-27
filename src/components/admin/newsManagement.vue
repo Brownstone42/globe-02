@@ -118,7 +118,7 @@
                                 <textarea
                                     v-model="faqRawInput"
                                     rows="4"
-                                    placeholder="Paste Q: ... A: ... block from Facebook then click Parse"
+                                    placeholder="วางข้อความรูปแบบ Q: คำถาม และ A: คำตอบ จากนั้นกด Parse & Add"
                                 ></textarea>
                                 <button type="button" class="btn-parse" @click="parseFaq" :disabled="!faqRawInput.trim()">
                                     Parse &amp; Add
@@ -126,7 +126,7 @@
                             </div>
 
                             <div v-if="form.faq.length === 0" class="empty-sub">
-                                No FAQ items yet.
+                                ยังไม่มีคำถามที่พบบ่อย กด + Add Q&amp;A เพื่อเพิ่มคำถามและคำตอบ
                             </div>
 
                             <div
@@ -138,19 +138,20 @@
                                     <input
                                         v-model="item.question"
                                         type="text"
-                                        placeholder="Question"
+                                        placeholder="กรอกคำถาม"
                                     />
                                     <textarea
                                         v-model="item.answer"
                                         rows="2"
-                                        placeholder="Answer"
+                                        placeholder="กรอกคำตอบ"
                                     ></textarea>
                                 </div>
                                 <button
                                     type="button"
                                     class="remove-btn"
+                                    :aria-label="`ลบคำถามข้อที่ ${index + 1}`"
                                     @click="removeFaq(index)"
-                                >✕</button>
+                                >×</button>
                             </div>
                         </div>
 
@@ -665,7 +666,7 @@ textarea {
     display: flex;
     gap: 8px;
     margin-top: 8px;
-    align-items: flex-start;
+    align-items: stretch;
     padding: 10px;
     background: #f8fafc;
     border-radius: 8px;
@@ -676,26 +677,22 @@ textarea {
     display: flex;
     flex-direction: column;
     gap: 6px;
+    min-width: 0;
 }
 
 .empty-sub {
     font-size: 0.85rem;
-    color: #94a3b8;
-    padding: 20px;
-    text-align: center;
-    background: #f8fafc;
-    border: 1px dashed #e2e8f0;
-    border-radius: 8px;
+    color: #64748b;
 }
 
 .remove-btn {
-    border: none;
-    background: transparent;
-    color: #ef4444;
+    background: #fee2e2;
+    border: 0;
+    border-radius: 6px;
+    color: #b91c1c;
     cursor: pointer;
-    font-size: 1.1rem;
-    padding: 4px;
-    flex-shrink: 0;
+    flex: 0 0 34px;
+    font-size: 1.2rem;
 }
 
 .form-actions {

@@ -19,7 +19,7 @@ const storage = getStorage(app)
 
 const PRODUCT_FIELDS = new Set([
     'name', 'shortDescription', 'description', 'highlights', 'properties',
-    'specifications', 'standards', 'brand', 'sku', 'category', 'packing',
+    'specifications', 'standards', 'suitable', 'documents', 'faq', 'brand', 'sku', 'category', 'packing',
     'mainImageUrl', 'galleryImageUrls', 'createdAt', 'updatedAt',
 ])
 
@@ -27,6 +27,51 @@ function toItemList(value) {
     if (Array.isArray(value)) return value.map((item) => String(item).trim()).filter(Boolean)
     if (typeof value !== 'string' || !value.trim()) return []
     return value.split(/\r?\n/).map((item) => item.replace(/^[-•]\s*/, '').trim()).filter(Boolean)
+}
+
+function normalizeDocuments(value) {
+    if (!Array.isArray(value)) return []
+    return value
+        .map((item) => ({
+            name: String(item?.name || item?.fileName || '').trim(),
+            url: String(item?.url || '').trim(),
+        }))
+        .filter((item) => item.url)
+}
+
+function normalizeFaq(value) {
+    if (!Array.isArray(value)) return []
+    return value
+        .map((item) => ({
+            question: String(item?.question || '').trim(),
+            answer: String(item?.answer || '').trim(),
+        }))
+        .filter((item) => item.question || item.answer)
+}
+
+async function uploadProductDocuments(items) {
+    const documents = []
+    for (const item of Array.isArray(items) ? items : []) {
+        if (item?.file) {
+            const file = item.file
+            const uniqueName = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}-${file.name}`
+            const fileRef = storageRef(storage, `products/documents/${uniqueName}`)
+            const snapshot = await uploadBytes(fileRef, file, {
+                contentDisposition: 'attachment',
+                contentType: file.type || 'application/octet-stream',
+            })
+            documents.push({
+                name: String(item.name || file.name).trim() || file.name,
+                url: await getDownloadURL(snapshot.ref),
+            })
+        } else if (item?.url) {
+            documents.push({
+                name: String(item.name || item.fileName || 'ดาวน์โหลดเอกสาร').trim(),
+                url: item.url,
+            })
+        }
+    }
+    return documents
 }
 
 export const useProductStore = defineStore('product', {
@@ -100,6 +145,7 @@ export const useProductStore = defineStore('product', {
                 }
 
                 // 3) save to Firestore
+                const documents = await uploadProductDocuments(form.documents)
                 const productData = {
                     name: form.name || '',
                     shortDescription: form.shortDescription || '',
@@ -108,6 +154,9 @@ export const useProductStore = defineStore('product', {
                     properties: toItemList(form.properties),
                     specifications: toItemList(form.specifications),
                     standards: toItemList(form.standards),
+                    suitable: toItemList(form.suitable),
+                    documents,
+                    faq: normalizeFaq(form.faq),
                     brand: form.brand || '',
                     sku: form.sku || '',
                     packing: form.packing || '',
@@ -169,6 +218,7 @@ export const useProductStore = defineStore('product', {
                     }
                 }
 
+                const documents = await uploadProductDocuments(form.documents)
                 const updateData = {
                     name: form.name || '',
                     shortDescription: form.shortDescription || '',
@@ -177,6 +227,9 @@ export const useProductStore = defineStore('product', {
                     properties: toItemList(form.properties),
                     specifications: toItemList(form.specifications),
                     standards: toItemList(form.standards),
+                    suitable: toItemList(form.suitable),
+                    documents,
+                    faq: normalizeFaq(form.faq),
                     brand: form.brand || '',
                     sku: form.sku || '',
                     packing: form.packing || '',
@@ -211,6 +264,9 @@ export const useProductStore = defineStore('product', {
                     !Array.isArray(product.properties) ||
                     !Array.isArray(product.specifications) ||
                     !Array.isArray(product.standards) ||
+                    !Array.isArray(product.suitable) ||
+                    !Array.isArray(product.documents) ||
+                    !Array.isArray(product.faq) ||
                     !Array.isArray(product.galleryImageUrls) ||
                     product.galleryImageUrls.length > 4
             })
@@ -227,6 +283,9 @@ export const useProductStore = defineStore('product', {
                             ? toItemList(product.specifications)
                             : toItemList(product.spec),
                         standards: toItemList(product.standards),
+                        suitable: toItemList(product.suitable),
+                        documents: normalizeDocuments(product.documents),
+                        faq: normalizeFaq(product.faq),
                         galleryImageUrls: Array.isArray(product.galleryImageUrls)
                             ? product.galleryImageUrls.slice(0, 4)
                             : [],

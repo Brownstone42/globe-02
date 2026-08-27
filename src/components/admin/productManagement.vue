@@ -45,6 +45,11 @@
                 <div class="pm-list-header">
                     <h2 class="pm-section-title">Product List</h2>
                     <div class="pm-filter">
+                        <select v-model="sortBy" class="filter-select" aria-label="เรียงสินค้าตามชื่อ">
+                            <option value="">-- Sort by Name --</option>
+                            <option value="name-asc">Name A–Z</option>
+                            <option value="name-desc">Name Z–A</option>
+                        </select>
                         <select v-model="filterCategory" class="filter-select">
                             <option value="">-- All Categories --</option>
                             <option v-for="cat in categories" :key="cat.id" :value="cat.slug">
@@ -127,6 +132,7 @@ export default {
         return {
             currentProductId: null, // null = create mode, not null = edit mode
             filterCategory: '', // หมวดหมู่ที่เลือกกรอง
+            sortBy: '',
         }
     },
     computed: {
@@ -143,8 +149,19 @@ export default {
             return this.categoryStore.categories || []
         },
         filteredProducts() {
-            if (!this.filterCategory) return this.products
-            return this.products.filter((p) => p.category === this.filterCategory)
+            const products = this.filterCategory
+                ? this.products.filter((product) => product.category === this.filterCategory)
+                : [...this.products]
+
+            if (!this.sortBy) return products
+
+            const direction = this.sortBy === 'name-desc' ? -1 : 1
+            return products.sort((a, b) =>
+                String(a.name || '').localeCompare(String(b.name || ''), ['th', 'en'], {
+                    numeric: true,
+                    sensitivity: 'base',
+                }) * direction,
+            )
         },
         isLoading() {
             return this.productStore.loading
