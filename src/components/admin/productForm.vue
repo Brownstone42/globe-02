@@ -76,7 +76,7 @@
                 v-model="hashtagInput"
                 type="text"
                 class="form-input"
-                placeholder="พิมพ์ Hashtag เช่น Cleanroom, ESD, Safety แล้วกดเพิ่ม"
+                placeholder="พิมพ์ Hashtag เช่น #cleanroom #ESD # safety แล้วกดเพิ่ม"
                 @keydown.enter.prevent="addHashtags"
             />
             <div v-if="form.hashtags.length" class="hashtag-admin-list">
@@ -334,7 +334,8 @@ export default {
         },
         addHashtags() {
             const hashtags = this.hashtagInput
-                .split(/[,，\n]+/)
+                .replace(/#\s+/g, '#')
+                .split(/[\s,，]+/)
                 .map((item) => item.replace(/^#+/, '').trim())
                 .filter(Boolean)
             hashtags.forEach((hashtag) => {

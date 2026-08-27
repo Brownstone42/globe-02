@@ -16,12 +16,12 @@
                     <path d="M35 55 H860 Q910 55 910 105 V285 Q910 335 860 335 H210 Q160 335 160 385 V575 Q160 625 210 625 H1110" />
                     <g>
                         <circle cx="35" cy="55" r="7" />
-                        <circle cx="470" cy="55" r="7" />
+                        <circle cx="400" cy="55" r="7" />
                         <circle cx="910" cy="105" r="7" />
                         <circle cx="160" cy="375" r="7" />
-                        <circle cx="370" cy="335" r="7" />
+                        <circle cx="400" cy="335" r="7" />
                         <circle cx="780" cy="335" r="7" />
-                        <circle cx="320" cy="625" r="7" />
+                        <circle cx="400" cy="625" r="7" />
                         <circle cx="650" cy="625" r="7" />
                         <circle cx="940" cy="625" r="7" />
                     </g>
@@ -133,10 +133,10 @@ const aboutRevealDirective = {
 
 const mobileYearRevealDirective = {
     mounted(element) {
-        const isMobile = window.matchMedia('(max-width: 768px)').matches
+        const usesVerticalTimeline = window.matchMedia('(max-width: 1200px)').matches
         const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-        if (!isMobile || reduceMotion) {
+        if (!usesVerticalTimeline || reduceMotion) {
             element.classList.add('is-revealed')
             return
         }
@@ -233,12 +233,12 @@ export default {
 .history-card p { font-size: 1rem; font-weight: 600; line-height: 1.5; margin: 0; }
 .history-card img { display: block; object-fit: cover; }
 .year-2001 { left: 0; top: 78px; }.year-2001 img { margin-top: 10px; width: 235px; }
-.year-2003 { left: 39%; top: 78px; }
+.year-2003 { left: 30.3%; top: 78px; }
 .year-2007 { right: 0; top: 58px; width: 245px; }.year-2007 img { height: 132px; margin: 10px 0 14px; width: 230px; }
 .year-2018 { left: -5%; text-align: right; top: 365px; width: 220px; }
 .year-2017 { left: 23%; top: 365px; }
 .year-2011 { left: 62%; top: 365px; }
-.year-2022 { left: 17%; top: 655px; }.year-2023 { left: 48%; top: 655px; }.year-future { left: 75%; top: 650px; }
+.year-2022 { left: 23%; top: 655px; }.year-2023 { left: 51.1%; top: 655px; }.year-future { left: 75%; top: 650px; }
 .mobile-history { display: none; }
 .trust-section { background: #ae8c62; display: block; margin: 0; max-width: none; padding: 58px 28px; text-align: center; }
 .trust-section img,
@@ -310,6 +310,17 @@ export default {
     .mobile-history-row:last-child::after { height: calc(100% + 53px); }
     .mobile-history-row h2 { font-size: 1.7rem; font-weight: 700; line-height: 1; margin: 0; text-align: right; }
     .mobile-history-row:last-child h2 { font-size: 1.15rem; white-space: nowrap; }
+    .mobile-history-row.mobile-year-reveal {
+        opacity: 0;
+        transform: translateY(34px) scale(0.98);
+        transition:
+            opacity 0.72s cubic-bezier(0.22, 1, 0.36, 1),
+            transform 0.72s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .mobile-history-row.mobile-year-reveal.is-revealed {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
     .timeline-dot { background: #d8b574; border-radius: 50%; height: var(--dot-size); position: relative; width: var(--dot-size); z-index: 1; }
     .mobile-history-row p { font-size: 1rem; font-weight: 600; line-height: 1.5; margin: -4px 0 14px; }
     .mobile-history-row img { display: block; height: 128px; object-fit: cover; width: min(100%, 280px); }
@@ -334,17 +345,6 @@ export default {
     }
     .mobile-history-row { min-height: 138px; }
     .mobile-history-row.has-image { min-height: 205px; }
-    .mobile-history-row.mobile-year-reveal {
-        opacity: 0;
-        transform: translateY(34px) scale(0.98);
-        transition:
-            opacity 0.72s cubic-bezier(0.22, 1, 0.36, 1),
-            transform 0.72s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-    .mobile-history-row.mobile-year-reveal.is-revealed {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
     .mobile-history-row h2 { font-size: 1.55rem; font-weight: 700; line-height: 1; margin: 0; text-align: right; }
     .mobile-history-row:last-child h2 { font-size: 0.9rem; }
     .mobile-history-row:last-child::after { height: calc(100% + 31px); }

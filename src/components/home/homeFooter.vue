@@ -1,5 +1,18 @@
 <template>
     <footer class="site-footer">
+        <section class="standards-strip" aria-labelledby="standards-strip-title">
+            <div class="standards-strip-inner">
+                <div class="standards-strip-copy">
+                    <h2 id="standards-strip-title">มาตรฐานและการรับรองที่เกี่ยวข้องกับผลิตภัณฑ์ของเรา</h2>
+                    <p>Product Standards, Testing &amp; Compliance</p>
+                </div>
+                <div class="standards-logo-space">
+                    <div v-for="index in 6" :key="index" class="standard-logo-item">
+                        <img :src="`/images/logo/0${index}.jpg`" :alt="`มาตรฐานและการรับรอง ${index}`" />
+                    </div>
+                </div>
+            </div>
+        </section>
         <div class="footer-inner">
             <div class="footer-brand">
                 <img src="/images/footer-logo.png" alt="Ideal Globe" />
@@ -155,6 +168,60 @@ export default {
     color: #f4f4f4;
     position: relative;
 }
+
+.standards-strip {
+    background: #f7f8fa;
+    color: #23272d;
+}
+
+.standards-strip-inner {
+    align-items: center;
+    display: grid;
+    gap: 24px;
+    grid-template-columns: minmax(520px, 1.35fr) minmax(0, 1.65fr);
+    margin: 0 auto;
+    padding: 18px 0;
+    width: min(1380px, 90vw);
+}
+
+.standards-strip-copy h2 {
+    color: #23272d;
+    font-size: clamp(1rem, 1.35vw, 1.3rem);
+    font-weight: 700;
+    line-height: 1.25;
+    margin: 0 0 5px;
+    white-space: nowrap;
+}
+
+.standards-strip-copy p {
+    color: #48515e;
+    font-size: clamp(0.85rem, 1.05vw, 1rem);
+    margin: 0;
+    white-space: nowrap;
+}
+
+.standards-logo-space {
+    align-items: center;
+    display: grid;
+    gap: clamp(5px, 0.7vw, 11px);
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.standard-logo-item {
+    align-items: center;
+    display: flex;
+    height: 54px;
+    justify-content: center;
+    min-width: 0;
+}
+
+.standard-logo-item img {
+    display: block;
+    height: 100%;
+    object-fit: contain;
+    width: 100%;
+}
+
 
 .footer-inner {
     margin: 0 auto;
@@ -431,12 +498,37 @@ export default {
 }
 
 @media (max-width: 1050px) {
+    .standards-strip-inner {
+        gap: 14px;
+        grid-template-columns: 1fr;
+    }
+
+    .standards-logo-space { max-width: 760px; }
+
     .footer-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
 @media (max-width: 600px) {
+    .standards-strip-inner {
+        display: block;
+        padding: 16px 0;
+        text-align: center;
+        width: min(86vw, 460px);
+    }
+
+    .standards-strip-copy h2,
+    .standards-strip-copy p { white-space: normal; }
+
+    .standards-logo-space {
+        gap: 10px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        margin-top: 16px;
+    }
+
+    .standard-logo-item { height: 48px; }
+
     .footer-inner {
         padding: 42px 0 70px;
         width: min(86vw, 460px);
