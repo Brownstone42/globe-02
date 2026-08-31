@@ -277,7 +277,7 @@ export default {
 .hashtag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
 .hashtag-section-footer { margin: 18px 42px 6px; }
 .hashtag-chip {
-    background: #bcc5d3;
+    background: #e1e5ea;
     border-radius: 999px;
     color: #737983;
     display: inline-flex;
