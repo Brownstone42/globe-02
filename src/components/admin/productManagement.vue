@@ -73,7 +73,7 @@
                                     <th>Image</th>
                                     <th>Name</th>
                                     <th>Category</th>
-                                    <th style="width: 120px">Actions</th>
+                                    <th style="width: 210px">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -95,6 +95,14 @@
                                             @click="startEdit(product)"
                                         >
                                             แก้ไข
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="btn-copy"
+                                            :disabled="productStore.loading"
+                                            @click="duplicateProduct(product)"
+                                        >
+                                            คัดลอก
                                         </button>
                                         <button
                                             type="button"
@@ -199,6 +207,17 @@ export default {
         startEdit(product) {
             this.currentProductId = product.id
         },
+        async duplicateProduct(product) {
+            const ok = window.confirm(
+                `ต้องการคัดลอกสินค้า "${product.name}" ใช่หรือไม่?\nสินค้าที่สร้างใหม่จะมีคำว่า - copy ต่อท้ายชื่อ`,
+            )
+            if (!ok) return
+
+            const duplicated = await this.productStore.duplicateProduct(product.id)
+            if (duplicated) {
+                window.alert(`คัดลอกสินค้าเป็น "${duplicated.name}" เรียบร้อยแล้ว`)
+            }
+        },
         async deleteProduct(product) {
             const ok = window.confirm(`ต้องการลบสินค้า "${product.name}" ใช่หรือไม่?`)
             if (!ok) return
@@ -244,7 +263,7 @@ export default {
 
 .pm-layout {
     display: grid;
-    grid-template-columns: 1.1fr 1fr;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
     gap: 32px; /* กว้างขึ้นนิดหน่อยให้ดูโปร่ง */
     align-items: stretch;
     flex: 1;
@@ -446,6 +465,28 @@ export default {
     background: #f1f5f9;
     color: #1e293b;
     border-color: #cbd5e1;
+}
+
+.btn-copy {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 6px;
+    color: #2563eb;
+    cursor: pointer;
+    font-size: 0.85rem;
+    margin-right: 6px;
+    padding: 6px 12px;
+    transition: all 0.2s;
+}
+
+.btn-copy:hover:not(:disabled) {
+    background: #dbeafe;
+    border-color: #93c5fd;
+}
+
+.btn-copy:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
 }
 
 .btn-danger {

@@ -210,7 +210,7 @@ export default {
 .contact-social-links { display: flex; gap: 18px; }
 .social-circle {
     align-items: center;
-    background: #a0805b;
+    background: #a38c67;
     border-radius: 50%;
     color: #fff;
     display: inline-flex;

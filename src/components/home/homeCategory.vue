@@ -260,7 +260,7 @@ export default {
 
 .category-arrow {
     align-items: center;
-    background: #a0805b;
+    background: #a38c67;
     border-radius: 50%;
     color: #fff;
     display: inline-flex;

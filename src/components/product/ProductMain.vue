@@ -345,7 +345,7 @@ export default {
     white-space: nowrap;
 }
 .quote-action { background: #364052; cursor: default; }
-.phone-btn { background: #ad9975; }
+.phone-btn { background: #a38c67; }
 
 figure {
     margin: auto;

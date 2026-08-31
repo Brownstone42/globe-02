@@ -477,7 +477,7 @@ export default {
 
 .social-row span {
     align-items: center;
-    background: #a0805b;
+    background: #a38c67;
     border-radius: 50%;
     color: #fff;
     display: inline-flex;

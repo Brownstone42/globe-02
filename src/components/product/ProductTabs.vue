@@ -36,21 +36,20 @@
                 <p v-else>-</p>
             </div>
             <div v-else-if="internalActive === 'documents'">
-                <div v-if="documents.length" class="document-buttons">
-                    <a
-                        v-for="(document, index) in documents"
-                        :key="document.url + index"
-                        class="document-download"
-                        :href="document.url"
-                        :download="document.name"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        <i class="fa-solid fa-download" aria-hidden="true"></i>
-                        {{ document.name }}
-                    </a>
+                <div class="document-panel">
+                    <h3>เอกสารที่เกี่ยวข้อง</h3>
+                    <div v-if="documents.length" class="document-list">
+                        <div v-for="(document, index) in documents" :key="document.url + index" class="document-row">
+                            <i class="fa-regular fa-file-lines document-file-icon" aria-hidden="true"></i>
+                            <a class="document-name-link" :href="document.url" :download="document.name" target="_blank" rel="noopener noreferrer">{{ document.name }}</a>
+                            <span class="document-status">Available</span>
+                            <a :href="document.url" :download="document.name" target="_blank" rel="noopener noreferrer" :aria-label="`ดาวน์โหลด ${document.name}`">
+                                <i class="fa-solid fa-download" aria-hidden="true"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <p v-else class="document-empty">-</p>
                 </div>
-                <p v-else>-</p>
             </div>
             <div v-else-if="internalActive === 'faq'">
                 <div v-if="faqItems.length" class="faq-list">
@@ -118,21 +117,20 @@
                                 <p v-else>-</p>
                             </template>
                             <template v-else-if="tab.key === 'documents'">
-                                <div v-if="documents.length" class="document-buttons">
-                                    <a
-                                        v-for="(document, index) in documents"
-                                        :key="document.url + index"
-                                        class="document-download"
-                                        :href="document.url"
-                                        :download="document.name"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                    >
-                                        <i class="fa-solid fa-download" aria-hidden="true"></i>
-                                        {{ document.name }}
-                                    </a>
+                                <div class="document-panel">
+                                    <h3>เอกสารที่เกี่ยวข้อง</h3>
+                                    <div v-if="documents.length" class="document-list">
+                                        <div v-for="(document, index) in documents" :key="document.url + index" class="document-row">
+                                            <i class="fa-regular fa-file-lines document-file-icon" aria-hidden="true"></i>
+                                            <a class="document-name-link" :href="document.url" :download="document.name" target="_blank" rel="noopener noreferrer">{{ document.name }}</a>
+                                            <span class="document-status">Available</span>
+                                            <a :href="document.url" :download="document.name" target="_blank" rel="noopener noreferrer" :aria-label="`ดาวน์โหลด ${document.name}`">
+                                                <i class="fa-solid fa-download" aria-hidden="true"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <p v-else class="document-empty">-</p>
                                 </div>
-                                <p v-else>-</p>
                             </template>
                             <template v-else-if="tab.key === 'faq'">
                                 <div v-if="faqItems.length" class="faq-list">
@@ -279,27 +277,34 @@ export default {
 .hashtag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
 .hashtag-section-footer { margin: 18px 42px 6px; }
 .hashtag-chip {
-    background: #ead9c7;
+    background: #bcc5d3;
     border-radius: 999px;
-    color: #a0805b;
+    color: #737983;
     display: inline-flex;
     font-size: 0.82rem;
     font-weight: 600;
     line-height: 1;
     padding: 8px 13px;
 }
-.document-buttons { align-items: flex-start; display: flex; flex-direction: column; gap: 10px; }
-.document-download {
+.document-panel { background: #fff; border-radius: 22px; padding: 28px 34px 18px; }
+.document-panel > h3 { color: #a0805b; font-size: 1.35rem; margin: 0 0 16px; }
+.document-list { display: flex; flex-direction: column; }
+.document-row {
     align-items: center;
-    background: #a0805b;
-    border-radius: 6px;
-    color: #fff;
-    display: inline-flex;
-    gap: 9px;
+    border-bottom: 1px solid #d9d9d9;
+    display: grid;
+    gap: 14px;
+    grid-template-columns: 24px minmax(0, 1fr) 110px 30px;
+    min-height: 68px;
     padding: 10px 16px;
-    text-decoration: none;
 }
-.document-download:hover { background: #876a4a; color: #fff; }
+.document-file-icon { color: #303640; font-size: 1.25rem; }
+.document-name-link { color: #303640; font-size: 1rem; font-weight: 600; text-decoration: none; }
+.document-name-link:hover { color: #a0805b; }
+.document-status { color: #54b83f; font-size: 0.95rem; text-align: center; }
+.document-row > a { color: #a0805b; font-size: 1.05rem; padding: 6px; text-align: center; }
+.document-row > a:hover { color: #876a4a; }
+.document-empty { margin: 0; padding: 18px 16px 25px; }
 .faq-list { border-top: 1px solid #ddd8d0; }
 .faq-item { border-bottom: 1px solid #ddd8d0; }
 .faq-question {
@@ -398,6 +403,12 @@ export default {
         padding: 2px 16px 20px;
     }
     .accordion-content h3 { color: #a0805b; font-size: 1.15rem; font-weight: 700; margin-bottom: 10px; }
+    .document-panel { border-radius: 14px; padding: 18px 12px 8px; }
+    .document-panel > h3 { font-size: 1.08rem; margin-left: 6px; }
+    .document-row { gap: 8px; grid-template-columns: 20px minmax(0, 1fr) 72px 25px; min-height: 58px; padding: 8px 5px; }
+    .document-file-icon { font-size: 1rem; }
+    .document-name-link { font-size: 0.8rem; overflow-wrap: anywhere; }
+    .document-status { font-size: 0.72rem; }
     .hashtag-section-footer { margin: 18px 16px 4px; }
 }
 </style>

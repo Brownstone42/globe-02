@@ -311,7 +311,7 @@ export default {
 }
 
 .contact-form button {
-    background: #a0805b;
+    background: #a38c67;
     border: 0;
     border-radius: 7px;
     color: #fff;

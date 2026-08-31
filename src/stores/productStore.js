@@ -323,6 +323,54 @@ export const useProductStore = defineStore('product', {
             }
         },
 
+        async duplicateProduct(id) {
+            const source = this.products.find((item) => item.id === id)
+            if (!source) {
+                this.error = 'ไม่พบสินค้าที่ต้องการคัดลอก'
+                return null
+            }
+
+            this.loading = true
+            this.error = null
+
+            try {
+                const productData = {
+                    name: `${source.name || 'สินค้า'} - copy`,
+                    shortDescription: source.shortDescription || '',
+                    description: source.description || '',
+                    highlights: toItemList(source.highlights),
+                    properties: toItemList(source.properties),
+                    specifications: toItemList(source.specifications),
+                    standards: toItemList(source.standards),
+                    suitable: toItemList(source.suitable),
+                    documents: normalizeDocuments(source.documents),
+                    faq: normalizeFaq(source.faq),
+                    hashtags: normalizeHashtags(source.hashtags),
+                    brand: source.brand || '',
+                    sku: source.sku || '',
+                    packing: source.packing || '',
+                    categories: normalizeCategories(source.categories, source.category),
+                    mainImageUrl: source.mainImageUrl || null,
+                    galleryImageUrls: Array.isArray(source.galleryImageUrls)
+                        ? [...source.galleryImageUrls].slice(0, 4)
+                        : [],
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp(),
+                }
+
+                const docRef = await addDoc(productsCol, productData)
+                const duplicated = { id: docRef.id, ...productData }
+                this.products.push(duplicated)
+                return duplicated
+            } catch (err) {
+                console.error('duplicateProduct error:', err)
+                this.error = 'คัดลอกสินค้าไม่สำเร็จ'
+                return null
+            } finally {
+                this.loading = false
+            }
+        },
+
         async deleteProduct(id) {
             try {
                 const docRef = doc(db, 'products', id)

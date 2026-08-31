@@ -174,7 +174,7 @@ export default {
 }
 
 .quote-btn {
-    background: #a0805b;
+    background: #a38c67;
     border: 0;
     color: #fff;
     cursor: pointer;

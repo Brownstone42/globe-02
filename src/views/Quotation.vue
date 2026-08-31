@@ -42,12 +42,23 @@
                             <button type="button" class="add-product-btn" @click="showProductPicker = !showProductPicker">＋ เพิ่มสินค้า</button>
                             <span>คุณสามารถเพิ่มสินค้าหลายรายการเพื่อขอใบเสนอราคาในครั้งเดียว</span>
                         </div>
-                        <div v-if="showProductPicker" class="product-picker">
-                            <select v-model="productToAdd">
-                                <option value="">เลือกสินค้า</option>
-                                <option v-for="product in availableProducts" :key="product.id" :value="product.id">{{ product.name }}</option>
-                            </select>
-                            <button type="button" :disabled="!productToAdd" @click="addSelectedProduct">เพิ่มรายการ</button>
+                        <div v-if="showProductPicker" class="product-picker product-card-picker">
+                            <button
+                                v-for="product in availableProducts"
+                                :key="product.id"
+                                type="button"
+                                class="product-pick-card"
+                                @click="addProduct(product.id)"
+                            >
+                                <img v-if="product.mainImageUrl" :src="product.mainImageUrl" :alt="product.name" />
+                                <span v-else class="picker-image-placeholder"><i class="fa-regular fa-image"></i></span>
+                                <span class="picker-product-info">
+                                    <strong>{{ product.name }}</strong>
+                                    <small>SKU: {{ product.sku || '-' }}</small>
+                                </span>
+                                <i class="fa-solid fa-plus picker-add-icon" aria-hidden="true"></i>
+                            </button>
+                            <p v-if="!availableProducts.length" class="no-products-to-add">เพิ่มสินค้าทุกรายการแล้ว</p>
                         </div>
                     </section>
 
@@ -72,7 +83,7 @@
                         <a href="tel:028601525"><i class="fa-solid fa-phone"></i><span><b>โทรศัพท์</b>02-860-1525</span></a>
                         <a href="https://line.me/R/ti/p/%40idealglobe" target="_blank" rel="noopener"><i class="fa-brands fa-line"></i><span><b>Line OA</b>@idealglobe (มี@)</span></a>
                         <a href="mailto:sales@idealglobe.com"><i class="fa-regular fa-envelope"></i><span><b>อีเมล</b>sales@idealglobe.com</span></a>
-                        <div class="help-item"><i class="fa-regular fa-clock"></i><span><b>เวลาทำการ</b>จันทร์ – ศุกร์ 08:30 – 17:30 น.</span></div>
+                        <div class="help-item"><i class="fa-regular fa-clock"></i><span><b>เวลาทำการ</b>จันทร์ – ศุกร์ 08:00 – 17:00 น.</span></div>
                     </section>
                     <section class="trust-card">
                         <h2><i class="fa-solid fa-shield-halved" aria-hidden="true"></i>มั่นใจในคุณภาพ</h2>
@@ -104,7 +115,7 @@ export default {
     name: 'Quotation',
     data() {
         return {
-            selectedItems: [], productToAdd: '', showProductPicker: false,
+            selectedItems: [], showProductPicker: false,
             form: { name: '', phone: '', company: '', email: '', lineId: '', message: '' },
             submitting: false, submitted: false, submitError: '', referenceNumber: '',
         }
@@ -125,9 +136,11 @@ export default {
         addProduct(productId) {
             if (!productId || this.selectedItems.some((item) => item.productId === productId)) return
             const product = this.productStore.products.find((item) => item.id === productId)
-            if (product) this.selectedItems.push({ productId, product, quantity: 1, unit: 'ชิ้น' })
+            if (product) {
+                this.selectedItems.push({ productId, product, quantity: 1, unit: 'ชิ้น' })
+                this.showProductPicker = false
+            }
         },
-        addSelectedProduct() { this.addProduct(this.productToAdd); this.productToAdd = ''; this.showProductPicker = false },
         removeProduct(productId) { this.selectedItems = this.selectedItems.filter((item) => item.productId !== productId) },
         async submitQuotation() {
             if (!this.selectedItems.length) { this.submitError = 'กรุณาเลือกสินค้าอย่างน้อย 1 รายการ'; return }
@@ -151,6 +164,118 @@ export default {
 </script>
 
 <style scoped>
+.quotation-aside .trust-card {
+    background: #02b54f !important;
+    border-color: #02b54f;
+}
+
+.quotation-aside .trust-card h2,
+.quotation-aside .trust-card h2 i,
+.quotation-aside .trust-card p,
+.quotation-aside .trust-card p i {
+    color: #d6efc7 !important;
+}
+
+.quotation-aside h2 {
+    font-size: 1.05rem !important;
+}
+
+.quotation-aside p {
+    font-size: 0.78rem !important;
+}
+
+.quotation-aside .help-card span {
+    font-size: 0.76rem;
+}
+
+.product-picker.product-card-picker {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    max-height: 340px;
+    overflow-y: auto;
+    padding: 4px 14px 16px;
+}
+
+.product-picker .product-pick-card {
+    align-items: center;
+    background: #fff !important;
+    border: 1px solid #e0e2e5;
+    border-radius: 8px;
+    color: #30343a;
+    display: grid;
+    gap: 8px;
+    grid-template-columns: 48px minmax(0, 1fr) 22px;
+    min-width: 0;
+    padding: 8px;
+    text-align: left;
+    white-space: normal;
+}
+
+.product-pick-card:hover {
+    border-color: #a38c67;
+    box-shadow: 0 3px 10px rgba(35, 39, 45, 0.1);
+}
+
+.product-pick-card > img,
+.picker-image-placeholder {
+    align-items: center;
+    background: #f5f6f7;
+    border-radius: 5px;
+    display: flex;
+    height: 48px;
+    justify-content: center;
+    object-fit: contain;
+    width: 48px;
+}
+
+.picker-product-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.picker-product-info strong {
+    display: -webkit-box;
+    font-size: 0.72rem;
+    line-height: 1.25;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.picker-product-info small {
+    color: #737983;
+    font-size: 0.62rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.picker-add-icon { color: #a38c67; }
+.no-products-to-add { color: #737983; grid-column: 1 / -1; margin: 12px; text-align: center; }
+
+@media (max-width: 700px) {
+    .product-picker.product-card-picker {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .product-picker .product-pick-card {
+        grid-template-columns: 42px minmax(0, 1fr) 18px;
+        padding: 7px;
+    }
+
+    .product-pick-card > img,
+    .picker-image-placeholder {
+        height: 42px;
+        width: 42px;
+    }
+}
+
+.product-picker button,
+.submit-quote {
+    background: #a38c67 !important;
+}
 .why-card p {
     align-items: flex-start;
     display: flex;
@@ -173,13 +298,13 @@ export default {
 
 .why-card p b {
     color: #23272d !important;
-    font-size: 0.78rem;
+    font-size: 0.86rem;
     line-height: 1.35;
 }
 
 .why-card p small {
     color: inherit;
-    font-size: 0.68rem;
+    font-size: 0.75rem;
     line-height: 1.4;
 }
 

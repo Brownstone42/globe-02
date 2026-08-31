@@ -218,7 +218,7 @@ export default {
 }
 
 .read-all-btn:hover {
-    background: #a0805b;
+    background: #a38c67;
     color: #fff;
 }
 
@@ -274,7 +274,7 @@ export default {
 }
 
 .carousel-arrow:hover {
-    background: #a0805b;
+    background: #a38c67;
     transform: translateY(-50%) scale(1.06);
 }
 
