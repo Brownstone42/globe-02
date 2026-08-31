@@ -44,7 +44,7 @@
                     class="product-image"
                     :to="{
                         name: 'product-detail',
-                        params: { category: product.category, productId: product.id },
+                        params: { category: productCategorySlug(product), productId: product.id },
                     }"
                 >
                     <img v-if="product.mainImageUrl" :src="product.mainImageUrl" :alt="product.name" />
@@ -60,17 +60,17 @@
                             class="product-detail-btn"
                             :to="{
                                 name: 'product-detail',
-                                params: { category: product.category, productId: product.id },
+                                params: { category: productCategorySlug(product), productId: product.id },
                             }"
                         >
                             ดูรายละเอียดสินค้า
                         </RouterLink>
-                        <button
+                        <RouterLink
                             class="quote-btn"
-                            type="button"
+                            :to="{ name: 'quotation', query: { productId: product.id } }"
                         >
                             ขอใบเสนอราคา
-                        </button>
+                        </RouterLink>
                     </div>
                 </div>
             </article>
@@ -229,6 +229,11 @@ export default {
         },
     },
     methods: {
+        productCategorySlug(product) {
+            if (this.category && this.category !== 'all') return this.category
+            if (Array.isArray(product.categories) && product.categories.length) return product.categories[0]
+            return product.category || 'all'
+        },
         async goToPage(pageNumber) {
             if (
                 this.isChangingPage ||
@@ -449,7 +454,7 @@ export default {
     background: #a0805b;
     border: 0;
     color: #fff;
-    cursor: default;
+    cursor: pointer;
     font-family: inherit;
     font-size: 0.72rem;
 }

@@ -1,10 +1,10 @@
 <template>
     <main class="about-page">
-        <section class="about-hero">
+        <section class="about-hero" :style="{ backgroundImage: `url(${aboutBackground})` }">
             <div v-about-reveal class="hero-content about-reveal">
                 <p><strong>มั่นใจในคุณภาพสินค้าและมาตรฐานการบริการ</strong></p>
                 <p>ด้วยประสบการณ์ยาวนานกว่า</p>
-                <img src="/images/about/30.png" alt="ประสบการณ์กว่า 30 ปี" />
+                <img :src="experienceImage" alt="ประสบการณ์กว่า 30 ปี" />
             </div>
         </section>
 
@@ -30,7 +30,7 @@
                 <article class="history-card year-2001">
                     <h2>2001</h2>
                     <p>ก่อตั้งบริษัท ไอเดียลโกลบ จำกัด</p>
-                    <img src="/images/about/WH01.png" alt="สำนักงานใหญ่ Ideal Globe" />
+                    <img :src="officeImage" alt="สำนักงานใหญ่ Ideal Globe" />
                 </article>
                 <article class="history-card year-2003">
                     <h2>2003</h2>
@@ -38,7 +38,7 @@
                 </article>
                 <article class="history-card year-2007">
                     <h2>2007</h2>
-                    <img src="/images/about/WH.png" alt="คลังสินค้า Ideal Globe" />
+                    <img :src="warehouseImage" alt="คลังสินค้า Ideal Globe" />
                     <p>เปิดคลังสินค้าแห่งแรก<br />รองรับสต็อกสินค้าและจัดส่งทั่วประเทศ</p>
                 </article>
                 <article class="history-card year-2018">
@@ -86,7 +86,7 @@
         </section>
 
         <section v-about-reveal class="trust-section about-reveal">
-            <img src="/images/footer-logo.png" alt="Ideal Globe" />
+            <img :src="footerLogo" alt="Ideal Globe" />
             <div class="trust-desktop-content">
                 <h2>พันธมิตรที่คุณเชื่อมั่นได้</h2>
                 <p>ด้วยประสบการณ์ยาวนาน ความพร้อมด้านสินค้า และการบริการที่ใส่ใจในทุกขั้นตอน</p>
@@ -101,6 +101,12 @@
 </template>
 
 <script>
+import experienceImage from '@/assets/images/about/30.png'
+import aboutBackground from '@/assets/images/about/background.png'
+import officeImage from '@/assets/images/about/office.png'
+import warehouseImage from '@/assets/images/about/warehouse.png'
+import footerLogo from '@/assets/images/branding/footer-logo.png'
+
 const aboutRevealDirective = {
     mounted(element) {
         const isDesktop = window.matchMedia('(min-width: 1201px)').matches
@@ -165,11 +171,16 @@ export default {
     },
     data() {
         return {
+            experienceImage,
+            aboutBackground,
+            officeImage,
+            warehouseImage,
+            footerLogo,
             mobileHistory: [
                 {
                     year: '2001',
                     text: 'ก่อตั้งบริษัท ไอเดียลโกลบ จำกัด',
-                    image: '/images/about/WH01.png',
+                    image: officeImage,
                     alt: 'สำนักงานใหญ่ Ideal Globe',
                 },
                 {
@@ -179,7 +190,7 @@ export default {
                 {
                     year: '2007',
                     text: 'เปิดคลังสินค้าแห่งแรก รองรับสต็อกสินค้าและจัดส่งทั่วประเทศ',
-                    image: '/images/about/WH.png',
+                    image: warehouseImage,
                     alt: 'คลังสินค้า Ideal Globe',
                 },
                 {
@@ -214,7 +225,7 @@ export default {
 
 <style scoped>
 .about-page { background: #23272d; color: #f7f3eb; overflow: hidden; }
-.about-hero { background: #15191e url('/images/about/BG.png') center / cover no-repeat; min-height: 480px; position: relative; }
+.about-hero { background-color: #15191e; background-position: center; background-repeat: no-repeat; background-size: cover; min-height: 480px; position: relative; }
 .hero-content { left: 50%; position: absolute; text-align: center; top: 68%; transform: translate(-50%, -50%); width: min(720px, 90vw); }
 .hero-content p { font-size: clamp(1.45rem, 2.25vw, 2.05rem); line-height: 1.25; margin: 0; }
 .hero-content strong { color: #dcc293; font-weight: 500; }

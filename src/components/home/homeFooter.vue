@@ -7,15 +7,15 @@
                     <p>Product Standards, Testing &amp; Compliance</p>
                 </div>
                 <div class="standards-logo-space">
-                    <div v-for="index in 6" :key="index" class="standard-logo-item">
-                        <img :src="`/images/logo/0${index}.jpg`" :alt="`มาตรฐานและการรับรอง ${index}`" />
+                    <div v-for="(logo, index) in standardLogos" :key="logo" class="standard-logo-item">
+                        <img :src="logo" :alt="`มาตรฐานและการรับรอง ${index + 1}`" />
                     </div>
                 </div>
             </div>
         </section>
         <div class="footer-inner">
             <div class="footer-brand">
-                <img src="/images/footer-logo.png" alt="Ideal Globe" />
+                <img :src="footerLogo" alt="Ideal Globe" />
                 <div>
                     <strong>
                         <span class="slogan-line">บริการด้วยคุณภาพ</span>
@@ -97,7 +97,7 @@
                         rel="noopener noreferrer"
                         aria-label="เพิ่มเพื่อน LINE Ideal Globe"
                     >
-                        <img src="/images/example/qr.png" alt="LINE QR Code @idealglobe" />
+                        <img :src="lineQr" alt="LINE QR Code @idealglobe" />
                     </a>
                     <small>LINE OA</small>
                     <p><strong>@IDEALGLOBE</strong> (มี@)</p>
@@ -137,9 +137,23 @@
 import { mapStores } from 'pinia'
 import { useCategoryStore } from '@/stores/categoryStore'
 import { categoryLabelThai } from '@/utils/categoryLabels'
+import footerLogo from '@/assets/images/branding/footer-logo.png'
+import lineQr from '@/assets/images/contact/line-qr.png'
+import standard01 from '@/assets/images/standards/01.png'
+import standard02 from '@/assets/images/standards/02.png'
+import standard03 from '@/assets/images/standards/03.png'
+import standard04 from '@/assets/images/standards/04.png'
+import standard05 from '@/assets/images/standards/05.png'
 
 export default {
     name: 'homeFooter',
+    data() {
+        return {
+            footerLogo,
+            lineQr,
+            standardLogos: [standard01, standard02, standard03, standard04, standard05],
+        }
+    },
     computed: {
         ...mapStores(useCategoryStore),
         visibleCategories() {
@@ -204,7 +218,7 @@ export default {
     align-items: center;
     display: grid;
     gap: clamp(5px, 0.7vw, 11px);
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
 .standard-logo-item {

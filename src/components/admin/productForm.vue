@@ -98,20 +98,19 @@
             </div>
         </div>
 
-        <div class="form-row">
-            <div class="form-group">
-                <label for="category">หมวดหมู่</label>
-                <select id="category" v-model="form.category" class="form-select" required>
-                    <option value="" disabled>-- เลือกหมวดหมู่ --</option>
-                    <option v-for="cat in categoryOptions" :key="cat.id" :value="cat.slug">
-                        {{ cat.name }}
-                    </option>
-                </select>
+        <div class="form-group">
+            <label>หมวดหมู่ <small class="field-hint">(เลือกได้หลายหมวดและไม่บังคับ)</small></label>
+            <div class="category-checkboxes">
+                <label v-for="cat in categoryOptions" :key="cat.id" class="category-checkbox">
+                    <input v-model="form.categories" type="checkbox" :value="cat.slug" />
+                    <span>{{ cat.description || cat.name || cat.slug }}</span>
+                </label>
             </div>
-            <div class="form-group">
-                <label for="packing">แพคกิ้ง</label>
-                <input id="packing" type="text" v-model="form.packing" class="form-input" placeholder="-" />
-            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="packing">แพคกิ้ง</label>
+            <input id="packing" type="text" v-model="form.packing" class="form-input" placeholder="-" />
         </div>
 
         <div class="form-group">
@@ -165,7 +164,7 @@ export default {
                 hashtags: [],
                 brand: '',
                 sku: '',
-                category: '',
+                categories: [],
                 packing: '',
                 mainImageFile: null,
                 existingGalleryImageUrls: [],
@@ -226,7 +225,11 @@ export default {
                     this.form.brand = newVal.brand || ''
                     this.form.sku = newVal.sku || ''
                     this.form.packing = newVal.packing || ''
-                    this.form.category = newVal.category || ''
+                    this.form.categories = Array.isArray(newVal.categories) && newVal.categories.length
+                        ? [...newVal.categories]
+                        : newVal.category
+                            ? [newVal.category]
+                            : []
                     this.mainImagePreview = newVal.mainImageUrl || null
                     this.form.existingGalleryImageUrls = Array.isArray(newVal.galleryImageUrls)
                         ? [...newVal.galleryImageUrls]
@@ -380,7 +383,7 @@ export default {
                 hashtags: [],
                 brand: '',
                 sku: '',
-                category: '',
+                categories: [],
                 packing: '',
                 mainImageFile: null,
                 existingGalleryImageUrls: [],
@@ -396,7 +399,7 @@ export default {
         async handleSubmit() {
             const wasEditing = this.isEditMode && this.editingProduct && this.editingProduct.id
             const savedProduct = wasEditing
-                ? { id: this.editingProduct.id, category: this.form.category }
+                ? { id: this.editingProduct.id, categories: [...this.form.categories] }
                 : null
 
             if (wasEditing) {
@@ -483,6 +486,29 @@ label {
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
+.field-hint { color: #64748b; font-weight: 400; }
+.category-checkboxes {
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    display: grid;
+    gap: 7px 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-height: 150px;
+    overflow-y: auto;
+    padding: 10px;
+}
+.category-checkbox {
+    align-items: center;
+    display: flex;
+    gap: 7px;
+    min-width: 0;
+}
+.category-checkbox input {
+    accent-color: #a0805b;
+    cursor: pointer;
+}
+.category-checkbox span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .image-preview img {
     max-width: 180px;
     border-radius: 6px;

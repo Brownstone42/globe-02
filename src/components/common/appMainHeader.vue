@@ -2,7 +2,7 @@
     <div class="header">
         <div class="row">
             <img
-                src="/images/logo9.png"
+                :src="headerLogo"
                 alt="Company Logo"
                 class="header-logo"
                 @click="navigate('/')"
@@ -62,6 +62,8 @@
 </template>
 
 <script>
+import headerLogo from '@/assets/images/branding/logo-header.png'
+
 export default {
     name: 'mainHeader',
     mounted() {
@@ -73,6 +75,7 @@ export default {
     data() {
         return {
             isOpen: false,
+            headerLogo,
         }
     },
     methods: {

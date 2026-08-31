@@ -79,7 +79,7 @@
                     target="_blank"
                     rel="noopener noreferrer"
                 >
-                    <img src="/images/line_icon.png" alt="" />
+                    <img :src="lineIcon" alt="" />
                     <span>สอบถามและสั่งซื้อผ่านไลน์<br /><strong>@idealglobe</strong> <small>(มี@)</small></span>
                 </a>
                 <button class="action-btn quote-action" type="button">
@@ -97,8 +97,13 @@
 </template>
 
 <script>
+import lineIcon from '@/assets/images/branding/line-icon.png'
+
 export default {
     name: 'ProductMain',
+    data() {
+        return { lineIcon }
+    },
     props: {
         product: {
             type: Object,

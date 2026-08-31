@@ -64,8 +64,9 @@
 
 <script>
 import { useBannerStore } from '@/stores/bannerStore'
+import fallbackBanner from '@/assets/images/home/banner.png'
 
-const FALLBACK_BANNER = '/images/banner5.png'
+const FALLBACK_BANNER = fallbackBanner
 
 export default {
     name: 'BannerManagement',

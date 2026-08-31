@@ -87,7 +87,7 @@
                                         <div v-else class="image-placeholder">No image</div>
                                     </td>
                                     <td>{{ product.name }}</td>
-                                    <td>{{ product.category }}</td>
+                                    <td>{{ productCategoryLabels(product) }}</td>
                                     <td>
                                         <button
                                             type="button"
@@ -150,7 +150,7 @@ export default {
         },
         filteredProducts() {
             const products = this.filterCategory
-                ? this.products.filter((product) => product.category === this.filterCategory)
+                ? this.products.filter((product) => this.productCategories(product).includes(this.filterCategory))
                 : [...this.products]
 
             if (!this.sortBy) return products
@@ -184,6 +184,15 @@ export default {
         }
     },
     methods: {
+        productCategories(product) {
+            if (Array.isArray(product.categories) && product.categories.length) return product.categories
+            return product.category ? [product.category] : []
+        },
+        productCategoryLabels(product) {
+            return this.productCategories(product)
+                .map((slug) => this.categories.find((category) => category.slug === slug)?.name || slug)
+                .join(', ') || '-'
+        },
         startCreate() {
             this.currentProductId = null
         },

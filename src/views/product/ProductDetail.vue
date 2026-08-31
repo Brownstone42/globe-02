@@ -16,7 +16,7 @@
                         <RouterLink
                             :to="{
                                 name: 'product-category',
-                                params: { category: product?.category || category },
+                                params: { category: effectiveCategory },
                             }"
                         >
                             {{ categoryLabel }}
@@ -104,8 +104,15 @@ export default {
         },
 
         // หา label ของ category จาก categoryStore (อิง slug)
+        effectiveCategory() {
+            if (this.category && this.category !== 'all') return this.category
+            if (Array.isArray(this.product?.categories) && this.product.categories.length) {
+                return this.product.categories[0]
+            }
+            return this.product?.category || 'all'
+        },
         categoryLabel() {
-            const slug = this.product ? this.product.category : this.category
+            const slug = this.effectiveCategory
 
             const categories = this.categoryStore.sortedCategories || []
             const found = categories.find((cat) => cat.slug === slug)
@@ -138,7 +145,7 @@ export default {
         // สินค้าในหมวดเดียวกัน (ไม่รวมตัวเอง)
         relatedProducts() {
             if (!this.product) return []
-            const sameCategory = this.productStore.productsByCategory(this.product.category) || []
+            const sameCategory = this.productStore.productsByCategory(this.effectiveCategory) || []
 
             return sameCategory.filter((item) => item.id !== this.product.id).slice(0, 4) // จะปรับจำนวนทีหลังก็ได้
         },

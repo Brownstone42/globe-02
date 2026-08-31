@@ -34,7 +34,10 @@
                             >
                                 ดูรายละเอียดสินค้า
                             </RouterLink>
-                            <button class="quote-btn" type="button">ขอใบเสนอราคา</button>
+                            <RouterLink
+                                class="quote-btn"
+                                :to="{ name: 'quotation', query: { productId: item.id } }"
+                            >ขอใบเสนอราคา</RouterLink>
                         </div>
                     </div>
                 </article>
@@ -174,7 +177,7 @@ export default {
     background: #a0805b;
     border: 0;
     color: #fff;
-    cursor: default;
+    cursor: pointer;
 }
 
 .quote-btn:hover {

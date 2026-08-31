@@ -19,7 +19,7 @@ const storage = getStorage(app)
 
 const PRODUCT_FIELDS = new Set([
     'name', 'shortDescription', 'description', 'highlights', 'properties',
-    'specifications', 'standards', 'suitable', 'documents', 'faq', 'hashtags', 'brand', 'sku', 'category', 'packing',
+    'specifications', 'standards', 'suitable', 'documents', 'faq', 'hashtags', 'brand', 'sku', 'categories', 'packing',
     'mainImageUrl', 'galleryImageUrls', 'createdAt', 'updatedAt',
 ])
 
@@ -53,6 +53,11 @@ function normalizeHashtags(value) {
     return toItemList(value)
         .map((item) => item.replace(/^#+/, '').trim())
         .filter(Boolean)
+}
+
+function normalizeCategories(value, legacyCategory = '') {
+    const values = Array.isArray(value) ? value : []
+    return [...new Set([...values, legacyCategory].map((item) => String(item || '').trim()).filter(Boolean))]
 }
 
 async function uploadProductDocuments(items) {
@@ -92,7 +97,9 @@ export const useProductStore = defineStore('product', {
             if (!category || category === 'all') {
                 return state.products
             }
-            return state.products.filter((item) => item.category === category)
+            return state.products.filter((item) =>
+                normalizeCategories(item.categories, item.category).includes(category),
+            )
         },
     },
 
@@ -169,7 +176,7 @@ export const useProductStore = defineStore('product', {
                     packing: form.packing || '',
                     mainImageUrl: mainImageUrl,
                     galleryImageUrls: galleryImageUrls,
-                    category: form.category || '',
+                    categories: normalizeCategories(form.categories),
                     createdAt: serverTimestamp(),
                     updatedAt: serverTimestamp(),
                 }
@@ -241,7 +248,7 @@ export const useProductStore = defineStore('product', {
                     brand: form.brand || '',
                     sku: form.sku || '',
                     packing: form.packing || '',
-                    category: form.category || '',
+                    categories: normalizeCategories(form.categories),
                     mainImageUrl,
                     galleryImageUrls,
                     createdAt: existing.createdAt || serverTimestamp(),
@@ -276,6 +283,7 @@ export const useProductStore = defineStore('product', {
                     !Array.isArray(product.documents) ||
                     !Array.isArray(product.faq) ||
                     !Array.isArray(product.hashtags) ||
+                    !Array.isArray(product.categories) ||
                     !Array.isArray(product.galleryImageUrls) ||
                     product.galleryImageUrls.length > 4
             })
@@ -296,6 +304,7 @@ export const useProductStore = defineStore('product', {
                         documents: normalizeDocuments(product.documents),
                         faq: normalizeFaq(product.faq),
                         hashtags: normalizeHashtags(product.hashtags),
+                        categories: normalizeCategories(product.categories, product.category),
                         galleryImageUrls: Array.isArray(product.galleryImageUrls)
                             ? product.galleryImageUrls.slice(0, 4)
                             : [],

@@ -1,8 +1,8 @@
 <template>
     <main class="contact-page">
-        <section class="contact-hero">
+        <section class="contact-hero" :style="{ '--contact-background': `url(${contactBackground})` }">
             <div class="contact-hero-content">
-                <img src="/images/footer-logo.png" alt="Ideal Globe" />
+                <img :src="footerLogo" alt="Ideal Globe" />
                 <div>
                     <h1>บริการด้วยคุณภาพ สร้างความไว้วางใจอย่างยั่งยืน</h1>
                     <p>พร้อมให้คำปรึกษาและดูแลอย่างใกล้ชิด โดยทีมงานผู้เชี่ยวชาญ</p>
@@ -111,10 +111,15 @@
 </template>
 
 <script>
+import contactBackground from '@/assets/images/contact/background.png'
+import footerLogo from '@/assets/images/branding/footer-logo.png'
+
 export default {
     name: 'ContactView',
     data() {
         return {
+            contactBackground,
+            footerLogo,
             flippedCards: [],
             salesTeam: [
                 { id: 1, name: 'ฝ่ายขาย', line: 'Line ID: กรุณาระบุภายหลัง', phone: '097-220-4888' },
@@ -138,7 +143,7 @@ export default {
 .contact-page { background: #fff; color: #23272d; }
 .contact-hero {
     align-items: center;
-    background: linear-gradient(rgba(25, 31, 38, 0.88), rgba(25, 31, 38, 0.88)), url('/images/contact-background.png') center / cover no-repeat;
+    background: linear-gradient(rgba(25, 31, 38, 0.88), rgba(25, 31, 38, 0.88)), var(--contact-background) center / cover no-repeat;
     display: flex;
     min-height: 245px;
     padding: 42px 5vw;

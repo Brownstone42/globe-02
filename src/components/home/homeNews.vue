@@ -37,7 +37,7 @@
                         :src="
                             item.coverImageUrl ||
                             item.featuredImageUrl ||
-                            '/images/example/news01.png'
+                            fallbackNewsImage
                         "
                         :alt="item.title"
                     />
@@ -74,6 +74,7 @@
 
 <script>
 import { useNewsStore } from '@/stores/newsStore'
+import fallbackNewsImage from '@/assets/images/news/fallback.png'
 
 function toDate(value) {
     if (!value) return null
@@ -87,6 +88,7 @@ export default {
     name: 'homeNews',
     data() {
         return {
+            fallbackNewsImage,
             isVisible: false,
             revealObserver: null,
             canScrollPrev: false,

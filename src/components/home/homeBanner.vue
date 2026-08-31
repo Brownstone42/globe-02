@@ -37,7 +37,7 @@
                         target="_blank"
                         rel="noopener noreferrer"
                     >
-                        <img class="contact-line-icon" src="/images/line_icon.png" alt="" />
+                        <img class="contact-line-icon" :src="lineIcon" alt="" />
                         ติดต่อเรา
                     </a>
                 </div>
@@ -50,15 +50,20 @@
 
 <script>
 import { useBannerStore } from '@/stores/bannerStore'
+import fallbackBanner from '@/assets/images/home/banner.png'
+import lineIcon from '@/assets/images/branding/line-icon.png'
 
 export default {
     name: 'AppBanner',
+    data() {
+        return { lineIcon }
+    },
     computed: {
         bannerStore() {
             return useBannerStore()
         },
         bannerUrl() {
-            return this.bannerStore.imageUrl || '/images/banner5.png'
+            return this.bannerStore.imageUrl || fallbackBanner
         },
     },
     mounted() {

@@ -17,7 +17,7 @@
                 >
                     <div class="card-thumb">
                         <img
-                            :src="article.coverImageUrl || article.featuredImageUrl || '/images/example/news01.png'"
+                            :src="article.coverImageUrl || article.featuredImageUrl || fallbackNewsImage"
                             :alt="article.title"
                         />
                     </div>
@@ -37,9 +37,13 @@
 
 <script>
 import { useNewsStore } from '@/stores/newsStore'
+import fallbackNewsImage from '@/assets/images/news/fallback.png'
 
 export default {
     name: 'BlogList',
+    data() {
+        return { fallbackNewsImage }
+    },
     computed: {
         loading() {
             return useNewsStore().loading

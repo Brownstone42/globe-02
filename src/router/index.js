@@ -12,6 +12,7 @@ import BlogList from '@/views/news/BlogList.vue'
 import BlogDetail from '@/views/news/BlogDetail.vue'
 import About from '@/views/About.vue'
 import Contact from '@/views/Contact.vue'
+import Quotation from '@/views/Quotation.vue'
 
 const routes = [
     {
@@ -39,6 +40,11 @@ const routes = [
         path: '/contact',
         name: 'contact',
         component: Contact,
+    },
+    {
+        path: '/quotation',
+        name: 'quotation',
+        component: Quotation,
     },
     {
         path: '/blogs',
