@@ -226,11 +226,13 @@ export default {
 
 <style scoped>
 .product-management {
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     gap: 16px;
     height: 100%;
     overflow: hidden;
+    padding: 0 6px 12px;
 }
 
 .pm-title {

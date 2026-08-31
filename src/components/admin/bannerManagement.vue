@@ -130,8 +130,10 @@ export default {
 
 <style scoped>
 .banner-management {
+    box-sizing: border-box;
     height: 100%;
     overflow-y: auto;
+    padding: 0 6px 12px;
 }
 
 .panel-header {

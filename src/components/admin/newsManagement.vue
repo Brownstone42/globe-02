@@ -433,10 +433,12 @@ export default {
 
 <style scoped>
 .news-wrap {
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     height: 100%;
     overflow: hidden;
+    padding: 0 6px 12px;
 }
 
 .layout {
@@ -470,6 +472,7 @@ export default {
         0 4px 6px -1px rgba(0, 0, 0, 0.1),
         0 2px 4px -1px rgba(0, 0, 0, 0.06);
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
     display: flex;
     flex-direction: column;

@@ -26,23 +26,26 @@
                 >
                     <span class="sales-card-inner">
                         <span class="sales-card-face sales-card-front">
-                            <span class="person-placeholder" aria-hidden="true">
+                            <img v-if="person.imageUrl" class="person-photo" :src="person.imageUrl" :alt="person.name" />
+                            <span v-else class="person-placeholder" aria-hidden="true">
                                 <i class="fa-solid fa-user"></i>
                                 <small>รูปพนักงาน</small>
                             </span>
                             <span class="person-info">
                                 <strong>{{ person.name }}</strong>
-                                <small>{{ person.line }}</small>
+                                <small>{{ person.position || 'ฝ่ายขาย' }}</small>
+                                <small>{{ displayLine(person) }}</small>
                             </span>
                         </span>
 
                         <span class="sales-card-face sales-card-back">
-                            <span class="qr-placeholder" aria-hidden="true">
+                            <img v-if="person.qrCodeUrl" class="qr-image" :src="person.qrCodeUrl" :alt="`QR Code ${person.name}`" />
+                            <span v-else class="qr-placeholder" aria-hidden="true">
                                 <i class="fa-solid fa-qrcode"></i>
                                 <small>QR Code</small>
                             </span>
                             <strong>{{ person.phone }}</strong>
-                            <small>{{ person.line }}</small>
+                            <small>{{ displayLine(person) }}</small>
                         </span>
                     </span>
                 </button>
@@ -113,6 +116,8 @@
 <script>
 import contactBackground from '@/assets/images/contact/background.png'
 import footerLogo from '@/assets/images/branding/footer-logo.png'
+import { mapStores } from 'pinia'
+import { useSalesStore } from '@/stores/salesStore'
 
 export default {
     name: 'ContactView',
@@ -121,15 +126,21 @@ export default {
             contactBackground,
             footerLogo,
             flippedCards: [],
-            salesTeam: [
-                { id: 1, name: 'ฝ่ายขาย', line: 'Line ID: กรุณาระบุภายหลัง', phone: '097-220-4888' },
-                { id: 2, name: 'ฝ่ายขาย', line: 'Line ID: กรุณาระบุภายหลัง', phone: '097-220-4888' },
-                { id: 3, name: 'ฝ่ายขาย', line: 'Line ID: กรุณาระบุภายหลัง', phone: '097-294-7975' },
-                { id: 4, name: 'ฝ่ายขาย', line: 'Line ID: กรุณาระบุภายหลัง', phone: '097-294-7975' },
-            ],
         }
     },
+    computed: {
+        ...mapStores(useSalesStore),
+        salesTeam() {
+            return this.salesStore.visibleSales
+        },
+    },
+    created() {
+        this.salesStore.loadSales()
+    },
     methods: {
+        displayLine(person) {
+            return person.lineId ? `Line ID: ${person.lineId}` : 'Line ID: -'
+        },
         toggleCard(id) {
             const index = this.flippedCards.indexOf(id)
             if (index === -1) this.flippedCards.push(id)
@@ -173,6 +184,7 @@ export default {
 }
 .person-placeholder { align-items: center; background: linear-gradient(150deg, #fff 0%, #f3dfb5 68%, #14636d 68%); color: #a0805b; display: flex; flex: 1; flex-direction: column; justify-content: center; }
 .person-placeholder i { font-size: 6rem; }
+.person-photo { flex: 1; min-height: 0; object-fit: cover; width: 100%; }
 .person-placeholder small { margin-top: 12px; }
 .person-info { display: flex; flex-direction: column; min-height: 78px; padding: 15px; }
 .person-info strong { font-size: 1rem; }
@@ -180,6 +192,7 @@ export default {
 .sales-card-back { align-items: center; background: linear-gradient(145deg, #fff 10%, #f1dfb9 100%); justify-content: center; transform: rotateY(180deg); }
 .qr-placeholder { align-items: center; border: 2px dashed #a0805b; border-radius: 10px; color: #a0805b; display: flex; flex-direction: column; height: 155px; justify-content: center; margin-bottom: 18px; width: 155px; }
 .qr-placeholder i { font-size: 5rem; }
+.qr-image { background:#fff; border-radius:10px; height:155px; margin-bottom:18px; object-fit:contain; padding:6px; width:155px; }
 .sales-card-back > strong { font-size: 1.05rem; }
 .sales-card-back > small { color: #59636d; }
 .contact-details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0 auto; max-width: 1180px; width: 90vw; }
@@ -229,6 +242,7 @@ export default {
     .person-info strong { font-size: 0.86rem; }
     .person-info small { font-size: 0.7rem; }
     .qr-placeholder { height: 105px; width: 105px; }
+    .qr-image { height:105px; width:105px; }
     .qr-placeholder i { font-size: 3.4rem; }
     .sales-card-back > strong { font-size: 0.86rem; }
     .sales-card-back > small { font-size: 0.7rem; }

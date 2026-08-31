@@ -142,10 +142,8 @@
                                     <th>#</th>
                                     <th>Image</th>
                                     <th>Name</th>
-                                    <th>Slug</th>
-                                    <th>Order</th>
+                                    <th>Description</th>
                                     <th>Visible</th>
-                                    <th>Sub-Count</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -157,8 +155,7 @@
                                         <span v-else class="image-placeholder">No image</span>
                                     </td>
                                     <td>{{ cat.name }}</td>
-                                    <td>{{ cat.slug }}</td>
-                                    <td>{{ cat.order }}</td>
+                                    <td>{{ cat.description || '-' }}</td>
                                     <td>
                                         <button
                                             class="pill"
@@ -168,7 +165,6 @@
                                             {{ cat.visibility ? 'Visible' : 'Hidden' }}
                                         </button>
                                     </td>
-                                    <td>{{ (cat.subcategories || []).length }}</td>
                                     <td>
                                         <button class="link-btn" @click="startEdit(cat)">
                                             Edit
@@ -352,10 +348,12 @@ export default {
 
 <style scoped>
 .category-wrap {
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     height: 100%;
     overflow: hidden;
+    padding: 0 6px 12px;
 }
 
 .layout {
@@ -383,6 +381,7 @@ export default {
         0 4px 6px -1px rgba(0, 0, 0, 0.1),
         0 2px 4px -1px rgba(0, 0, 0, 0.06);
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
     display: flex;
     flex-direction: column;

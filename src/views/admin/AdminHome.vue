@@ -34,6 +34,14 @@
             >
                 Banner Management
             </button>
+
+            <button
+                class="admin-menu-item"
+                :class="{ active: currentModule === 'sales' }"
+                @click="currentModule = 'sales'"
+            >
+                Sales Management
+            </button>
         </aside>
 
         <main class="admin-content">
@@ -41,6 +49,7 @@
             <product-management v-else-if="currentModule === 'product'"></product-management>
             <news-management v-else-if="currentModule === 'news'"></news-management>
             <banner-management v-else-if="currentModule === 'banner'"></banner-management>
+            <sales-management v-else-if="currentModule === 'sales'"></sales-management>
 
             <div v-else class="placeholder">Select a module from the left menu.</div>
         </main>
@@ -53,6 +62,7 @@ import CategoryManagement from '@/components/admin/categoryManagement.vue'
 import ProductManagement from '@/components/admin/productManagement.vue'
 import NewsManagement from '@/components/admin/newsManagement.vue'
 import BannerManagement from '@/components/admin/bannerManagement.vue'
+import SalesManagement from '@/components/admin/salesManagement.vue'
 
 export default {
     name: 'AdminHome',
@@ -61,6 +71,7 @@ export default {
         ProductManagement,
         NewsManagement,
         BannerManagement,
+        SalesManagement,
     },
     data() {
         return {
