@@ -13,20 +13,41 @@ import {
 } from 'firebase/firestore'
 import { db, app } from '@/firebase'
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { uniqueProductSlug } from '@/utils/productSlug'
 
 const productsCol = collection(db, 'products')
 const storage = getStorage(app)
 
 const PRODUCT_FIELDS = new Set([
-    'name', 'shortDescription', 'description', 'highlights', 'properties',
-    'specifications', 'standards', 'suitable', 'documents', 'faq', 'hashtags', 'brand', 'sku', 'categories', 'packing',
-    'mainImageUrl', 'galleryImageUrls', 'createdAt', 'updatedAt',
+    'name',
+    'slug',
+    'shortDescription',
+    'description',
+    'highlights',
+    'properties',
+    'specifications',
+    'standards',
+    'suitable',
+    'documents',
+    'faq',
+    'hashtags',
+    'brand',
+    'sku',
+    'categories',
+    'packing',
+    'mainImageUrl',
+    'galleryImageUrls',
+    'createdAt',
+    'updatedAt',
 ])
 
 function toItemList(value) {
     if (Array.isArray(value)) return value.map((item) => String(item).trim()).filter(Boolean)
     if (typeof value !== 'string' || !value.trim()) return []
-    return value.split(/\r?\n/).map((item) => item.replace(/^[-•]\s*/, '').trim()).filter(Boolean)
+    return value
+        .split(/\r?\n/)
+        .map((item) => item.replace(/^[-•]\s*/, '').trim())
+        .filter(Boolean)
 }
 
 function normalizeDocuments(value) {
@@ -57,7 +78,11 @@ function normalizeHashtags(value) {
 
 function normalizeCategories(value, legacyCategory = '') {
     const values = Array.isArray(value) ? value : []
-    return [...new Set([...values, legacyCategory].map((item) => String(item || '').trim()).filter(Boolean))]
+    return [
+        ...new Set(
+            [...values, legacyCategory].map((item) => String(item || '').trim()).filter(Boolean),
+        ),
+    ]
 }
 
 async function uploadProductDocuments(items) {
@@ -161,6 +186,7 @@ export const useProductStore = defineStore('product', {
                 const documents = await uploadProductDocuments(form.documents)
                 const productData = {
                     name: form.name || '',
+                    slug: uniqueProductSlug(form.name, this.products),
                     shortDescription: form.shortDescription || '',
                     description: form.description || '',
                     highlights: toItemList(form.highlights),
@@ -235,6 +261,7 @@ export const useProductStore = defineStore('product', {
                 const documents = await uploadProductDocuments(form.documents)
                 const updateData = {
                     name: form.name || '',
+                    slug: existing.slug || uniqueProductSlug(form.name, this.products, id),
                     shortDescription: form.shortDescription || '',
                     description: form.description || '',
                     highlights: toItemList(form.highlights),
@@ -274,7 +301,9 @@ export const useProductStore = defineStore('product', {
                 const hasUnknownField = Object.keys(product).some(
                     (key) => key !== 'id' && !PRODUCT_FIELDS.has(key),
                 )
-                return hasUnknownField ||
+                return (
+                    hasUnknownField ||
+                    !product.slug ||
                     !Array.isArray(product.highlights) ||
                     !Array.isArray(product.properties) ||
                     !Array.isArray(product.specifications) ||
@@ -286,14 +315,22 @@ export const useProductStore = defineStore('product', {
                     !Array.isArray(product.categories) ||
                     !Array.isArray(product.galleryImageUrls) ||
                     product.galleryImageUrls.length > 4
+                )
             })
 
             if (!productsToMigrate.length) return
 
             try {
                 const batch = writeBatch(db)
+                const assignedSlugs = this.products
+                    .filter((product) => product.slug)
+                    .map((product) => ({ id: product.id, slug: product.slug }))
                 productsToMigrate.forEach((product) => {
+                    const slug =
+                        product.slug || uniqueProductSlug(product.name, assignedSlugs, product.id)
+                    assignedSlugs.push({ id: product.id, slug })
                     const migrated = {
+                        slug,
                         highlights: toItemList(product.highlights),
                         properties: toItemList(product.properties),
                         specifications: toItemList(product.specifications).length
@@ -336,6 +373,7 @@ export const useProductStore = defineStore('product', {
             try {
                 const productData = {
                     name: `${source.name || 'สินค้า'} - copy`,
+                    slug: uniqueProductSlug(`${source.name || 'สินค้า'} - copy`, this.products),
                     shortDescription: source.shortDescription || '',
                     description: source.description || '',
                     highlights: toItemList(source.highlights),

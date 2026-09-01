@@ -65,6 +65,7 @@ import ProductTabs from '@/components/product/ProductTabs.vue'
 import RelatedProducts from '@/components/product/RelatedProducts.vue'
 import { categoryLabelThai } from '@/utils/categoryLabels'
 import { setSeo, setStructuredData } from '@/utils/seo'
+import { productRouteKey } from '@/utils/productSlug'
 
 export default {
     name: 'ProductDetail',
@@ -99,7 +100,12 @@ export default {
 
         // ดึง product จาก store ตาม productId
         product() {
-            return this.productStore.products.find((item) => item.id === this.productId) || null
+            return (
+                this.productStore.products.find(
+                    (item) =>
+                        productRouteKey(item) === this.productId || item.id === this.productId,
+                ) || null
+            )
         },
 
         // หา label ของ category จาก categoryStore (อิง slug)
@@ -171,6 +177,7 @@ export default {
             // เวลาเปลี่ยน product (เช่น จาก relatedProducts) ให้ reset state
             this.selectedImageIndex = 0
             this.activeTab = 'details'
+            this.$nextTick(() => this.updateProductSeo())
         },
         product: {
             immediate: true,
@@ -198,6 +205,7 @@ export default {
         updateProductSeo() {
             const product = this.product
             if (!product) return
+            this.redirectLegacyProductUrl(product)
             setSeo({
                 title: `${product.name} | Ideal Globe`,
                 description:
@@ -237,6 +245,19 @@ export default {
                         item: `https://idealglobe.com${this.$route.path}`,
                     },
                 ],
+            })
+        },
+        redirectLegacyProductUrl(product) {
+            const routeKey = productRouteKey(product)
+            if (this.productId === routeKey) return
+            this.$router.replace({
+                name: 'product-detail',
+                params: {
+                    category: this.effectiveCategory,
+                    productId: routeKey,
+                },
+                query: this.$route.query,
+                hash: this.$route.hash,
             })
         },
     },

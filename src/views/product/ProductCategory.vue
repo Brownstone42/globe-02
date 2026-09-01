@@ -1,7 +1,9 @@
 <template>
     <div class="product-category">
         <div ref="resultsToolbar" class="results-toolbar">
-            <span class="result-meta">Showing {{ start }}–{{ end }} of {{ totalResults }} results</span>
+            <span class="result-meta"
+                >Showing {{ start }}–{{ end }} of {{ totalResults }} results</span
+            >
 
             <div class="toolbar-controls">
                 <div class="per-page-control">
@@ -44,10 +46,17 @@
                     class="product-image"
                     :to="{
                         name: 'product-detail',
-                        params: { category: productCategorySlug(product), productId: product.id },
+                        params: {
+                            category: productCategorySlug(product),
+                            productId: productRouteKey(product),
+                        },
                     }"
                 >
-                    <img v-if="product.mainImageUrl" :src="product.mainImageUrl" :alt="product.name" />
+                    <img
+                        v-if="product.mainImageUrl"
+                        :src="product.mainImageUrl"
+                        :alt="product.name"
+                    />
                     <div v-else class="image-placeholder" aria-hidden="true"></div>
                 </RouterLink>
 
@@ -60,7 +69,10 @@
                             class="product-detail-btn"
                             :to="{
                                 name: 'product-detail',
-                                params: { category: productCategorySlug(product), productId: product.id },
+                                params: {
+                                    category: productCategorySlug(product),
+                                    productId: productRouteKey(product),
+                                },
                             }"
                         >
                             ดูรายละเอียดสินค้า
@@ -76,8 +88,18 @@
             </article>
         </div>
 
-        <nav v-if="totalPages > 1" class="pagination pagination--bottom" aria-label="Product pagination ด้านล่าง">
-            <button type="button" :disabled="page === 1 || isChangingPage" @click="goToPage(page - 1)">‹</button>
+        <nav
+            v-if="totalPages > 1"
+            class="pagination pagination--bottom"
+            aria-label="Product pagination ด้านล่าง"
+        >
+            <button
+                type="button"
+                :disabled="page === 1 || isChangingPage"
+                @click="goToPage(page - 1)"
+            >
+                ‹
+            </button>
             <button
                 v-for="pageNumber in visiblePages"
                 :key="pageNumber"
@@ -88,14 +110,20 @@
             >
                 {{ pageNumber }}
             </button>
-            <button type="button" :disabled="page === totalPages || isChangingPage" @click="goToPage(page + 1)">›</button>
+            <button
+                type="button"
+                :disabled="page === totalPages || isChangingPage"
+                @click="goToPage(page + 1)"
+            >
+                ›
+            </button>
         </nav>
-
     </div>
 </template>
 
 <script>
 import { useProductStore } from '@/stores/productStore'
+import { productRouteKey } from '@/utils/productSlug'
 
 const productRevealDirective = {
     mounted(element) {
@@ -179,9 +207,7 @@ export default {
             } else if (this.sortBy === 'name-desc') {
                 products.sort((a, b) => (b.name || '').localeCompare(a.name || ''))
             } else if (this.sortBy === 'newest') {
-                products.sort(
-                    (a, b) => timestampValue(b.createdAt) - timestampValue(a.createdAt),
-                )
+                products.sort((a, b) => timestampValue(b.createdAt) - timestampValue(a.createdAt))
             }
 
             return products
@@ -229,9 +255,11 @@ export default {
         },
     },
     methods: {
+        productRouteKey,
         productCategorySlug(product) {
             if (this.category && this.category !== 'all') return this.category
-            if (Array.isArray(product.categories) && product.categories.length) return product.categories[0]
+            if (Array.isArray(product.categories) && product.categories.length)
+                return product.categories[0]
             return product.category || 'all'
         },
         async goToPage(pageNumber) {
@@ -240,7 +268,8 @@ export default {
                 pageNumber < 1 ||
                 pageNumber > this.totalPages ||
                 pageNumber === this.page
-            ) return
+            )
+                return
 
             this.isChangingPage = true
             await this.scrollToResults()
@@ -435,7 +464,10 @@ export default {
     padding: 6px 8px;
     text-align: center;
     text-decoration: none;
-    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+    transition:
+        background 0.18s ease,
+        border-color 0.18s ease,
+        color 0.18s ease;
     width: 100%;
 }
 
@@ -471,7 +503,9 @@ export default {
     justify-content: center;
 }
 
-.pagination--bottom { margin: 54px 0 0; }
+.pagination--bottom {
+    margin: 54px 0 0;
+}
 
 .pagination button {
     background: transparent;

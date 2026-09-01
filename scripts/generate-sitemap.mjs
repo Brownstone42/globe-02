@@ -1,9 +1,11 @@
 import { writeFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import { firebaseConfig } from '../src/firebaseConfig.js'
+import { slugifyProductName } from '../src/utils/productSlug.js'
 
 const SITE_URL = 'https://idealglobe.com'
 const outputPath = fileURLToPath(new URL('../public/sitemap.xml', import.meta.url))
+const redirectsOutputPath = fileURLToPath(new URL('../public/_redirects', import.meta.url))
 
 const staticPaths = ['/', '/about', '/product', '/blogs', '/contact', '/quotation']
 
@@ -107,8 +109,9 @@ try {
 
     products.forEach((product) => {
         const category = productCategory(product)
+        const routeKey = product.slug || slugifyProductName(product.name) || product.id
         entries.push({
-            path: `/product/${encodePathSegment(category)}/${encodePathSegment(product.id)}`,
+            path: `/product/${encodePathSegment(category)}/${encodePathSegment(routeKey)}`,
             lastmod: timestampToIso(product.updatedAt || product.createdAt),
         })
     })
@@ -130,7 +133,20 @@ try {
         '',
     ].join('\n')
 
-    await writeFile(outputPath, sitemap, 'utf8')
+    const productRedirects = products
+        .filter((product) => product.slug)
+        .map((product) => {
+            const category = encodePathSegment(productCategory(product))
+            const id = encodePathSegment(product.id)
+            const slug = encodePathSegment(product.slug)
+            return `/product/${category}/${id}    /product/${category}/${slug}    301!`
+        })
+    const redirects = [...productRedirects, '/*    /index.html   200', ''].join('\n')
+
+    await Promise.all([
+        writeFile(outputPath, sitemap, 'utf8'),
+        writeFile(redirectsOutputPath, redirects, 'utf8'),
+    ])
     console.log(
         `Generated sitemap.xml with ${uniqueEntries.length} URLs (${categories.length} categories, ${products.length} products, ${articles.length} articles checked).`,
     )

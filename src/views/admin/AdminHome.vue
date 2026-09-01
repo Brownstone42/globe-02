@@ -58,6 +58,7 @@
 
 <script>
 import { useAuthStore } from '@/stores/authStore'
+import { useProductStore } from '@/stores/productStore'
 import CategoryManagement from '@/components/admin/categoryManagement.vue'
 import ProductManagement from '@/components/admin/productManagement.vue'
 import NewsManagement from '@/components/admin/newsManagement.vue'
@@ -85,6 +86,11 @@ export default {
         userEmail() {
             return this.auth.user ? this.auth.user.email : ''
         },
+    },
+    async mounted() {
+        const products = useProductStore()
+        await products.fetchProducts()
+        await products.migrateProductSchema()
     },
     methods: {
         logout() {

@@ -13,7 +13,10 @@
                         class="related-image"
                         :to="{
                             name: 'product-detail',
-                            params: { category: item.category, productId: item.id },
+                            params: {
+                                category: productCategory(item),
+                                productId: productRouteKey(item),
+                            },
                         }"
                     >
                         <img v-if="item.mainImageUrl" :src="item.mainImageUrl" :alt="item.name" />
@@ -22,14 +25,23 @@
 
                     <div class="related-info">
                         <h3>{{ item.name }}</h3>
-                        <p>{{ item.shortDescription || shortText(item.description) || 'รายละเอียดสินค้า' }}</p>
+                        <p>
+                            {{
+                                item.shortDescription ||
+                                shortText(item.description) ||
+                                'รายละเอียดสินค้า'
+                            }}
+                        </p>
 
                         <div class="related-link-row">
                             <RouterLink
                                 class="product-detail-btn"
                                 :to="{
                                     name: 'product-detail',
-                                    params: { category: item.category, productId: item.id },
+                                    params: {
+                                        category: productCategory(item),
+                                        productId: productRouteKey(item),
+                                    },
                                 }"
                             >
                                 ดูรายละเอียดสินค้า
@@ -37,7 +49,8 @@
                             <RouterLink
                                 class="quote-btn"
                                 :to="{ name: 'quotation', query: { productId: item.id } }"
-                            >ขอใบเสนอราคา</RouterLink>
+                                >ขอใบเสนอราคา</RouterLink
+                            >
                         </div>
                     </div>
                 </article>
@@ -47,6 +60,8 @@
 </template>
 
 <script>
+import { primaryProductCategory, productRouteKey } from '@/utils/productSlug'
+
 export default {
     name: 'RelatedProducts',
     props: {
@@ -56,6 +71,8 @@ export default {
         },
     },
     methods: {
+        productRouteKey,
+        productCategory: primaryProductCategory,
         shortText(text) {
             if (!text) return ''
             // ตัดข้อความความยาวให้เหมาะเพื่อให้ layout สวยเหมือนเดิม
@@ -159,7 +176,10 @@ export default {
     padding: 6px 8px;
     text-align: center;
     text-decoration: none;
-    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+    transition:
+        background 0.18s ease,
+        border-color 0.18s ease,
+        color 0.18s ease;
     width: 100%;
 }
 
