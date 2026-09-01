@@ -25,10 +25,7 @@
                         </RouterLink>
 
                         <ul v-if="cat.subcategories?.length" class="subcategory-list">
-                            <li
-                                v-for="sub in visibleSubcategories(cat)"
-                                :key="sub.id || sub.name"
-                            >
+                            <li v-for="sub in visibleSubcategories(cat)" :key="sub.id || sub.name">
                                 <RouterLink
                                     :to="{
                                         name: 'product-category',
@@ -60,6 +57,7 @@
 import { mapStores } from 'pinia'
 import { useCategoryStore } from '@/stores/categoryStore'
 import { categoryLabelThai } from '@/utils/categoryLabels'
+import { setSeo } from '@/utils/seo'
 
 export default {
     name: 'ProductLayout',
@@ -76,6 +74,17 @@ export default {
             this.categoryStore.loadCategories()
         }
     },
+    watch: {
+        '$route.fullPath': {
+            immediate: true,
+            handler() {
+                this.updateCategorySeo()
+            },
+        },
+        visibleCategories() {
+            this.updateCategorySeo()
+        },
+    },
     methods: {
         categoryLabelThai,
         visibleSubcategories(category) {
@@ -85,6 +94,27 @@ export default {
         },
         isCategoryActive(slug) {
             return this.$route.params.category === slug
+        },
+        updateCategorySeo() {
+            if (this.$route.name === 'product-detail') return
+
+            const slug = this.$route.params.category
+            const category = this.visibleCategories.find((item) => item.slug === slug)
+            const categoryName = category ? categoryLabelThai(category) : ''
+            const subcategory = category?.subcategories?.find(
+                (item) => item.id === this.$route.query.sub,
+            )
+            const pageName = subcategory?.name || categoryName
+
+            setSeo({
+                title: pageName
+                    ? `${pageName} – อุปกรณ์สำหรับโรงงาน | Ideal Globe`
+                    : 'อุปกรณ์ Cleanroom, ESD และ Safety | Ideal Globe',
+                description: pageName
+                    ? `เลือกชม ${pageName} สำหรับโรงงานอุตสาหกรรม พร้อมคำแนะนำด้านการเลือกใช้งานและบริการจาก Ideal Globe`
+                    : 'เลือกชมอุปกรณ์ Cleanroom, ESD, Safety และอุปกรณ์สำหรับโรงงาน พร้อมบริการให้คำปรึกษาจาก Ideal Globe',
+                path: this.$route.path,
+            })
         },
     },
 }

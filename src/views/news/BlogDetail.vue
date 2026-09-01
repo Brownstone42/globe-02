@@ -7,12 +7,7 @@
             <!-- Hero: cover image with title/meta overlaid -->
             <header class="blog-hero">
                 <div class="blog-hero-inner">
-                    <img
-                        v-if="heroUrl"
-                        class="blog-hero-img"
-                        :src="heroUrl"
-                        :alt="article.title"
-                    />
+                    <img v-if="heroUrl" class="blog-hero-img" :src="heroUrl" :alt="article.title" />
                     <div class="blog-hero-overlay">
                         <h1 class="blog-hero-title">{{ article.title }}</h1>
                     </div>
@@ -21,7 +16,9 @@
 
             <div class="content-wrap">
                 <!-- Back -->
-                <button class="back-btn" @click="$router.push('/blogs')">← กลับไปบทความทั้งหมด</button>
+                <button class="back-btn" @click="$router.push('/blogs')">
+                    ← กลับไปบทความทั้งหมด
+                </button>
 
                 <!-- Body content -->
                 <div class="article-body" v-if="article.content">
@@ -41,11 +38,7 @@
                 <!-- FAQ -->
                 <div class="faq-section" v-if="article.faq && article.faq.length">
                     <h2 class="section-title">คำถามที่พบบ่อย (FAQ)</h2>
-                    <div
-                        v-for="(item, index) in article.faq"
-                        :key="index"
-                        class="faq-item"
-                    >
+                    <div v-for="(item, index) in article.faq" :key="index" class="faq-item">
                         <div class="faq-q" @click="toggleFaq(index)">
                             <span>{{ item.question }}</span>
                             <span class="faq-icon">{{ openFaq === index ? '−' : '+' }}</span>
@@ -58,11 +51,7 @@
 
                 <!-- Tags -->
                 <div class="tags-section" v-if="article.tags && article.tags.length">
-                    <span
-                        v-for="tag in article.tags"
-                        :key="tag"
-                        class="tag"
-                    >#{{ tag }}</span>
+                    <span v-for="tag in article.tags" :key="tag" class="tag">#{{ tag }}</span>
                 </div>
             </div>
         </template>
@@ -71,6 +60,15 @@
 
 <script>
 import { useNewsStore } from '@/stores/newsStore'
+import { setSeo, setStructuredData } from '@/utils/seo'
+
+function isoDate(value) {
+    if (!value) return undefined
+    if (typeof value.toDate === 'function') return value.toDate().toISOString()
+    if (typeof value.seconds === 'number') return new Date(value.seconds * 1000).toISOString()
+    const date = new Date(value)
+    return Number.isNaN(date.getTime()) ? undefined : date.toISOString()
+}
 
 export default {
     name: 'BlogDetail',
@@ -109,7 +107,66 @@ export default {
             store.fetchNews()
         }
     },
+    watch: {
+        loading: {
+            immediate: true,
+            handler(loading) {
+                if (!loading && !this.article) this.setMissingArticleSeo()
+            },
+        },
+        article: {
+            immediate: true,
+            handler(article) {
+                if (!article) {
+                    if (!this.loading) this.setMissingArticleSeo()
+                    return
+                }
+                setSeo({
+                    title: `${article.title} | Ideal Globe`,
+                    description:
+                        article.metaDescription || `อ่านบทความ ${article.title} จาก Ideal Globe`,
+                    path: this.$route.path,
+                    image: this.heroUrl || article.featuredImageUrl,
+                    type: 'article',
+                })
+                const image = this.heroUrl || article.featuredImageUrl
+                setStructuredData('article', {
+                    '@context': 'https://schema.org',
+                    '@type': 'Article',
+                    headline: article.title,
+                    description:
+                        article.metaDescription || `อ่านบทความ ${article.title} จาก Ideal Globe`,
+                    image: image ? [image] : undefined,
+                    datePublished: isoDate(article.createdAt),
+                    dateModified: isoDate(article.updatedAt),
+                    mainEntityOfPage: `https://idealglobe.com${this.$route.path}`,
+                    author: {
+                        '@type': 'Organization',
+                        '@id': 'https://idealglobe.com/#organization',
+                        name: 'Ideal Globe',
+                    },
+                    publisher: {
+                        '@type': 'Organization',
+                        '@id': 'https://idealglobe.com/#organization',
+                        name: 'Ideal Globe',
+                        logo: {
+                            '@type': 'ImageObject',
+                            url: 'https://idealglobe.com/images/footer-logo.png',
+                        },
+                    },
+                })
+            },
+        },
+    },
     methods: {
+        setMissingArticleSeo() {
+            setSeo({
+                title: 'ไม่พบบทความ | Ideal Globe',
+                description: 'ไม่พบบทความที่คุณกำลังค้นหาบนเว็บไซต์ Ideal Globe',
+                path: this.$route.path,
+                robots: 'noindex, follow, noarchive',
+            })
+        },
         toggleFaq(index) {
             this.openFaq = this.openFaq === index ? null : index
         },

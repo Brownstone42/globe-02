@@ -8,9 +8,7 @@
                         <RouterLink to="/">หน้าแรก</RouterLink>
                     </li>
                     <li>
-                        <RouterLink :to="{ name: 'product-all' }">
-                            ผลิตภัณฑ์
-                        </RouterLink>
+                        <RouterLink :to="{ name: 'product-all' }"> ผลิตภัณฑ์ </RouterLink>
                     </li>
                     <li>
                         <RouterLink
@@ -66,6 +64,7 @@ import ProductMain from '@/components/product/ProductMain.vue'
 import ProductTabs from '@/components/product/ProductTabs.vue'
 import RelatedProducts from '@/components/product/RelatedProducts.vue'
 import { categoryLabelThai } from '@/utils/categoryLabels'
+import { setSeo, setStructuredData } from '@/utils/seo'
 
 export default {
     name: 'ProductDetail',
@@ -162,10 +161,83 @@ export default {
         }
     },
     watch: {
+        'productStore.loading': {
+            immediate: true,
+            handler(loading) {
+                if (!loading && !this.product) this.setMissingProductSeo()
+            },
+        },
         productId() {
             // เวลาเปลี่ยน product (เช่น จาก relatedProducts) ให้ reset state
             this.selectedImageIndex = 0
             this.activeTab = 'details'
+        },
+        product: {
+            immediate: true,
+            handler() {
+                if (!this.product) {
+                    if (!this.productStore.loading) this.setMissingProductSeo()
+                    return
+                }
+                this.updateProductSeo()
+            },
+        },
+        categoryLabel() {
+            this.updateProductSeo()
+        },
+    },
+    methods: {
+        setMissingProductSeo() {
+            setSeo({
+                title: 'ไม่พบสินค้า | Ideal Globe',
+                description: 'ไม่พบสินค้าที่คุณกำลังค้นหาบนเว็บไซต์ Ideal Globe',
+                path: this.$route.path,
+                robots: 'noindex, follow, noarchive',
+            })
+        },
+        updateProductSeo() {
+            const product = this.product
+            if (!product) return
+            setSeo({
+                title: `${product.name} | Ideal Globe`,
+                description:
+                    product.shortDescription ||
+                    product.description ||
+                    `รายละเอียด ${product.name} จาก Ideal Globe`,
+                path: this.$route.path,
+                image: product.mainImageUrl,
+                type: 'product',
+            })
+            setStructuredData('breadcrumb', {
+                '@context': 'https://schema.org',
+                '@type': 'BreadcrumbList',
+                itemListElement: [
+                    {
+                        '@type': 'ListItem',
+                        position: 1,
+                        name: 'หน้าแรก',
+                        item: 'https://idealglobe.com/',
+                    },
+                    {
+                        '@type': 'ListItem',
+                        position: 2,
+                        name: 'ผลิตภัณฑ์',
+                        item: 'https://idealglobe.com/product',
+                    },
+                    {
+                        '@type': 'ListItem',
+                        position: 3,
+                        name: this.categoryLabel,
+                        item: `https://idealglobe.com/product/${encodeURIComponent(this.effectiveCategory)}`,
+                    },
+                    {
+                        '@type': 'ListItem',
+                        position: 4,
+                        name: product.name,
+                        item: `https://idealglobe.com${this.$route.path}`,
+                    },
+                ],
+            })
         },
     },
 }
