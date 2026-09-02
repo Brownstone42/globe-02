@@ -214,18 +214,20 @@ export default {
     .mobile-contact-floating {
         align-items: center;
         animation: line-button-enter 0.72s cubic-bezier(0.22, 1, 0.36, 1) both;
-        background: rgba(225, 229, 234, 0.88);
+        -webkit-backdrop-filter: blur(7px) saturate(1.1);
+        backdrop-filter: blur(7px) saturate(1.1);
+        background: rgba(225, 229, 234, 0.32);
         border-radius: 999px;
         bottom: 25px;
         display: flex;
         filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.24));
-        gap: 6px;
+        gap: 7px;
         left: 50%;
         padding: 8px;
         position: fixed;
         transition: opacity 0.18s ease, transform 0.18s ease;
         transform: translateX(-50%);
-        width: min(215px, calc(100vw - 34px));
+        width: min(270px, calc(100vw - 34px));
         z-index: 999;
     }
 
@@ -235,9 +237,9 @@ export default {
         border-radius: 50%;
         color: #fff;
         display: flex;
-        flex: 0 0 32px;
-        font-size: 0.88rem;
-        height: 32px;
+        flex: 0 0 41px;
+        font-size: 1.15rem;
+        height: 41px;
         justify-content: center;
         text-decoration: none;
     }
@@ -249,13 +251,13 @@ export default {
         color: #fff;
         display: flex;
         flex: 1;
-        font-size: clamp(0.6rem, 2.35vw, 0.68rem);
+        font-size: clamp(0.78rem, 3.1vw, 0.9rem);
         font-weight: 700;
         gap: 6px;
-        height: 30px;
+        height: 38px;
         justify-content: center;
         min-width: 0;
-        padding: 0 8px;
+        padding: 0 12px;
         position: relative;
         text-decoration: none;
         white-space: nowrap;
@@ -263,9 +265,9 @@ export default {
 
     .floating-line img {
         filter: brightness(0) invert(1);
-        height: 15px;
+        height: 20px;
         object-fit: contain;
-        width: 18px;
+        width: 24px;
     }
 
     .mobile-contact-floating::before,
