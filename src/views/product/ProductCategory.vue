@@ -390,10 +390,11 @@ export default {
 
 .product-image {
     align-items: center;
+    aspect-ratio: 1 / 1;
     background: #fff;
     box-sizing: border-box;
     display: flex;
-    height: 190px;
+    height: auto;
     justify-content: center;
     overflow: hidden;
     padding-top: 12px;
@@ -570,7 +571,7 @@ export default {
     }
 
     .product-image {
-        height: 150px;
+        height: auto;
     }
 
     .toolbar-controls {

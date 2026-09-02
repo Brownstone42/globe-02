@@ -102,9 +102,10 @@ export default {
 
 .related-image {
     align-items: center;
+    aspect-ratio: 1 / 1;
     background: #fff;
     display: flex;
-    height: 190px;
+    height: auto;
     justify-content: center;
     overflow: hidden;
 }

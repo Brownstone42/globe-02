@@ -17,7 +17,10 @@
         <div class="hero-content">
             <div class="hero-copy">
                 <div class="hero-heading">
-                    <h1>โซลูชั่นครบครัน<br />เพื่อโรงงานอุตสาหกรรม</h1>
+                    <h1>
+                        <span>อุปกรณ์คลีนรูม อุปกรณ์ป้องกันไฟฟ้าสถิต</span>
+                        <span>และอุปกรณ์เพื่อความปลอดภัย</span>
+                    </h1>
                     <p>
                         จำหน่ายอุปกรณ์ Cleanroom, ESD, Safety<br />
                         และอุปกรณ์โรงงาน คุณภาพมาตรฐานสากล
@@ -42,7 +45,7 @@
                     </a>
                 </div>
 
-                <p class="hero-trust">มากกว่า 30 ปี ที่ผู้ประกอบการวางใจ</p>
+                <p class="hero-trust">มาตรฐานที่ภาคอุตสาหกรรมไว้วางใจ</p>
             </div>
         </div>
     </section>
@@ -141,10 +144,19 @@ export default {
 
 .hero-heading h1 {
     color: #23272d;
-    font-size: clamp(2.1rem, 3.2vw, 3.35rem);
+    font-size: clamp(1.7rem, 2.45vw, 2.4rem);
     font-weight: 700;
     line-height: 1.18;
     margin: 0 0 12px;
+}
+
+.hero-heading h1 span {
+    display: block;
+    white-space: nowrap;
+}
+
+.hero-heading h1 span + span {
+    margin-top: 7px;
 }
 
 .hero-heading p {
@@ -222,7 +234,7 @@ export default {
 
 .hero-trust {
     color: #205b6c;
-    font-size: 0.9rem;
+    font-size: 1rem;
     font-weight: 700;
     margin: 14px 0 0;
 }
@@ -258,7 +270,7 @@ export default {
     }
 
     .hero-heading h1 {
-        font-size: clamp(1.85rem, 8vw, 2.35rem);
+        font-size: clamp(1rem, 4.5vw, 1.35rem);
         line-height: 1.22;
     }
 

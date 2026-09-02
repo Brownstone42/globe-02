@@ -33,7 +33,7 @@
                             </span>
                             <span class="person-info">
                                 <strong>{{ person.name }}</strong>
-                                <small>{{ person.position || 'ฝ่ายขาย' }}</small>
+                                <small v-if="person.position && person.position !== 'ฝ่ายขาย'">{{ person.position }}</small>
                                 <small>{{ displayLine(person) }}</small>
                             </span>
                         </span>
@@ -167,7 +167,7 @@ export default {
 .sales-section > h2 { color: #205266; font-size: 1.45rem; margin: 0; text-align: center; }
 .flip-hint { color: #8a9299; font-size: 0.82rem; margin: 5px 0 30px; text-align: center; }
 .sales-grid { display: grid; gap: 34px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
-.sales-card { background: transparent; border: 0; cursor: pointer; height: 330px; padding: 0; perspective: 1100px; }
+.sales-card { aspect-ratio: 140 / 215; background: transparent; border: 0; cursor: pointer; height: auto; padding: 0; perspective: 1100px; }
 .sales-card-inner { display: block; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1); width: 100%; }
 .sales-card.is-flipped .sales-card-inner { transform: rotateY(180deg); }
 .sales-card-face {
@@ -182,9 +182,9 @@ export default {
     overflow: hidden;
     position: absolute;
 }
-.person-placeholder { align-items: center; background: linear-gradient(150deg, #fff 0%, #f3dfb5 68%, #14636d 68%); color: #a0805b; display: flex; flex: 1; flex-direction: column; justify-content: center; }
+.person-placeholder { align-items: center; aspect-ratio: 140 / 170; background: linear-gradient(150deg, #fff 0%, #f3dfb5 68%, #14636d 68%); color: #a0805b; display: flex; flex: 0 0 auto; flex-direction: column; justify-content: center; width: 100%; }
 .person-placeholder i { font-size: 6rem; }
-.person-photo { flex: 1; min-height: 0; object-fit: cover; width: 100%; }
+.person-photo { aspect-ratio: 140 / 170; display: block; flex: 0 0 auto; object-fit: cover; width: 100%; }
 .person-placeholder small { margin-top: 12px; }
 .person-info { display: flex; flex-direction: column; min-height: 78px; padding: 15px; }
 .person-info strong { font-size: 1rem; }
@@ -236,7 +236,7 @@ export default {
     .contact-hero-content img { width: 92px; }
     .sales-section { padding: 46px 0 54px; }
     .sales-grid { gap: 18px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .sales-card { height: 255px; }
+    .sales-card { aspect-ratio: 140 / 215; height: auto; }
     .person-placeholder i { font-size: 4rem; }
     .person-info { min-height: 70px; padding: 11px 8px; }
     .person-info strong { font-size: 0.86rem; }

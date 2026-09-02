@@ -45,24 +45,27 @@
             <a href="/contact" class="mobile-item" @click.prevent="navigate('/contact')">CONTACT US</a>
         </nav>
 
-        <a
-            href="https://lin.ee/qyMmToF"
-            class="mobile-line-floating"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="เพิ่มเพื่อน LINE @idealglobe"
-        >
-            <img
-                src="https://scdn.line-apps.com/n/line_add_friends/btn/th.png"
-                alt="LINE @idealglobe"
-                height="36"
-            />
-        </a>
+        <div class="mobile-contact-floating" aria-label="ช่องทางสอบถามและสั่งซื้อ">
+            <a class="floating-phone" href="tel:0972204888" aria-label="โทร 097-220-4888">
+                <i class="fa-solid fa-phone" aria-hidden="true"></i>
+            </a>
+            <a
+                href="https://lin.ee/qyMmToF"
+                class="floating-line"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="สอบถามและสั่งซื้อผ่าน LINE @idealglobe"
+            >
+                <img :src="lineIcon" alt="" />
+                <span>สอบถามและสั่งซื้อ</span>
+            </a>
+        </div>
     </div>
 </template>
 
 <script>
 import headerLogo from '@/assets/images/branding/logo-header.png'
+import lineIcon from '@/assets/images/branding/line-icon.png'
 
 export default {
     name: 'mainHeader',
@@ -76,6 +79,7 @@ export default {
         return {
             isOpen: false,
             headerLogo,
+            lineIcon,
         }
     },
     methods: {
@@ -193,7 +197,7 @@ export default {
     color: #a0805b;
 }
 
-.mobile-line-floating {
+.mobile-contact-floating {
     display: none;
 }
 
@@ -207,31 +211,67 @@ export default {
         display: flex; /* แสดงปุ่ม Hamburger */
     }
 
-    .mobile-line-floating {
+    .mobile-contact-floating {
+        align-items: center;
         animation: line-button-enter 0.72s cubic-bezier(0.22, 1, 0.36, 1) both;
-        border-radius: 10px;
-        display: block;
+        background: rgba(225, 229, 234, 0.88);
+        border-radius: 999px;
+        bottom: 25px;
+        display: flex;
         filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.24));
-        line-height: 0;
-        overflow: visible;
+        gap: 6px;
+        left: 50%;
+        padding: 8px;
         position: fixed;
-        right: 27px;
-        bottom: 34px;
         transition: opacity 0.18s ease, transform 0.18s ease;
+        transform: translateX(-50%);
+        width: min(215px, calc(100vw - 34px));
         z-index: 999;
     }
 
-    .mobile-line-floating img {
-        border-radius: 10px;
-        display: block;
-        height: 36px;
-        width: auto;
+    .floating-phone {
+        align-items: center;
+        background: #364052;
+        border-radius: 50%;
+        color: #fff;
+        display: flex;
+        flex: 0 0 32px;
+        font-size: 0.88rem;
+        height: 32px;
+        justify-content: center;
+        text-decoration: none;
     }
 
-    .mobile-line-floating::before,
-    .mobile-line-floating::after {
-        border: 2px solid rgba(6, 199, 85, 0.72);
-        border-radius: 13px;
+    .floating-line {
+        align-items: center;
+        background: #50bd2e;
+        border-radius: 999px;
+        color: #fff;
+        display: flex;
+        flex: 1;
+        font-size: clamp(0.6rem, 2.35vw, 0.68rem);
+        font-weight: 700;
+        gap: 6px;
+        height: 30px;
+        justify-content: center;
+        min-width: 0;
+        padding: 0 8px;
+        position: relative;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    .floating-line img {
+        filter: brightness(0) invert(1);
+        height: 15px;
+        object-fit: contain;
+        width: 18px;
+    }
+
+    .mobile-contact-floating::before,
+    .mobile-contact-floating::after {
+        border: 2px solid rgba(128, 135, 145, 0.62);
+        border-radius: 999px;
         content: '';
         inset: -3px;
         opacity: 0;
@@ -241,11 +281,12 @@ export default {
         animation: line-button-aura 2.2s ease-out 0.9s infinite;
     }
 
-    .mobile-line-floating::after {
+    .mobile-contact-floating::after {
         animation-delay: 2s;
     }
 
-    .mobile-line-floating:active {
+    .floating-phone:active,
+    .floating-line:active {
         opacity: 0.86;
         transform: scale(0.96);
     }
@@ -253,11 +294,11 @@ export default {
     @keyframes line-button-enter {
         from {
             opacity: 0;
-            transform: translateX(48px) scale(0.88);
+            transform: translate(-50%, 42px) scale(0.88);
         }
         to {
             opacity: 1;
-            transform: translateX(0) scale(1);
+            transform: translateX(-50%) scale(1);
         }
     }
 

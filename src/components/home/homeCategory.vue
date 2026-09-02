@@ -204,8 +204,9 @@ export default {
 }
 
 .category-image {
+    aspect-ratio: 1 / 1;
     background: #fff;
-    height: 210px;
+    height: auto;
     overflow: hidden;
     padding: 20px 10px 10px;
     width: 100%;
@@ -327,7 +328,7 @@ export default {
     }
 
     .category-image {
-        height: 136px;
+        height: auto;
         padding: 12px 6px 6px;
     }
 
