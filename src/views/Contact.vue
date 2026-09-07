@@ -12,43 +12,49 @@
 
         <section class="sales-section" aria-labelledby="sales-heading">
             <h2 id="sales-heading">ทีมงานฝ่ายขาย</h2>
-            <p class="flip-hint">กดที่การ์ดเพื่อดู QR Code</p>
+            <p class="flip-hint">
+                <span class="desktop-flip-hint">วางเมาส์บนรูปเพื่อดู QR Code</span>
+                <span class="mobile-line-hint">กดที่รูปเพื่อเพิ่มเพื่อนทาง Line</span>
+            </p>
 
             <div class="sales-grid">
-                <button
-                    v-for="(person, index) in salesTeam"
+                <article
+                    v-for="person in salesTeam"
                     :key="person.id"
-                    type="button"
                     class="sales-card"
-                    :class="{ 'is-flipped': flippedCards.includes(person.id) }"
-                    :aria-label="flippedCards.includes(person.id) ? `กลับไปดูข้อมูล ${person.name}` : `ดู QR Code ของ ${person.name}`"
-                    @click="toggleCard(person.id)"
                 >
-                    <span class="sales-card-inner">
-                        <span class="sales-card-face sales-card-front">
-                            <img v-if="person.imageUrl" class="person-photo" :src="person.imageUrl" :alt="person.name" />
-                            <span v-else class="person-placeholder" aria-hidden="true">
-                                <i class="fa-solid fa-user"></i>
-                                <small>รูปพนักงาน</small>
+                    <a
+                        class="sales-image-link"
+                        :href="lineAddUrl(person)"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        :aria-label="`เพิ่มเพื่อน Line ${person.name}`"
+                        @click="handleSalesImageClick($event, person)"
+                    >
+                        <span class="sales-image-inner">
+                            <span class="sales-image-face sales-image-front">
+                                <img v-if="person.imageUrl" class="person-photo" :src="person.imageUrl" :alt="person.name" />
+                                <span v-else class="person-placeholder" aria-hidden="true">
+                                    <i class="fa-solid fa-user"></i>
+                                    <small>รูปพนักงาน</small>
+                                </span>
                             </span>
-                            <span class="person-info">
-                                <strong>{{ person.name }}</strong>
-                                <small v-if="person.position && person.position !== 'ฝ่ายขาย'">{{ person.position }}</small>
-                                <small>{{ displayLine(person) }}</small>
+                            <span class="sales-image-face sales-image-back">
+                                <img v-if="person.qrCodeUrl" class="qr-image" :src="person.qrCodeUrl" :alt="`QR Code ${person.name}`" />
+                                <span v-else class="qr-placeholder" aria-hidden="true">
+                                    <i class="fa-solid fa-qrcode"></i>
+                                    <small>QR Code</small>
+                                </span>
                             </span>
                         </span>
+                    </a>
 
-                        <span class="sales-card-face sales-card-back">
-                            <img v-if="person.qrCodeUrl" class="qr-image" :src="person.qrCodeUrl" :alt="`QR Code ${person.name}`" />
-                            <span v-else class="qr-placeholder" aria-hidden="true">
-                                <i class="fa-solid fa-qrcode"></i>
-                                <small>QR Code</small>
-                            </span>
-                            <strong>{{ person.phone }}</strong>
-                            <small>{{ displayLine(person) }}</small>
-                        </span>
+                    <span class="person-info">
+                        <strong>{{ person.name }}</strong>
+                        <small v-if="person.position && person.position !== 'ฝ่ายขาย'">{{ person.position }}</small>
+                        <small>{{ displayLine(person) }}</small>
                     </span>
-                </button>
+                </article>
             </div>
         </section>
 
@@ -125,7 +131,6 @@ export default {
         return {
             contactBackground,
             footerLogo,
-            flippedCards: [],
         }
     },
     computed: {
@@ -141,10 +146,14 @@ export default {
         displayLine(person) {
             return person.lineId ? `Line ID: ${person.lineId}` : 'Line ID: -'
         },
-        toggleCard(id) {
-            const index = this.flippedCards.indexOf(id)
-            if (index === -1) this.flippedCards.push(id)
-            else this.flippedCards.splice(index, 1)
+        lineAddUrl(person) {
+            const lineId = String(person.lineId || '').trim()
+            if (!lineId) return '#'
+            if (/^https?:\/\//i.test(lineId)) return lineId
+            return `https://line.me/R/ti/p/${encodeURIComponent(lineId)}`
+        },
+        handleSalesImageClick(event, person) {
+            if (!person.lineId) event.preventDefault()
         },
     },
 }
@@ -166,35 +175,32 @@ export default {
 .sales-section { margin: 0 auto; padding: 60px 0 72px; width: min(1180px, 90vw); }
 .sales-section > h2 { color: #205266; font-size: 1.45rem; margin: 0; text-align: center; }
 .flip-hint { color: #8a9299; font-size: 0.82rem; margin: 5px 0 30px; text-align: center; }
+.mobile-line-hint { display: none; }
 .sales-grid { display: grid; gap: 34px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
-.sales-card { aspect-ratio: 140 / 215; background: transparent; border: 0; cursor: pointer; height: auto; padding: 0; perspective: 1100px; }
-.sales-card-inner { display: block; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1); width: 100%; }
-.sales-card.is-flipped .sales-card-inner { transform: rotateY(180deg); }
-.sales-card-face {
+.sales-card { background: #fff; border: 1px solid #e4e1db; border-radius: 18px; box-shadow: 0 5px 16px rgba(35, 39, 45, 0.14); overflow: hidden; }
+.sales-image-link { aspect-ratio: 140 / 170; display: block; perspective: 1100px; text-decoration: none; width: 100%; }
+.sales-image-inner { display: block; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1); width: 100%; }
+.sales-image-face {
     backface-visibility: hidden;
-    background: #fff;
-    border: 1px solid #e4e1db;
-    border-radius: 18px;
-    box-shadow: 0 5px 16px rgba(35, 39, 45, 0.14);
     display: flex;
-    flex-direction: column;
     inset: 0;
     overflow: hidden;
     position: absolute;
 }
-.person-placeholder { align-items: center; aspect-ratio: 140 / 170; background: linear-gradient(150deg, #fff 0%, #f3dfb5 68%, #14636d 68%); color: #a0805b; display: flex; flex: 0 0 auto; flex-direction: column; justify-content: center; width: 100%; }
+.sales-image-back { align-items: center; background: linear-gradient(145deg, #fff 10%, #f1dfb9 100%); justify-content: center; transform: rotateY(180deg); }
+.person-placeholder { align-items: center; background: linear-gradient(150deg, #fff 0%, #f3dfb5 68%, #14636d 68%); color: #a0805b; display: flex; flex-direction: column; height: 100%; justify-content: center; width: 100%; }
 .person-placeholder i { font-size: 6rem; }
-.person-photo { aspect-ratio: 140 / 170; display: block; flex: 0 0 auto; object-fit: cover; width: 100%; }
+.person-photo { display: block; height: 100%; object-fit: cover; width: 100%; }
 .person-placeholder small { margin-top: 12px; }
 .person-info { display: flex; flex-direction: column; min-height: 78px; padding: 15px; }
 .person-info strong { font-size: 1rem; }
 .person-info small { color: #5f6870; }
-.sales-card-back { align-items: center; background: linear-gradient(145deg, #fff 10%, #f1dfb9 100%); justify-content: center; transform: rotateY(180deg); }
-.qr-placeholder { align-items: center; border: 2px dashed #a0805b; border-radius: 10px; color: #a0805b; display: flex; flex-direction: column; height: 155px; justify-content: center; margin-bottom: 18px; width: 155px; }
+.qr-placeholder { align-items: center; border: 2px dashed #a0805b; border-radius: 10px; color: #a0805b; display: flex; flex-direction: column; height: 155px; justify-content: center; width: 155px; }
 .qr-placeholder i { font-size: 5rem; }
-.qr-image { background:#fff; border-radius:10px; height:155px; margin-bottom:18px; object-fit:contain; padding:6px; width:155px; }
-.sales-card-back > strong { font-size: 1.05rem; }
-.sales-card-back > small { color: #59636d; }
+.qr-image { background:#fff; border-radius:10px; height:72%; object-fit:contain; padding:6px; width:72%; }
+@media (hover: hover) and (min-width: 601px) {
+    .sales-image-link:hover .sales-image-inner { transform: rotateY(180deg); }
+}
 .contact-details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0 auto; max-width: 1180px; width: 90vw; }
 .office-details { border-bottom: 1px solid #d3bd97; border-top: 1px solid #d3bd97; padding: 28px 30px 22px; }
 .detail-block + .detail-block { margin-top: 24px; }
@@ -236,7 +242,10 @@ export default {
     .contact-hero-content img { width: 92px; }
     .sales-section { padding: 46px 0 54px; }
     .sales-grid { gap: 18px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .sales-card { aspect-ratio: 140 / 215; height: auto; }
+    .desktop-flip-hint { display: none; }
+    .mobile-line-hint { display: inline; }
+    .sales-image-inner { transform: none !important; }
+    .sales-image-back { display: none; }
     .person-placeholder i { font-size: 4rem; }
     .person-info { min-height: 70px; padding: 11px 8px; }
     .person-info strong { font-size: 0.86rem; }
