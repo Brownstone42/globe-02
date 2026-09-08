@@ -10,7 +10,6 @@
             >
                 <div
                     class="clients-track"
-                    :class="{ 'is-reverse': rowIndex === 1 }"
                     :style="{ '--slide-duration': '32s' }"
                 >
                     <div class="clients-logo-set">
@@ -102,10 +101,6 @@ export default {
     will-change: transform;
 }
 
-.clients-track.is-reverse {
-    animation-direction: reverse;
-}
-
 .clients-logo-set {
     display: flex;
     flex: 0 0 auto;
@@ -118,7 +113,7 @@ export default {
     flex: 0 0 calc(var(--clients-width) / 4);
     height: 88px;
     justify-content: center;
-    padding: 12px clamp(14px, 2vw, 30px);
+    padding: 8px 12px;
 }
 
 .client-logo-item img {
@@ -154,7 +149,7 @@ export default {
 
     .client-logo-item {
         height: 58px;
-        padding: 8px 7px;
+        padding: 6px 3px;
     }
 }
 </style>

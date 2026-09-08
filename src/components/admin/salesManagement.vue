@@ -13,6 +13,7 @@
                     <label><span>ตำแหน่ง</span><input v-model.trim="form.position" placeholder="Sales Representative" /></label>
                     <label><span>เบอร์โทร</span><input v-model.trim="form.phone" type="tel" placeholder="097-000-0000" /></label>
                     <label><span>Line ID</span><input v-model.trim="form.lineId" placeholder="@idealglobe" /></label>
+                    <label><span>ลิงก์สำหรับการ์ดหน้า Contact</span><input v-model.trim="form.link" type="url" placeholder="https://line.me/R/ti/p/..." /></label>
                     <label><span>อีเมล</span><input v-model.trim="form.email" type="email" placeholder="sales@idealglobe.com" /></label>
                     <label><span>ลำดับการแสดง</span><input v-model.number="form.order" type="number" min="0" /></label>
                 </div>
@@ -51,7 +52,7 @@
 import { mapStores } from 'pinia'
 import { useSalesStore } from '@/stores/salesStore'
 
-const emptyForm = () => ({ name: '', position: '', phone: '', lineId: '', email: '', order: 0, visibility: true, imageFile: null, qrCodeFile: null })
+const emptyForm = () => ({ name: '', position: '', phone: '', lineId: '', link: '', email: '', order: 0, visibility: true, imageFile: null, qrCodeFile: null })
 
 export default {
     name: 'SalesManagement',
@@ -75,7 +76,7 @@ export default {
         },
         editSales(person) {
             this.clearObjectUrls(); this.editingId = person.id
-            this.form = { name: person.name || '', position: person.position || '', phone: person.phone || '', lineId: person.lineId || '', email: person.email || '', order: person.order || 0, visibility: person.visibility !== false, imageFile: null, qrCodeFile: null }
+            this.form = { name: person.name || '', position: person.position || '', phone: person.phone || '', lineId: person.lineId || '', link: person.link || '', email: person.email || '', order: person.order || 0, visibility: person.visibility !== false, imageFile: null, qrCodeFile: null }
             this.imagePreview = person.imageUrl || ''; this.qrPreview = person.qrCodeUrl || ''
         },
         async saveSales() {

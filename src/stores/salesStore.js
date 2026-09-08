@@ -46,7 +46,7 @@ export const useSalesStore = defineStore('sales', {
                 ])
                 const data = {
                     name: payload.name || '', position: payload.position || '', phone: payload.phone || '',
-                    lineId: payload.lineId || '', email: payload.email || '', order: Number(payload.order) || 0,
+                    lineId: payload.lineId || '', link: payload.link || '', email: payload.email || '', order: Number(payload.order) || 0,
                     visibility: payload.visibility ?? true, image: image?.path || '', qrCode: qrCode?.path || '',
                     createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
                 }
@@ -65,7 +65,7 @@ export const useSalesStore = defineStore('sales', {
                 ])
                 const data = {
                     name: payload.name || '', position: payload.position || '', phone: payload.phone || '',
-                    lineId: payload.lineId || '', email: payload.email || '', order: Number(payload.order) || 0,
+                    lineId: payload.lineId || '', link: payload.link || '', email: payload.email || '', order: Number(payload.order) || 0,
                     visibility: payload.visibility ?? true, image: image?.path || current.image || '',
                     qrCode: qrCode?.path || current.qrCode || '', updatedAt: serverTimestamp(),
                 }

@@ -147,13 +147,15 @@ export default {
             return person.lineId ? `Line ID: ${person.lineId}` : 'Line ID: -'
         },
         lineAddUrl(person) {
+            const savedLink = String(person.link || '').trim()
+            if (savedLink) return savedLink
             const lineId = String(person.lineId || '').trim()
             if (!lineId) return '#'
             if (/^https?:\/\//i.test(lineId)) return lineId
             return `https://line.me/R/ti/p/${encodeURIComponent(lineId)}`
         },
         handleSalesImageClick(event, person) {
-            if (!person.lineId) event.preventDefault()
+            if (!person.link && !person.lineId) event.preventDefault()
         },
     },
 }
