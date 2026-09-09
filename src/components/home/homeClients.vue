@@ -68,7 +68,7 @@ export default {
 
 <style scoped>
 .clients-section {
-    --clients-width: min(1180px, 92vw);
+    --clients-width: min(1120px, 80vw);
     background: #fff;
     overflow: hidden;
     padding: 66px 0 76px;
@@ -85,20 +85,25 @@ export default {
 .clients-rows {
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 6px;
+    margin: 0 auto;
+    padding: 10px 0;
+    width: var(--clients-width);
+    border: 1px solid #eee9e3;
+    border-radius: 12px;
 }
 
 .clients-viewport {
-    margin: 0 auto;
     overflow: hidden;
-    width: var(--clients-width);
+    width: 100%;
 }
 
 .clients-track {
     animation: clients-slide var(--slide-duration) linear infinite;
+    -webkit-animation: clients-slide var(--slide-duration) linear infinite;
     display: flex;
     width: max-content;
-    will-change: transform;
+    transform: translateX(0);
 }
 
 .clients-logo-set {
@@ -111,12 +116,14 @@ export default {
     box-sizing: border-box;
     display: flex;
     flex: 0 0 calc(var(--clients-width) / 4);
-    height: 88px;
+    height: 78px;
     justify-content: center;
-    padding: 8px 12px;
+    padding: 5px 8px;
 }
 
 .client-logo-item img {
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
     display: block;
     height: 100%;
     max-width: 100%;
@@ -124,13 +131,21 @@ export default {
     width: 100%;
 }
 
-.clients-viewport:hover .clients-track {
-    animation-play-state: paused;
+@media (hover: hover) and (pointer: fine) {
+    .clients-viewport:hover .clients-track {
+        animation-play-state: paused;
+        -webkit-animation-play-state: paused;
+    }
 }
 
 @keyframes clients-slide {
-    from { transform: translate3d(0, 0, 0); }
-    to { transform: translate3d(-50%, 0, 0); }
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+@-webkit-keyframes clients-slide {
+    from { -webkit-transform: translateX(0); }
+    to { -webkit-transform: translateX(-50%); }
 }
 
 @media (max-width: 600px) {
@@ -145,6 +160,9 @@ export default {
 
     .clients-rows {
         gap: 10px;
+        border: 0;
+        border-radius: 0;
+        padding: 0;
     }
 
     .client-logo-item {

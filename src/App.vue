@@ -19,6 +19,17 @@ export default {
         appMainHeader,
         homeFooter,
     },
+    mounted() {
+        document.addEventListener('contextmenu', this.preventContextMenu)
+    },
+    beforeUnmount() {
+        document.removeEventListener('contextmenu', this.preventContextMenu)
+    },
+    methods: {
+        preventContextMenu(event) {
+            event.preventDefault()
+        },
+    },
 }
 </script>
 
