@@ -10,7 +10,11 @@
             >
                 <div
                     class="clients-track"
-                    :style="{ '--slide-duration': '32s' }"
+                    :style="{
+                        '--slide-duration': '32s',
+                        '--logo-count': row.length,
+                        '--track-width': `${row.length * 50}%`,
+                    }"
                 >
                     <div class="clients-logo-set">
                         <div v-for="logo in row" :key="`original-${logo.src}`" class="client-logo-item">
@@ -102,20 +106,23 @@ export default {
     animation: clients-slide var(--slide-duration) linear infinite;
     -webkit-animation: clients-slide var(--slide-duration) linear infinite;
     display: flex;
-    width: max-content;
+    flex: 0 0 auto;
+    width: var(--track-width);
     transform: translateX(0);
 }
 
 .clients-logo-set {
     display: flex;
-    flex: 0 0 auto;
+    flex: 0 0 50%;
+    min-width: 0;
+    width: 50%;
 }
 
 .client-logo-item {
     align-items: center;
     box-sizing: border-box;
     display: flex;
-    flex: 0 0 calc(var(--clients-width) / 4);
+    flex: 0 0 calc(100% / var(--logo-count));
     height: 78px;
     justify-content: center;
     padding: 5px 8px;
