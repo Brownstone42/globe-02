@@ -5,7 +5,13 @@
             class="iso-strip"
             aria-label="มาตรฐานความปลอดภัยข้อมูล ISO 27001"
         >
-            <img :src="isoBanner" alt="มาตรฐานความปลอดภัยข้อมูล ISO 27001" />
+            <div class="iso-strip-inner">
+                <img :src="isoBanner" alt="ISO 27001 Certified" />
+                <div class="iso-strip-copy">
+                    <strong>มาตรฐานความปลอดภัยข้อมูล</strong>
+                    <span>ข้อมูลบริษัทและรายละเอียดทางเทคนิคของคุณจะถูกเก็บเป็นความลับภายใต้มาตรฐาน ISO 27001</span>
+                </div>
+            </div>
         </section>
 
         <section class="standards-strip" aria-labelledby="standards-strip-title">
@@ -163,7 +169,7 @@ import standard02 from '@/assets/images/standards/02.png'
 import standard03 from '@/assets/images/standards/03.png'
 import standard04 from '@/assets/images/standards/04.png'
 import standard05 from '@/assets/images/standards/05.png'
-import isoBanner from '@/assets/images/standards/iso01.png'
+import isoBanner from '@/assets/images/standards/iso.png'
 
 export default {
     name: 'homeFooter',
@@ -207,18 +213,49 @@ export default {
 .iso-strip {
     align-items: center;
     background: #1f6eb5;
+    box-sizing: border-box;
     display: flex;
+    height: 88px;
     justify-content: center;
-    padding: 12px 5vw;
+    padding: 8px 5vw;
 }
 
-.iso-strip img {
-    display: block;
-    height: auto;
-    max-height: 64px;
+.iso-strip-inner {
+    align-items: center;
+    display: flex;
+    gap: 18px;
+    justify-content: center;
     max-width: 1000px;
+    width: fit-content;
+}
+
+.iso-strip-inner img {
+    clip-path: inset(0 6% 0 0);
+    display: block;
+    flex: 0 0 68px;
+    height: 68px;
     object-fit: contain;
-    width: auto;
+    width: 68px;
+}
+
+.iso-strip-copy {
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.22;
+    min-width: 0;
+}
+
+.iso-strip-copy strong {
+    color: #fff !important;
+    font-size: clamp(1.15rem, 1.65vw, 1.5rem);
+    font-weight: 700;
+}
+
+.iso-strip-copy span {
+    color: #fff !important;
+    font-size: clamp(0.82rem, 1.15vw, 1rem);
+    margin-top: 3px;
 }
 
 .standards-strip {
@@ -587,12 +624,27 @@ export default {
 
 @media (max-width: 600px) {
     .iso-strip {
-        padding: 10px 3vw;
+        height: 88px;
+        padding: 7px 4vw;
     }
 
-    .iso-strip img {
-        max-height: 54px;
-        max-width: 94vw;
+    .iso-strip-inner {
+        gap: 10px;
+    }
+
+    .iso-strip-inner img {
+        flex-basis: 58px;
+        height: 58px;
+        width: 58px;
+    }
+
+    .iso-strip-copy strong {
+        font-size: clamp(0.92rem, 4.2vw, 1.05rem);
+    }
+
+    .iso-strip-copy span {
+        font-size: clamp(0.62rem, 2.7vw, 0.75rem);
+        line-height: 1.18;
     }
 
     .standards-strip-inner {

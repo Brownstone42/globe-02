@@ -200,7 +200,7 @@ export default {
 .person-placeholder small { margin-top: 12px; }
 .person-info {
     align-items: center;
-    background: linear-gradient(180deg, #fff 0%, #fff 40%, #d7d7d7 100%);
+    background: #fff;
     display: flex;
     flex-direction: column;
     justify-content: center;
