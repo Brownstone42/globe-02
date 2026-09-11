@@ -15,7 +15,7 @@
                 <div class="is-flex is-align-items-center sub-header-group">
                     <label class="sub-header-label">
                         <!--<i class="fas fa-mobile-alt sub-header-icon"></i>-->
-                        Sales : 091-010-8349, 097-294-7975
+                        Sales : 097-220-4888
                     </label>
                     <label class="sub-header-label">
                         <!--<i class="fas fa-phone sub-header-icon"></i>-->
@@ -36,8 +36,7 @@
             <div v-if="isMobile" class="scrolling-content">
                 <div class="is-flex is-align-items-center sub-header-group">
                     <label class="sub-header-label">
-                        <i class="fas fa-mobile-alt sub-header-icon"></i> Sales : 091-010-8349,
-                        097-294-7975
+                        <i class="fas fa-mobile-alt sub-header-icon"></i> Sales : 097-220-4888
                     </label>
                     <label class="sub-header-label">
                         <i class="fas fa-phone sub-header-icon"></i> Office : 02-860-1525
@@ -55,8 +54,7 @@
 
                 <div class="is-flex is-align-items-center sub-header-group">
                     <label class="sub-header-label">
-                        <i class="fas fa-mobile-alt sub-header-icon"></i> Sales : 091-010-8349,
-                        097-294-7975
+                        <i class="fas fa-mobile-alt sub-header-icon"></i> Sales : 097-220-4888
                     </label>
                     <label class="sub-header-label">
                         <i class="fas fa-phone sub-header-icon"></i> Office : 02-860-1525

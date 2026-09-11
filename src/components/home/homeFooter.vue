@@ -1,6 +1,10 @@
 <template>
     <footer class="site-footer">
-        <section class="iso-strip" aria-label="มาตรฐานความปลอดภัยข้อมูล ISO 27001">
+        <section
+            v-if="$route.name === 'quotation'"
+            class="iso-strip"
+            aria-label="มาตรฐานความปลอดภัยข้อมูล ISO 27001"
+        >
             <img :src="isoBanner" alt="มาตรฐานความปลอดภัยข้อมูล ISO 27001" />
         </section>
 
@@ -211,8 +215,10 @@ export default {
 .iso-strip img {
     display: block;
     height: auto;
+    max-height: 64px;
     max-width: 1000px;
-    width: min(100%, 1000px);
+    object-fit: contain;
+    width: auto;
 }
 
 .standards-strip {
@@ -582,6 +588,11 @@ export default {
 @media (max-width: 600px) {
     .iso-strip {
         padding: 10px 3vw;
+    }
+
+    .iso-strip img {
+        max-height: 54px;
+        max-width: 94vw;
     }
 
     .standards-strip-inner {

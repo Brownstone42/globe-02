@@ -15,20 +15,19 @@
                 :key="item.id"
                 v-category-reveal
                 class="category-card"
+                :class="{ 'is-clickable': item.slug }"
+                :role="item.slug ? 'link' : undefined"
+                :tabindex="item.slug ? 0 : undefined"
+                :aria-label="item.slug ? `ดูสินค้าในหมวดหมู่ ${item.name || ''}` : undefined"
                 :style="{
                     '--category-desktop-delay': `${(index % 4) * 85}ms`,
                     '--category-mobile-delay': `${(index % 2) * 110}ms`,
                 }"
+                @click="openCategory(item)"
+                @keydown.enter.prevent="openCategory(item)"
+                @keydown.space.prevent="openCategory(item)"
             >
-                <div
-                    class="category-image"
-                    :class="{ 'is-clickable': item.slug }"
-                    :role="item.slug ? 'link' : undefined"
-                    :tabindex="item.slug ? 0 : undefined"
-                    :aria-label="item.slug ? `ดูสินค้าในหมวดหมู่ ${item.name || ''}` : undefined"
-                    @click="openCategory(item)"
-                    @keydown.enter.prevent="openCategory(item)"
-                >
+                <div class="category-image">
                     <img v-if="item.imageUrl" :src="item.imageUrl" :alt="item.name || ''" />
                     <div v-else class="image-placeholder" aria-hidden="true"></div>
                 </div>
@@ -47,6 +46,7 @@
                             params: { category: item.slug },
                         }"
                         :aria-label="`ดูสินค้าในหมวดหมู่ ${item.name || ''}`"
+                        @click.stop
                     >
                         <i class="fa-solid fa-arrow-right"></i>
                     </RouterLink>
@@ -203,6 +203,15 @@ export default {
     transform: translateY(0) scale(1);
 }
 
+.category-card.is-clickable {
+    cursor: pointer;
+}
+
+.category-card.is-clickable:focus-visible {
+    outline: 3px solid rgba(163, 140, 103, 0.45);
+    outline-offset: 3px;
+}
+
 .category-image {
     aspect-ratio: 1 / 1;
     background: #fff;
@@ -211,8 +220,6 @@ export default {
     padding: 20px 10px 10px;
     width: 100%;
 }
-
-.category-image.is-clickable { cursor: pointer; }
 
 .category-image img {
     display: block;

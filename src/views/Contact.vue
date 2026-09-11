@@ -66,6 +66,11 @@
                 </div>
 
                 <div class="detail-block">
+                    <h2>ติดต่อแผนกฝ่ายขาย</h2>
+                    <p><strong>Call :</strong> <a href="tel:0972204888">097-220-4888</a></p>
+                </div>
+
+                <div class="detail-block">
                     <h2>ติดต่อฝ่ายบัญชี</h2>
                     <p><strong>Call :</strong> <a href="tel:028601525">02-860-1525</a> ต่อ 306</p>
                     <p><strong>Email :</strong> <a href="mailto:idealglobe.account@gmail.com">idealglobe.account@gmail.com</a></p>

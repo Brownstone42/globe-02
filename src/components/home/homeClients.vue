@@ -93,8 +93,8 @@ export default {
     margin: 0 auto;
     padding: 10px 0;
     width: var(--clients-width);
-    border: 1px solid #eee9e3;
-    border-radius: 12px;
+    border: 0;
+    border-radius: 0;
 }
 
 .clients-viewport {

@@ -28,9 +28,9 @@
                     <RouterLink class="hero-btn product-btn" to="/product">
                         ดูสินค้าทั้งหมด
                     </RouterLink>
-                    <button class="hero-btn quote-btn" type="button" @click="scrollToContact">
+                    <RouterLink class="hero-btn quote-btn" :to="{ name: 'quotation' }">
                         ขอใบเสนอราคา
-                    </button>
+                    </RouterLink>
                     <a
                         class="hero-btn contact-btn"
                         href="https://line.me/R/ti/p/%40idealglobe"
@@ -68,11 +68,6 @@ export default {
     },
     mounted() {
         this.bannerStore.loadBanner()
-    },
-    methods: {
-        scrollToContact() {
-            document.getElementById('contact-section')?.scrollIntoView({ behavior: 'smooth' })
-        },
     },
 }
 </script>
