@@ -1,5 +1,9 @@
 <template>
     <footer class="site-footer">
+        <section class="iso-strip" aria-label="มาตรฐานความปลอดภัยข้อมูล ISO 27001">
+            <img :src="isoBanner" alt="มาตรฐานความปลอดภัยข้อมูล ISO 27001" />
+        </section>
+
         <section class="standards-strip" aria-labelledby="standards-strip-title">
             <div class="standards-strip-inner">
                 <div class="standards-strip-copy">
@@ -121,6 +125,19 @@
                     </div>
                 </section>
             </div>
+
+            <a
+                class="dbd-registered"
+                href="https://dbdregistered.dbd.go.th/api/public/shopinfoReg?param=F08A2552C359176C090BD9BA8F884DC92E7B4B3BBC9FC1F02C831B843204E3EA"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="ตรวจสอบข้อมูล DBD Registered ของ Ideal Globe"
+            >
+                <img
+                    src="https://dbdregistered.dbd.go.th/api/public/bannerreg?param=F08A2552C359176C090BD9BA8F884DC92E7B4B3BBC9FC1F02C831B843204E3EA"
+                    alt="DBD Registered"
+                />
+            </a>
         </div>
 
         <button class="back-to-top" type="button" aria-label="กลับขึ้นด้านบน" @click="scrollToTop">
@@ -142,6 +159,7 @@ import standard02 from '@/assets/images/standards/02.png'
 import standard03 from '@/assets/images/standards/03.png'
 import standard04 from '@/assets/images/standards/04.png'
 import standard05 from '@/assets/images/standards/05.png'
+import isoBanner from '@/assets/images/standards/iso01.png'
 
 export default {
     name: 'homeFooter',
@@ -149,6 +167,7 @@ export default {
         return {
             footerLogo,
             lineQr,
+            isoBanner,
             standardLogos: [standard01, standard02, standard03, standard04, standard05],
         }
     },
@@ -179,6 +198,21 @@ export default {
     background: #23272d;
     color: #f4f4f4;
     position: relative;
+}
+
+.iso-strip {
+    align-items: center;
+    background: #1f6eb5;
+    display: flex;
+    justify-content: center;
+    padding: 12px 5vw;
+}
+
+.iso-strip img {
+    display: block;
+    height: auto;
+    max-width: 1000px;
+    width: min(100%, 1000px);
 }
 
 .standards-strip {
@@ -237,7 +271,7 @@ export default {
 
 .footer-inner {
     margin: 0 auto;
-    padding: 48px 0 66px;
+    padding: 64px 0 24px;
     width: min(1380px, 90vw);
 }
 
@@ -491,6 +525,22 @@ export default {
 .social-row span:nth-child(3):hover { background: #ff0000; }
 .social-row span:nth-child(4):hover { background: #52687a; }
 
+.dbd-registered {
+    align-items: center;
+    display: flex;
+    margin-top: 28px;
+    width: fit-content;
+    text-decoration: none;
+}
+
+.dbd-registered img {
+    display: block;
+    height: auto;
+    max-height: 58px;
+    max-width: 128px;
+    object-fit: contain;
+}
+
 .back-to-top {
     align-items: center;
     background: #80796e;
@@ -530,6 +580,10 @@ export default {
 }
 
 @media (max-width: 600px) {
+    .iso-strip {
+        padding: 10px 3vw;
+    }
+
     .standards-strip-inner {
         display: block;
         padding: 16px 0;
@@ -549,7 +603,7 @@ export default {
     .standard-logo-item { height: 34px; }
 
     .footer-inner {
-        padding: 42px 0 70px;
+        padding: 64px 0 24px;
         width: min(86vw, 460px);
     }
 
@@ -616,6 +670,15 @@ export default {
         height: 48px;
         right: 14px;
         width: 48px;
+    }
+
+    .dbd-registered {
+        margin: 28px auto 0;
+    }
+
+    .dbd-registered img {
+        max-height: 48px;
+        max-width: 108px;
     }
 
     .footer-credit {

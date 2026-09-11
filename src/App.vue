@@ -40,6 +40,19 @@ export default {
     font-family: 'Sukhumvit-Text', 'Helvetica';
     background-color: #f8f8f8;
 }
+
+input::placeholder,
+textarea::placeholder {
+    color: #aeb5bc;
+    opacity: 1;
+}
+
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
+    color: #aeb5bc;
+    opacity: 1;
+}
+
 @font-face {
     font-family: 'Sukhumvit-Text';
     src: url('./fonts/SukhumvitSet-Text.ttf') format('opentype');

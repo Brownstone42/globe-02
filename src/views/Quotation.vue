@@ -165,7 +165,7 @@ export default {
 
 <style scoped>
 .quotation-aside .trust-card {
-    background: #02b54f !important;
+    background: #d6efc7 !important;
     border-color: #02b54f;
 }
 
@@ -173,7 +173,7 @@ export default {
 .quotation-aside .trust-card h2 i,
 .quotation-aside .trust-card p,
 .quotation-aside .trust-card p i {
-    color: #d6efc7 !important;
+    color: #02b54f !important;
 }
 
 .quotation-aside h2 {
