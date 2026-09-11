@@ -51,7 +51,6 @@
 
                     <span class="person-info">
                         <strong>{{ person.name }}</strong>
-                        <small v-if="person.position && person.position !== 'ฝ่ายขาย'">{{ person.position }}</small>
                         <small>{{ displayLine(person) }}</small>
                     </span>
                 </article>
@@ -144,7 +143,7 @@ export default {
     },
     methods: {
         displayLine(person) {
-            return person.lineId ? `Line ID: ${person.lineId}` : 'Line ID: -'
+            return person.lineId ? `Line ID : ${person.lineId}` : 'Line ID : -'
         },
         lineAddUrl(person) {
             const savedLink = String(person.link || '').trim()
@@ -189,17 +188,26 @@ export default {
     overflow: hidden;
     position: absolute;
 }
-.sales-image-back { align-items: center; background: linear-gradient(145deg, #fff 10%, #f1dfb9 100%); justify-content: center; transform: rotateY(180deg); }
+.sales-image-back { align-items: center; background: #ead9c7; justify-content: center; transform: rotateY(180deg); }
 .person-placeholder { align-items: center; background: linear-gradient(150deg, #fff 0%, #f3dfb5 68%, #14636d 68%); color: #a0805b; display: flex; flex-direction: column; height: 100%; justify-content: center; width: 100%; }
 .person-placeholder i { font-size: 6rem; }
 .person-photo { display: block; height: 100%; object-fit: cover; width: 100%; }
 .person-placeholder small { margin-top: 12px; }
-.person-info { display: flex; flex-direction: column; min-height: 78px; padding: 15px; }
-.person-info strong { font-size: 1rem; }
-.person-info small { color: #5f6870; }
+.person-info {
+    align-items: center;
+    background: linear-gradient(180deg, #fff 0%, #fff 40%, #d7d7d7 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 105px;
+    padding: 14px 12px 18px;
+    text-align: center;
+}
+.person-info strong { color: #a0805b; font-size: 1.45rem; font-weight: 700; line-height: 1.2; }
+.person-info small { color: #23272d; font-size: 1rem; line-height: 1.35; margin-top: 8px; }
 .qr-placeholder { align-items: center; border: 2px dashed #a0805b; border-radius: 10px; color: #a0805b; display: flex; flex-direction: column; height: 155px; justify-content: center; width: 155px; }
 .qr-placeholder i { font-size: 5rem; }
-.qr-image { background:#fff; border-radius:10px; height:72%; object-fit:contain; padding:6px; width:72%; }
+.qr-image { background: transparent; border-radius: 0; height: 72%; mix-blend-mode: multiply; object-fit: contain; padding: 0; width: 72%; }
 @media (hover: hover) and (min-width: 601px) {
     .sales-image-link:hover .sales-image-inner { transform: rotateY(180deg); }
 }
@@ -249,9 +257,9 @@ export default {
     .sales-image-inner { transform: none !important; }
     .sales-image-back { display: none; }
     .person-placeholder i { font-size: 4rem; }
-    .person-info { min-height: 70px; padding: 11px 8px; }
-    .person-info strong { font-size: 0.86rem; }
-    .person-info small { font-size: 0.7rem; }
+    .person-info { min-height: 82px; padding: 10px 7px 13px; }
+    .person-info strong { font-size: 1rem; }
+    .person-info small { font-size: 0.75rem; margin-top: 5px; }
     .qr-placeholder { height: 105px; width: 105px; }
     .qr-image { height:105px; width:105px; }
     .qr-placeholder i { font-size: 3.4rem; }
