@@ -5,7 +5,16 @@
         <div class="column is-6">
             <div class="image-wrapper">
                 <!-- รูปใหญ่ -->
-                <div class="image-main">
+                <div
+                    class="image-main"
+                    :class="{ 'is-previewable': currentImage }"
+                    :role="currentImage ? 'button' : undefined"
+                    :tabindex="currentImage ? 0 : undefined"
+                    aria-label="เปิดดูรูปสินค้าขนาดใหญ่"
+                    @click="openImagePreview"
+                    @keydown.enter.prevent="openImagePreview"
+                    @keydown.space.prevent="openImagePreview"
+                >
                     <figure class="image">
                         <img :src="currentImage" :alt="product.name" />
                     </figure>
@@ -93,16 +102,40 @@
             </div>
         </div>
         </div>
+
+        <Teleport to="body">
+            <div
+                v-if="isPreviewOpen"
+                class="image-lightbox"
+                role="dialog"
+                aria-modal="true"
+                :aria-label="`รูปขนาดใหญ่ ${product.name}`"
+                @click.self="closeImagePreview"
+            >
+                <button class="lightbox-close" type="button" aria-label="ปิดรูปขนาดใหญ่" @click="closeImagePreview">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+                <div class="lightbox-media">
+                    <img class="lightbox-product-image" :src="currentImage" :alt="product.name" />
+                    <img class="lightbox-watermark" :src="watermarkLogo" alt="" aria-hidden="true" />
+                </div>
+            </div>
+        </Teleport>
     </div>
 </template>
 
 <script>
 import lineIcon from '@/assets/images/branding/line-icon.png'
+import watermarkLogo from '@/assets/images/branding/footer-logo.png'
 
 export default {
     name: 'ProductMain',
     data() {
-        return { lineIcon }
+        return {
+            lineIcon,
+            watermarkLogo,
+            isPreviewOpen: false,
+        }
     },
     props: {
         product: {
@@ -123,7 +156,25 @@ export default {
         },
     },
     emits: ['update:selected-image-index'],
+    beforeUnmount() {
+        document.removeEventListener('keydown', this.handlePreviewKeydown)
+        document.body.style.overflow = ''
+    },
     methods: {
+        openImagePreview() {
+            if (!this.currentImage) return
+            this.isPreviewOpen = true
+            document.body.style.overflow = 'hidden'
+            document.addEventListener('keydown', this.handlePreviewKeydown)
+        },
+        closeImagePreview() {
+            this.isPreviewOpen = false
+            document.body.style.overflow = ''
+            document.removeEventListener('keydown', this.handlePreviewKeydown)
+        },
+        handlePreviewKeydown(event) {
+            if (event.key === 'Escape') this.closeImagePreview()
+        },
         selectImage(index) {
             if (index < 0 || index >= this.images.length) return
             this.$emit('update:selected-image-index', index)
@@ -184,6 +235,76 @@ export default {
     max-width: 100%;
     object-fit: contain;
     width: 100%;
+}
+
+.image-main.is-previewable {
+    cursor: zoom-in;
+}
+
+.image-main.is-previewable:focus-visible {
+    outline: 3px solid rgba(163, 140, 103, 0.45);
+    outline-offset: 3px;
+}
+
+.image-lightbox {
+    align-items: center;
+    background: rgba(15, 18, 22, 0.9);
+    display: flex;
+    inset: 0;
+    justify-content: center;
+    padding: 5vh 5vw;
+    position: fixed;
+    z-index: 9999;
+}
+
+.lightbox-media {
+    align-items: center;
+    display: inline-flex;
+    justify-content: center;
+    max-height: 88vh;
+    max-width: 90vw;
+    position: relative;
+}
+
+.lightbox-product-image {
+    background: #fff;
+    display: block;
+    max-height: 88vh;
+    max-width: 90vw;
+    object-fit: contain;
+}
+
+.lightbox-watermark {
+    filter: drop-shadow(0 2px 3px rgba(20, 24, 28, 0.62));
+    height: auto;
+    left: 50%;
+    max-height: 44%;
+    max-width: 48%;
+    opacity: 0.58;
+    pointer-events: none;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    user-select: none;
+    z-index: 2;
+}
+
+.lightbox-close {
+    align-items: center;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: 50%;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    font-size: 1.25rem;
+    height: 42px;
+    justify-content: center;
+    position: fixed;
+    right: 24px;
+    top: 24px;
+    width: 42px;
+    z-index: 1;
 }
 
 .thumb-carousel {
