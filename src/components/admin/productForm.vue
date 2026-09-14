@@ -20,6 +20,16 @@
                 <label>{{ group.label }}</label>
                 <button type="button" class="btn-add" @click="addListItem(group.key)">+ เพิ่ม{{ group.label }}</button>
             </div>
+            <div class="faq-paste-area">
+                <textarea
+                    v-model="listRawInputs[group.key]"
+                    class="form-textarea"
+                    rows="3"
+                    :aria-label="`วางรายการ${group.label}`"
+                    :placeholder="`วาง${group.label}ทีละบรรทัด เช่น - ข้อความ, • ข้อความ หรือ 1. ข้อความ`"
+                ></textarea>
+                <button type="button" class="btn-parse" :disabled="!listRawInputs[group.key].trim()" @click="parseList(group.key)">Parse &amp; Add</button>
+            </div>
             <div v-for="(item, index) in form[group.key]" :key="`${group.key}-${index}`" class="list-row">
                 <input v-model="form[group.key][index]" type="text" class="form-input" :placeholder="`${group.label} ข้อที่ ${index + 1}`" />
                 <button type="button" class="btn-remove" :aria-label="`ลบ${group.label}ข้อที่ ${index + 1}`" @click="removeListItem(group.key, index)">×</button>
@@ -172,6 +182,7 @@ export default {
             },
             mainImagePreview: null,
             newGalleryPreviews: [],
+            listRawInputs: { highlights: '', properties: '', standards: '', specifications: '', suitable: '' },
             faqRawInput: '',
             hashtagInput: '',
             isEditMode: false,
@@ -220,6 +231,7 @@ export default {
                     this.form.documents = this.asEditableDocuments(newVal.documents)
                     this.form.faq = this.asEditableFaq(newVal.faq)
                     this.form.hashtags = this.asEditableHashtags(newVal.hashtags)
+                    this.resetListRawInputs()
                     this.faqRawInput = ''
                     this.hashtagInput = ''
                     this.form.brand = newVal.brand || ''
@@ -278,6 +290,18 @@ export default {
             return value
                 .map((item) => String(item || '').replace(/^#+/, '').trim())
                 .filter(Boolean)
+        },
+        resetListRawInputs() {
+            this.listGroups.forEach(({ key }) => { this.listRawInputs[key] = '' })
+        },
+        parseList(key) {
+            const items = this.listRawInputs[key]
+                .split(/\r\n|\n|\r/)
+                .map((line) => line.trim().replace(/^(?:[-•*]\s*|\d+[.)](?:\s+|$))/, '').trim())
+                .filter(Boolean)
+            if (!items.length) return
+            this.form[key] = [...this.form[key].filter((item) => item.trim()), ...items]
+            this.listRawInputs[key] = ''
         },
         addListItem(key) {
             this.form[key].push('')
@@ -392,6 +416,7 @@ export default {
             this.mainImagePreview = null
             this.newGalleryPreviews.forEach((url) => URL.revokeObjectURL(url))
             this.newGalleryPreviews = []
+            this.resetListRawInputs()
             this.faqRawInput = ''
             this.hashtagInput = ''
             this.$nextTick(() => this.clearFileInputs())
