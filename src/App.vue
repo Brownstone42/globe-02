@@ -21,13 +21,18 @@ export default {
     },
     mounted() {
         document.addEventListener('contextmenu', this.preventContextMenu)
+        document.addEventListener('dragstart', this.preventImageDrag)
     },
     beforeUnmount() {
         document.removeEventListener('contextmenu', this.preventContextMenu)
+        document.removeEventListener('dragstart', this.preventImageDrag)
     },
     methods: {
         preventContextMenu(event) {
             event.preventDefault()
+        },
+        preventImageDrag(event) {
+            if (event.target instanceof HTMLImageElement) event.preventDefault()
         },
     },
 }
@@ -39,6 +44,31 @@ export default {
     flex-direction: column;
     font-family: 'Sukhumvit-Text', 'Helvetica';
     background-color: #f8f8f8;
+}
+
+html,
+body,
+#app {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+img {
+    -webkit-touch-callout: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+input,
+textarea,
+select,
+[contenteditable='true'],
+.ql-editor {
+    -webkit-touch-callout: default;
+    -webkit-user-select: text;
+    user-select: text;
 }
 
 input::placeholder,
