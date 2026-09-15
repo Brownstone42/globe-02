@@ -134,10 +134,10 @@
                     <div v-if="bannerStore.loading" class="preview-placeholder">
                         กำลังโหลด...
                     </div>
-                    <div v-else class="banner-full-preview">
+                    <div v-else-if="editingBanner" class="banner-full-preview">
                         <img :src="previewUrl" alt="ตัวอย่างแบนเนอร์บนเดสก์ท็อป" />
                         <div class="preview-shade"></div>
-                        <div v-if="editingBanner" class="preview-overlay">
+                        <div class="preview-overlay">
                             <h4 :style="previewTextStyle(overlaySettings.title, 0.38)">{{ overlaySettings.title.text }}</h4>
                             <p :style="previewTextStyle(overlaySettings.subtitle, 0.48)">{{ overlaySettings.subtitle.text }}</p>
                             <div v-if="previewButtons.length" class="preview-actions">
@@ -155,6 +155,9 @@
                             </div>
                             <small :style="previewTextStyle(overlaySettings.ending, 0.52)">{{ overlaySettings.ending.text }}</small>
                         </div>
+                    </div>
+                    <div v-else class="preview-placeholder preview-empty">
+                        เลือก Banner จากรายการเพื่อดูตัวอย่าง
                     </div>
                 </div>
             </div>
@@ -217,9 +220,6 @@
 
 <script>
 import { useBannerStore } from '@/stores/bannerStore'
-import fallbackBanner from '@/assets/images/home/banner.png'
-
-const FALLBACK_BANNER = fallbackBanner
 
 export default {
     name: 'BannerManagement',
@@ -252,12 +252,7 @@ export default {
             return useBannerStore()
         },
         previewUrl() {
-            return (
-                this.localPreviewUrl ||
-                this.editingBanner?.imageUrl ||
-                this.bannerStore.imageUrl ||
-                FALLBACK_BANNER
-            )
+            return this.editingBanner?.imageUrl || ''
         },
         sortedBanners() {
             return [...this.bannerStore.banners].sort((a, b) => a.order - b.order)
@@ -544,6 +539,12 @@ export default {
     color: #64748b;
     display: flex;
     justify-content: center;
+}
+
+.preview-empty {
+    background: #e5e7eb !important;
+    color: #6b7280;
+    font-weight: 600;
 }
 
 .banner-full-preview { aspect-ratio: 3 / 1; border-radius: 12px; overflow: hidden; position: relative; }

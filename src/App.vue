@@ -4,7 +4,7 @@
 
     <router-view></router-view>
 
-    <home-footer></home-footer>
+    <home-footer v-if="!isAdminRoute"></home-footer>
 </template>
 
 <script>
@@ -18,6 +18,11 @@ export default {
         appSlideHeader,
         appMainHeader,
         homeFooter,
+    },
+    computed: {
+        isAdminRoute() {
+            return this.$route.path.startsWith('/admin')
+        },
     },
     mounted() {
         document.addEventListener('contextmenu', this.preventContextMenu)
