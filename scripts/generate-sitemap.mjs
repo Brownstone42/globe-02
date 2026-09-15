@@ -141,7 +141,15 @@ try {
             const slug = encodePathSegment(product.slug)
             return `/product/${category}/${id}    /product/${category}/${slug}    301!`
         })
-    const redirects = [...productRedirects, '/*    /index.html   200', ''].join('\n')
+    // Function routes must be listed before the SPA fallback. Otherwise Netlify
+    // serves index.html for /api/* and the browser receives a false 200/404 page
+    // instead of invoking the serverless function.
+    const redirects = [
+        '/api/send-quotation    /.netlify/functions/send-quotation    200!',
+        ...productRedirects,
+        '/*    /index.html   200',
+        '',
+    ].join('\n')
 
     await Promise.all([
         writeFile(outputPath, sitemap, 'utf8'),
