@@ -116,8 +116,6 @@
 
 <script>
 import { mapStores } from 'pinia'
-import { addDoc, collection, serverTimestamp, updateDoc } from 'firebase/firestore'
-import { db } from '@/firebase'
 import { useProductStore } from '@/stores/productStore'
 
 export default {
@@ -156,7 +154,6 @@ export default {
             if (!this.selectedItems.length) { this.submitError = 'กรุณาเลือกสินค้าอย่างน้อย 1 รายการ'; return }
             this.submitting = true; this.submitError = ''
             this.referenceNumber = `RFQ-${String(Date.now()).slice(-7)}`
-            let requestRef = null
             try {
                 const products = this.selectedItems.map(({ productId, product, quantity, unit }) => ({
                     productId,
@@ -165,16 +162,6 @@ export default {
                     quantity,
                     unit,
                 }))
-
-                requestRef = await addDoc(collection(db, 'quotationRequests'), {
-                    referenceNumber: this.referenceNumber,
-                    customer: { ...this.form },
-                    products,
-                    emailNotification: {
-                        status: 'pending',
-                    },
-                    status: 'new', createdAt: serverTimestamp(),
-                })
 
                 const response = await fetch('/api/send-quotation', {
                     method: 'POST',
@@ -192,33 +179,10 @@ export default {
                     throw new Error(result.error || `Email service returned ${response.status}`)
                 }
 
-                // Email delivery must not be reported as failed only because the
-                // optional audit-status update is blocked by Firestore rules.
-                try {
-                    await updateDoc(requestRef, {
-                        'emailNotification.status': 'sent',
-                        'emailNotification.sentAt': serverTimestamp(),
-                    })
-                } catch (statusError) {
-                    console.warn('quotation email status update failed:', statusError)
-                }
-
                 this.submitted = true; window.scrollTo({ top: 0, behavior: 'smooth' })
             } catch (error) {
                 console.error('quotation submit error:', error)
-                if (requestRef) {
-                    try {
-                        await updateDoc(requestRef, {
-                            'emailNotification.status': 'failed',
-                            'emailNotification.failedAt': serverTimestamp(),
-                        })
-                    } catch (statusError) {
-                        console.warn('quotation email failure status update failed:', statusError)
-                    }
-                    this.submitError = 'บันทึกคำขอแล้ว แต่ไม่สามารถส่งอีเมลได้ กรุณาติดต่อผ่าน Line'
-                } else {
-                    this.submitError = 'ไม่สามารถส่งคำขอได้ในขณะนี้ กรุณาลองใหม่อีกครั้งหรือติดต่อผ่าน Line'
-                }
+                this.submitError = 'ไม่สามารถส่งคำขอได้ในขณะนี้ กรุณาลองใหม่อีกครั้งหรือติดต่อผ่าน Line'
             } finally { this.submitting = false }
         },
     },
