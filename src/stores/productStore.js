@@ -85,13 +85,40 @@ function normalizeCategories(value, legacyCategory = '') {
     ]
 }
 
-async function uploadProductDocuments(items) {
+function safeStorageFileName(name = 'file') {
+    const normalized = String(name)
+        .normalize('NFKD')
+        .replace(/[^a-zA-Z0-9._-]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+    return normalized || 'file'
+}
+
+function uniqueStorageName(file) {
+    const uniqueId = globalThis.crypto?.randomUUID?.()
+        || `${Date.now()}-${Math.random().toString(36).slice(2, 12)}`
+    return `${uniqueId}-${safeStorageFileName(file?.name)}`
+}
+
+async function uploadProductImage(productId, type, file) {
+    const fileRef = storageRef(
+        storage,
+        `products/${type}/${productId}-${uniqueStorageName(file)}`,
+    )
+    const snapshot = await uploadBytes(fileRef, file, {
+        contentType: file.type || 'application/octet-stream',
+    })
+    return getDownloadURL(snapshot.ref)
+}
+
+async function uploadProductDocuments(productId, items) {
     const documents = []
     for (const item of Array.isArray(items) ? items : []) {
         if (item?.file) {
             const file = item.file
-            const uniqueName = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}-${file.name}`
-            const fileRef = storageRef(storage, `products/documents/${uniqueName}`)
+            const fileRef = storageRef(
+                storage,
+                `products/documents/${productId}-${uniqueStorageName(file)}`,
+            )
             const snapshot = await uploadBytes(fileRef, file, {
                 contentDisposition: 'attachment',
                 contentType: file.type || 'application/octet-stream',
@@ -156,34 +183,33 @@ export const useProductStore = defineStore('product', {
             this.error = null
 
             try {
+                // Reserve the Firestore ID before uploading so every stored object
+                // belongs to one product. The original filename is never used as
+                // an object key by itself because two products may use the same name.
+                const docRef = doc(productsCol)
                 let mainImageUrl = null
                 const galleryImageUrls = []
 
                 // 1) upload main image
                 if (form.mainImageFile) {
-                    const file = form.mainImageFile
-                    const filePath = `products/main/${file.name}`
-                    const fileRef = storageRef(storage, filePath)
-
-                    const snapshot = await uploadBytes(fileRef, file)
-                    mainImageUrl = await getDownloadURL(snapshot.ref)
+                    mainImageUrl = await uploadProductImage(
+                        docRef.id,
+                        'main',
+                        form.mainImageFile,
+                    )
                 }
 
                 // 2) upload gallery images
                 if (form.galleryImageFiles && form.galleryImageFiles.length) {
                     for (let i = 0; i < form.galleryImageFiles.length; i++) {
                         const file = form.galleryImageFiles[i]
-                        const filePath = `products/gallery/${file.name}`
-                        const fileRef = storageRef(storage, filePath)
-
-                        const snapshot = await uploadBytes(fileRef, file)
-                        const url = await getDownloadURL(snapshot.ref)
+                        const url = await uploadProductImage(docRef.id, 'gallery', file)
                         galleryImageUrls.push(url)
                     }
                 }
 
                 // 3) save to Firestore
-                const documents = await uploadProductDocuments(form.documents)
+                const documents = await uploadProductDocuments(docRef.id, form.documents)
                 const productData = {
                     name: form.name || '',
                     slug: uniqueProductSlug(form.name, this.products),
@@ -207,7 +233,7 @@ export const useProductStore = defineStore('product', {
                     updatedAt: serverTimestamp(),
                 }
 
-                const docRef = await addDoc(productsCol, productData)
+                await setDoc(docRef, productData)
 
                 this.products.push({
                     id: docRef.id,
@@ -234,14 +260,9 @@ export const useProductStore = defineStore('product', {
                     ? [...form.existingGalleryImageUrls].slice(0, 4)
                     : []
 
-                // ถ้ามีการเลือก mainImage ใหม่ → อัปใหม่ทับ
+                // ถ้ามีการเลือก mainImage ใหม่ → อัปเป็น object ใหม่ ไม่เขียนทับไฟล์เดิม
                 if (form.mainImageFile) {
-                    const file = form.mainImageFile
-                    const filePath = `products/main/${file.name}`
-                    const fileRef = storageRef(storage, filePath)
-
-                    const snapshot = await uploadBytes(fileRef, file)
-                    mainImageUrl = await getDownloadURL(snapshot.ref)
+                    mainImageUrl = await uploadProductImage(id, 'main', form.mainImageFile)
                 }
 
                 // เพิ่มรูปใหม่ต่อจากรูปเดิมที่ผู้ใช้ยังไม่ได้ลบ
@@ -249,16 +270,12 @@ export const useProductStore = defineStore('product', {
                     const files = form.galleryImageFiles.slice(0, 4 - galleryImageUrls.length)
                     for (let i = 0; i < files.length; i++) {
                         const file = files[i]
-                        const filePath = `products/gallery/${file.name}`
-                        const fileRef = storageRef(storage, filePath)
-
-                        const snapshot = await uploadBytes(fileRef, file)
-                        const url = await getDownloadURL(snapshot.ref)
+                        const url = await uploadProductImage(id, 'gallery', file)
                         galleryImageUrls.push(url)
                     }
                 }
 
-                const documents = await uploadProductDocuments(form.documents)
+                const documents = await uploadProductDocuments(id, form.documents)
                 const updateData = {
                     name: form.name || '',
                     slug: existing.slug || uniqueProductSlug(form.name, this.products, id),

@@ -181,6 +181,7 @@ export default {
                 galleryImageFiles: [],
             },
             mainImagePreview: null,
+            mainImageObjectUrl: '',
             newGalleryPreviews: [],
             listRawInputs: { highlights: '', properties: '', standards: '', specifications: '', suitable: '' },
             faqRawInput: '',
@@ -214,10 +215,14 @@ export default {
             await this.categoryStore.loadCategories()
         }
     },
+    beforeUnmount() {
+        this.releasePendingImagePreviews()
+    },
     watch: {
         editingProduct: {
             immediate: true,
             handler(newVal) {
+                this.releasePendingImagePreviews()
                 if (newVal) {
                     this.isEditMode = true
                     this.form.name = newVal.name || ''
@@ -294,6 +299,14 @@ export default {
         resetListRawInputs() {
             this.listGroups.forEach(({ key }) => { this.listRawInputs[key] = '' })
         },
+        releasePendingImagePreviews() {
+            if (this.mainImageObjectUrl) {
+                URL.revokeObjectURL(this.mainImageObjectUrl)
+                this.mainImageObjectUrl = ''
+            }
+            this.newGalleryPreviews.forEach((url) => URL.revokeObjectURL(url))
+            this.newGalleryPreviews = []
+        },
         parseList(key) {
             const items = this.listRawInputs[key]
                 .split(/\r\n|\n|\r/)
@@ -313,8 +326,10 @@ export default {
         onMainImageChange(event) {
             const file = event.target.files && event.target.files[0]
             if (!file) return
+            if (this.mainImageObjectUrl) URL.revokeObjectURL(this.mainImageObjectUrl)
             this.form.mainImageFile = file
-            this.mainImagePreview = URL.createObjectURL(file)
+            this.mainImageObjectUrl = URL.createObjectURL(file)
+            this.mainImagePreview = this.mainImageObjectUrl
         },
         onGalleryChange(event) {
             const files = event.target.files
@@ -393,6 +408,7 @@ export default {
             this.faqRawInput = ''
         },
         resetForm() {
+            this.releasePendingImagePreviews()
             this.form = {
                 name: '',
                 shortDescription: '',
@@ -414,8 +430,6 @@ export default {
                 galleryImageFiles: [],
             }
             this.mainImagePreview = null
-            this.newGalleryPreviews.forEach((url) => URL.revokeObjectURL(url))
-            this.newGalleryPreviews = []
             this.resetListRawInputs()
             this.faqRawInput = ''
             this.hashtagInput = ''

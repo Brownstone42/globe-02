@@ -111,6 +111,9 @@ import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
 import { db } from '@/firebase'
 import { useProductStore } from '@/stores/productStore'
 
+const QUOTATION_EMAIL_TO = 'idealglobe.ppc@gmail.com'
+const QUOTATION_EMAIL_CC = 'nupavee.t@gmail.com'
+
 export default {
     name: 'Quotation',
     data() {
@@ -142,17 +145,63 @@ export default {
             }
         },
         removeProduct(productId) { this.selectedItems = this.selectedItems.filter((item) => item.productId !== productId) },
+        buildQuotationEmail(products) {
+            const customer = this.form
+            const productLines = products.map((product, index) =>
+                `${index + 1}. ${product.name || '-'} | SKU: ${product.sku || '-'} | จำนวน: ${product.quantity} ${product.unit}`,
+            )
+
+            return [
+                `มีคำขอใบเสนอราคาใหม่ (${this.referenceNumber})`,
+                '',
+                `ชื่อผู้ติดต่อ: ${customer.name || '-'}`,
+                `บริษัท: ${customer.company || '-'}`,
+                `โทรศัพท์: ${customer.phone || '-'}`,
+                `อีเมล: ${customer.email || '-'}`,
+                `LINE ID: ${customer.lineId || '-'}`,
+                '',
+                'รายการสินค้า:',
+                ...productLines,
+                '',
+                'รายละเอียดเพิ่มเติม:',
+                customer.message || '-',
+            ].join('\n')
+        },
         async submitQuotation() {
             if (!this.selectedItems.length) { this.submitError = 'กรุณาเลือกสินค้าอย่างน้อย 1 รายการ'; return }
             this.submitting = true; this.submitError = ''
             this.referenceNumber = `RFQ-${String(Date.now()).slice(-7)}`
             try {
+                const products = this.selectedItems.map(({ productId, product, quantity, unit }) => ({
+                    productId,
+                    name: product.name || '',
+                    sku: product.sku || '',
+                    quantity,
+                    unit,
+                }))
+
                 await addDoc(collection(db, 'quotationRequests'), {
                     referenceNumber: this.referenceNumber,
                     customer: { ...this.form },
-                    products: this.selectedItems.map(({ productId, product, quantity, unit }) => ({ productId, name: product.name || '', sku: product.sku || '', quantity, unit })),
+                    products,
+                    emailNotification: {
+                        to: QUOTATION_EMAIL_TO,
+                        cc: QUOTATION_EMAIL_CC,
+                    },
                     status: 'new', createdAt: serverTimestamp(),
                 })
+
+                await addDoc(collection(db, 'mail'), {
+                    to: [QUOTATION_EMAIL_TO],
+                    cc: [QUOTATION_EMAIL_CC],
+                    replyTo: this.form.email,
+                    message: {
+                        subject: `[${this.referenceNumber}] คำขอใบเสนอราคาใหม่จาก ${this.form.company || this.form.name}`,
+                        text: this.buildQuotationEmail(products),
+                    },
+                    createdAt: serverTimestamp(),
+                })
+
                 this.submitted = true; window.scrollTo({ top: 0, behavior: 'smooth' })
             } catch (error) {
                 console.error('quotation submit error:', error)
