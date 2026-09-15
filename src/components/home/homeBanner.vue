@@ -2,48 +2,79 @@
     <section class="hero" role="banner" aria-label="Welcome to IdealGlobe">
         <div class="hero-bg" aria-hidden="true"></div>
 
-        <picture class="hero-media" aria-hidden="true">
-            <img
-                class="hero-img"
-                :src="bannerUrl"
-                alt=""
-                decoding="async"
-                fetchpriority="high"
-            />
-        </picture>
+        <div class="hero-media" aria-hidden="true">
+            <Transition :name="slideTransition">
+                <img
+                    v-if="bannerStore.loaded"
+                    :key="activeBanner.id"
+                    class="hero-img"
+                    :src="activeBanner.imageUrl"
+                    alt=""
+                    decoding="async"
+                    fetchpriority="high"
+                />
+            </Transition>
+        </div>
 
         <div class="hero-shade" aria-hidden="true"></div>
 
         <div class="hero-content">
             <div class="hero-copy">
                 <div class="hero-heading">
-                    <h1>
-                        <span>อุปกรณ์คลีนรูม อุปกรณ์ป้องกันไฟฟ้าสถิต</span>
-                        <span>และอุปกรณ์เพื่อความปลอดภัย</span>
-                    </h1>
-                    <p>คุณภาพมาตรฐานสากล</p>
+                    <h1
+                        :style="{
+                            '--title-font-size': `${overlaySettings.title.fontSize}px`,
+                            color: overlaySettings.title.color,
+                        }"
+                    >{{ overlaySettings.title.text }}</h1>
+                    <p
+                        v-if="overlaySettings.subtitle.text"
+                        :style="{
+                            '--subtitle-font-size': `${overlaySettings.subtitle.fontSize}px`,
+                            color: overlaySettings.subtitle.color,
+                        }"
+                    >{{ overlaySettings.subtitle.text }}</p>
                 </div>
 
-                <div class="hero-actions">
-                    <RouterLink class="hero-btn product-btn" to="/product">
-                        ดูสินค้าทั้งหมด
-                    </RouterLink>
-                    <RouterLink class="hero-btn quote-btn" :to="{ name: 'quotation' }">
-                        ขอใบเสนอราคา
-                    </RouterLink>
-                    <a
-                        class="hero-btn contact-btn"
-                        href="https://line.me/R/ti/p/%40idealglobe"
-                        target="_blank"
-                        rel="noopener noreferrer"
+                <div v-if="visibleButtons.length" class="hero-actions">
+                    <component
+                        :is="isInternalLink(button.link) ? 'RouterLink' : 'a'"
+                        v-for="(button, index) in visibleButtons"
+                        :key="index"
+                        v-bind="buttonLinkProps(button)"
+                        class="hero-btn"
+                        :style="{
+                            backgroundColor: button.backgroundColor,
+                            color: button.textColor,
+                        }"
                     >
-                        <img class="contact-line-icon" :src="lineIcon" alt="" />
-                        ติดต่อเรา
-                    </a>
+                        <i v-if="button.icon" :class="button.icon" aria-hidden="true"></i>
+                        <span>{{ button.text }}</span>
+                    </component>
                 </div>
 
-                <p class="hero-trust">มาตรฐานที่ภาคอุตสาหกรรมไว้วางใจ</p>
+                <p
+                    v-if="overlaySettings.ending.text"
+                    class="hero-trust"
+                    :style="{
+                        '--ending-font-size': `${overlaySettings.ending.fontSize}px`,
+                        color: overlaySettings.ending.color,
+                    }"
+                >{{ overlaySettings.ending.text }}</p>
             </div>
+        </div>
+
+        <div v-if="visibleBanners.length > 1" class="hero-pagination" aria-label="เลือกภาพแบนเนอร์">
+            <button
+                v-for="(banner, index) in visibleBanners"
+                :key="banner.id"
+                class="hero-pagination-dot"
+                :class="{ 'is-active': index === activeIndex }"
+                type="button"
+                :aria-label="`แสดงแบนเนอร์รูปที่ ${index + 1}`"
+                :aria-current="index === activeIndex ? 'true' : undefined"
+                @click="selectBanner(index)"
+            ></button>
         </div>
     </section>
 </template>
@@ -51,23 +82,100 @@
 <script>
 import { useBannerStore } from '@/stores/bannerStore'
 import fallbackBanner from '@/assets/images/home/banner.png'
-import lineIcon from '@/assets/images/branding/line-icon.png'
 
 export default {
     name: 'AppBanner',
     data() {
-        return { lineIcon }
+        return {
+            activeIndex: 0,
+            timerId: null,
+            slideDirection: 'next',
+        }
     },
     computed: {
         bannerStore() {
             return useBannerStore()
         },
-        bannerUrl() {
-            return this.bannerStore.imageUrl || fallbackBanner
+        visibleBanners() {
+            const banners = [...this.bannerStore.banners]
+                .filter((banner) => banner.visible !== false && banner.imageUrl)
+                .sort((a, b) => a.order - b.order)
+            return banners.length
+                ? banners
+                : [{ id: 'fallback-banner', imageUrl: fallbackBanner, order: 0, visible: true }]
+        },
+        activeBanner() {
+            return this.visibleBanners[this.activeIndex] || this.visibleBanners[0]
+        },
+        slideTransition() {
+            return this.slideDirection === 'previous' ? 'banner-slide-previous' : 'banner-slide-next'
+        },
+        intervalMilliseconds() {
+            return 5000
+        },
+        overlaySettings() {
+            return this.activeBanner.overlaySettings || this.bannerStore.overlaySettings
+        },
+        visibleButtons() {
+            return (this.overlaySettings.buttons || []).filter(
+                (button) => button.visible !== false && button.text,
+            )
         },
     },
-    mounted() {
-        this.bannerStore.loadBanner()
+    async mounted() {
+        await this.bannerStore.loadBanner()
+        this.startTimer()
+    },
+    beforeUnmount() {
+        this.stopTimer()
+    },
+    watch: {
+        visibleBanners: {
+            deep: true,
+            handler() {
+                if (this.activeIndex >= this.visibleBanners.length) this.activeIndex = 0
+                this.startTimer()
+            },
+        },
+    },
+    methods: {
+        isInternalLink(link) {
+            return String(link || '').startsWith('/')
+        },
+        buttonLinkProps(button) {
+            const link = String(button.link || '').trim() || '#'
+            if (this.isInternalLink(link)) return { to: link }
+            const opensNewTab = /^https?:\/\//i.test(link)
+            return {
+                href: link,
+                target: opensNewTab ? '_blank' : undefined,
+                rel: opensNewTab ? 'noopener noreferrer' : undefined,
+            }
+        },
+        selectBanner(index) {
+            if (index === this.activeIndex) {
+                this.startTimer()
+                return
+            }
+            this.slideDirection = index > this.activeIndex ? 'next' : 'previous'
+            this.activeIndex = index
+            this.startTimer()
+        },
+        showNextBanner() {
+            if (this.visibleBanners.length < 2) return
+            this.slideDirection = 'next'
+            this.activeIndex = (this.activeIndex + 1) % this.visibleBanners.length
+            this.startTimer()
+        },
+        startTimer() {
+            this.stopTimer()
+            if (this.visibleBanners.length < 2) return
+            this.timerId = window.setTimeout(this.showNextBanner, this.intervalMilliseconds)
+        },
+        stopTimer() {
+            if (this.timerId) window.clearTimeout(this.timerId)
+            this.timerId = null
+        },
     },
 }
 </script>
@@ -110,11 +218,32 @@ export default {
 }
 
 .hero-img {
+    inset: 0;
+    position: absolute;
     width: 100%;
     height: 100%;
     object-fit: cover;
     object-position: center;
     display: block;
+}
+
+.banner-slide-next-enter-active,
+.banner-slide-next-leave-active,
+.banner-slide-previous-enter-active,
+.banner-slide-previous-leave-active {
+    transition: opacity 0.65s ease, transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.banner-slide-next-enter-from,
+.banner-slide-previous-leave-to {
+    opacity: 0;
+    transform: translateX(7%);
+}
+
+.banner-slide-next-leave-to,
+.banner-slide-previous-enter-from {
+    opacity: 0;
+    transform: translateX(-7%);
 }
 
 .hero-content {
@@ -136,24 +265,16 @@ export default {
 
 .hero-heading h1 {
     color: #23272d;
-    font-size: clamp(1.7rem, 2.45vw, 2.4rem);
+    font-size: var(--title-font-size, 38px);
     font-weight: 700;
     line-height: 1.18;
     margin: 0 0 12px;
-}
-
-.hero-heading h1 span {
-    display: block;
-    white-space: nowrap;
-}
-
-.hero-heading h1 span + span {
-    margin-top: 7px;
+    white-space: pre-line;
 }
 
 .hero-heading p {
     color: #a0805b;
-    font-size: clamp(1rem, 1.45vw, 1.3rem);
+    font-size: var(--subtitle-font-size, 21px);
     line-height: 1.45;
     margin: 0;
 }
@@ -182,53 +303,48 @@ export default {
     transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
+.hero-btn i { flex: 0 0 auto; font-size: 1.15em; }
+
 .hero-btn:hover {
     box-shadow: 0 5px 13px rgba(15, 23, 42, 0.24);
     transform: translateY(-2px);
 }
 
-.product-btn {
-    background: #23272d;
-    color: #fff;
-}
-
-.quote-btn {
-    background: #a38c67;
-    color: #fff;
-}
-
-.contact-btn {
-    background: #fff;
-    color: #a0805b;
-}
-
-.contact-line-icon {
-    display: block;
-    height: 20px;
-    object-fit: contain;
-    width: 20px;
-}
-
-.product-btn:hover {
-    background: #15171b;
-    color: #fff;
-}
-
-.quote-btn:hover {
-    background: #896b49;
-    color: #fff;
-}
-
-.contact-btn:hover {
-    background: #f7f3ed;
-    color: #896b49;
-}
-
 .hero-trust {
     color: #205b6c;
-    font-size: 1rem;
+    font-size: var(--ending-font-size, 16px);
     font-weight: 700;
     margin: 14px 0 0;
+}
+
+.hero-pagination {
+    align-items: center;
+    bottom: 20px;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    left: 50%;
+    position: absolute;
+    transform: translateX(-50%);
+    z-index: 3;
+}
+
+.hero-pagination-dot {
+    background: rgba(255, 255, 255, 0.72);
+    border: 0;
+    border-radius: 999px;
+    box-shadow: 0 1px 5px rgba(15, 23, 42, 0.28);
+    cursor: pointer;
+    height: 9px;
+    padding: 0;
+    transition: background-color 0.35s ease, transform 0.35s ease, width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    width: 9px;
+}
+
+.hero-pagination-dot.is-active {
+    background: #a38c67;
+    transform: scaleY(1.08);
+    width: 34px;
 }
 
 /* Mobile adjustments */
@@ -262,16 +378,17 @@ export default {
     }
 
     .hero-heading h1 {
-        font-size: clamp(1rem, 4.5vw, 1.35rem);
+        font-size: min(var(--title-font-size, 38px), 5vw);
         line-height: 1.22;
     }
 
     .hero-heading p {
-        font-size: 1rem;
+        font-size: min(var(--subtitle-font-size, 21px), 4.2vw);
         line-height: 1.4;
     }
 
     .hero-trust {
+        font-size: min(var(--ending-font-size, 16px), 3.8vw);
         order: 2;
         margin-top: 14px;
     }
