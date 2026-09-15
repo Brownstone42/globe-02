@@ -11,7 +11,7 @@
         <div class="box tab-content">
             <div v-if="internalActive === 'details'">
                 <h3>คุณสมบัติ</h3>
-                <ul v-if="listValue(product.properties).length" class="content-list">
+                <ul v-if="listValue(product.properties).length" class="content-list spaced-list">
                     <li v-for="(item, index) in listValue(product.properties)" :key="index">{{ item }}</li>
                 </ul>
                 <p v-else>-</p>
@@ -24,13 +24,13 @@
 
             </div>
             <div v-else-if="internalActive === 'specifications'">
-                <ul v-if="listValue(product.specifications).length" class="content-list">
+                <ul v-if="listValue(product.specifications).length" class="content-list spaced-list">
                     <li v-for="(item, index) in listValue(product.specifications)" :key="index">{{ item }}</li>
                 </ul>
                 <p v-else>-</p>
             </div>
             <div v-else-if="internalActive === 'suitable'">
-                <ul v-if="listValue(product.suitable).length" class="content-list">
+                <ul v-if="listValue(product.suitable).length" class="content-list spaced-list">
                     <li v-for="(item, index) in listValue(product.suitable)" :key="index">{{ item }}</li>
                 </ul>
                 <p v-else>-</p>
@@ -92,7 +92,7 @@
                         <div class="accordion-content">
                             <template v-if="tab.key === 'details'">
                                 <h3>คุณสมบัติ</h3>
-                                <ul v-if="listValue(product.properties).length" class="content-list">
+                                <ul v-if="listValue(product.properties).length" class="content-list spaced-list">
                                     <li v-for="(item, index) in listValue(product.properties)" :key="index">{{ item }}</li>
                                 </ul>
                                 <p v-else>-</p>
@@ -105,13 +105,13 @@
 
                             </template>
                             <template v-else-if="tab.key === 'specifications'">
-                                <ul v-if="listValue(product.specifications).length" class="content-list">
+                                <ul v-if="listValue(product.specifications).length" class="content-list spaced-list">
                                     <li v-for="(item, index) in listValue(product.specifications)" :key="index">{{ item }}</li>
                                 </ul>
                                 <p v-else>-</p>
                             </template>
                             <template v-else-if="tab.key === 'suitable'">
-                                <ul v-if="listValue(product.suitable).length" class="content-list">
+                                <ul v-if="listValue(product.suitable).length" class="content-list spaced-list">
                                     <li v-for="(item, index) in listValue(product.suitable)" :key="index">{{ item }}</li>
                                 </ul>
                                 <p v-else>-</p>
@@ -273,6 +273,8 @@ export default {
     white-space: pre-wrap;
 }
 .content-list { list-style: disc; margin-left: 1.25rem; }
+.spaced-list { line-height: 1.65; }
+.spaced-list li + li { margin-top: 0.55rem; }
 .content-list li::marker { color: #a0805b; font-size: 0.7em; }
 .hashtag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
 .hashtag-section-footer { margin: 18px 42px 6px; }

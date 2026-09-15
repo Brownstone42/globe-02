@@ -75,7 +75,7 @@ export default {
     --clients-width: min(1120px, 80vw);
     background: #fff;
     overflow: hidden;
-    padding: 66px 0 76px;
+    padding: 36px 0 36px;
 }
 
 .clients-section h2 {
@@ -158,7 +158,7 @@ export default {
 @media (max-width: 600px) {
     .clients-section {
         --clients-width: 94vw;
-        padding: 46px 0 52px;
+        padding: 28px 0 28px;
     }
 
     .clients-section h2 {

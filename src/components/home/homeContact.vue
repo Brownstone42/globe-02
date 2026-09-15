@@ -1,18 +1,18 @@
 <template>
     <section id="contact-section" class="contact-section">
-        <div class="stats-strip" aria-label="ข้อมูลบริษัท">
+        <div ref="statsStrip" class="stats-strip" aria-label="ข้อมูลบริษัท">
             <div class="stats-inner">
                 <div class="stat-item">
-                    <strong>30+</strong>
+                    <strong>{{ statCounts.years }}+</strong>
                     <span>ปี ประสบการณ์</span>
                 </div>
                 <div class="stat-item">
-                    <strong>1000+</strong>
+                    <strong>{{ statCounts.products }}+</strong>
                     <span>รายการสินค้า</span>
                     <small>ครอบคลุมทุกความต้องการ</small>
                 </div>
                 <div class="stat-item">
-                    <strong>300+</strong>
+                    <strong>{{ statCounts.customers }}+</strong>
                     <span>ลูกค้า</span>
                     <small>วางใจให้เราดูแล</small>
                 </div>
@@ -107,6 +107,76 @@
 <script>
 export default {
     name: 'homeContact',
+    data() {
+        return {
+            statCounts: {
+                years: 0,
+                products: 0,
+                customers: 0,
+            },
+            statsAnimated: false,
+            statsObserver: null,
+            statsAnimationFrame: null,
+        }
+    },
+    mounted() {
+        this.observeStats()
+    },
+    beforeUnmount() {
+        this.statsObserver?.disconnect()
+        if (this.statsAnimationFrame) {
+            cancelAnimationFrame(this.statsAnimationFrame)
+        }
+    },
+    methods: {
+        observeStats() {
+            if (!('IntersectionObserver' in window)) {
+                this.animateStats()
+                return
+            }
+
+            this.statsObserver = new IntersectionObserver(
+                ([entry]) => {
+                    if (!entry.isIntersecting || this.statsAnimated) return
+                    this.animateStats()
+                    this.statsObserver?.disconnect()
+                },
+                { threshold: 0.3 },
+            )
+
+            this.statsObserver.observe(this.$refs.statsStrip)
+        },
+        animateStats() {
+            if (this.statsAnimated) return
+            this.statsAnimated = true
+
+            const targets = {
+                years: 30,
+                products: 1000,
+                customers: 300,
+            }
+            const duration = 1800
+            const startTime = performance.now()
+
+            const updateCounts = (currentTime) => {
+                const progress = Math.min((currentTime - startTime) / duration, 1)
+                const easedProgress = 1 - Math.pow(1 - progress, 3)
+
+                Object.keys(targets).forEach((key) => {
+                    this.statCounts[key] = Math.round(targets[key] * easedProgress)
+                })
+
+                if (progress < 1) {
+                    this.statsAnimationFrame = requestAnimationFrame(updateCounts)
+                } else {
+                    this.statCounts = { ...targets }
+                    this.statsAnimationFrame = null
+                }
+            }
+
+            this.statsAnimationFrame = requestAnimationFrame(updateCounts)
+        },
+    },
 }
 </script>
 

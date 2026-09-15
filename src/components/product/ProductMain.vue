@@ -403,8 +403,13 @@ export default {
 .info-list {
     color: #1e293b;
     font-size: 0.9rem;
+    line-height: 1.65;
     list-style: disc;
     margin: 0 0 0 1.2rem;
+}
+
+.info-list li + li {
+    margin-top: 0.55rem;
 }
 
 .info-list li::marker {

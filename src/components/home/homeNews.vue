@@ -179,7 +179,7 @@ export default {
 <style scoped>
 .news-section {
     background: #fff;
-    padding: 68px 0 84px;
+    padding: 36px 0 84px;
 }
 
 .news-header,
@@ -401,7 +401,7 @@ export default {
 
 @media (max-width: 600px) {
     .news-section {
-        padding: 54px 0 68px;
+        padding: 30px 0 68px;
     }
 
     .news-header {
