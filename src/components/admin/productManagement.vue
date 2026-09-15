@@ -45,6 +45,23 @@
                 <div class="pm-list-header">
                     <h2 class="pm-section-title">Product List</h2>
                     <div class="pm-filter">
+                        <label class="product-search">
+                            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                            <input
+                                v-model="searchQuery"
+                                type="search"
+                                placeholder="ค้นหาสินค้า..."
+                                aria-label="ค้นหาสินค้า"
+                            />
+                            <button
+                                v-if="searchQuery"
+                                type="button"
+                                aria-label="ล้างคำค้นหา"
+                                @click="searchQuery = ''"
+                            >
+                                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                            </button>
+                        </label>
                         <select v-model="sortBy" class="filter-select" aria-label="เรียงสินค้าตามชื่อ">
                             <option value="">-- Sort by Name --</option>
                             <option value="name-asc">Name A–Z</option>
@@ -63,7 +80,7 @@
                     <div v-if="isLoading" class="pm-list-placeholder">กำลังโหลดสินค้า...</div>
 
                     <div v-else-if="!filteredProducts.length" class="pm-list-placeholder">
-                        ไม่พบสินค้าในหมวดหมู่นี้
+                        {{ searchQuery.trim() ? 'ไม่พบสินค้าที่ตรงกับการค้นหา' : 'ไม่พบสินค้าในหมวดหมู่นี้' }}
                     </div>
 
                     <div v-else class="pm-table-wrapper">
@@ -141,6 +158,7 @@ export default {
             currentProductId: null, // null = create mode, not null = edit mode
             filterCategory: '', // หมวดหมู่ที่เลือกกรอง
             sortBy: '',
+            searchQuery: '',
         }
     },
     computed: {
@@ -157,9 +175,33 @@ export default {
             return this.categoryStore.categories || []
         },
         filteredProducts() {
-            const products = this.filterCategory
+            let products = this.filterCategory
                 ? this.products.filter((product) => this.productCategories(product).includes(this.filterCategory))
                 : [...this.products]
+
+            const query = this.searchQuery.trim().toLocaleLowerCase(['th', 'en'])
+            if (query) {
+                products = products.filter((product) => {
+                    const categoryText = this.productCategories(product)
+                        .map((slug) => {
+                            const category = this.categories.find((item) => item.slug === slug)
+                            return [slug, category?.name, category?.description].filter(Boolean).join(' ')
+                        })
+                        .join(' ')
+                    const searchableText = [
+                        product.name,
+                        product.sku,
+                        product.brand,
+                        product.shortDescription,
+                        categoryText,
+                    ]
+                        .filter(Boolean)
+                        .join(' ')
+                        .toLocaleLowerCase(['th', 'en'])
+
+                    return searchableText.includes(query)
+                })
+            }
 
             if (!this.sortBy) return products
 
@@ -289,13 +331,69 @@ export default {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px;
-    height: 40px; /* ยึดความสูงให้เท่ากับฝั่งซ้าย */
+    min-height: 40px;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
 .pm-filter {
     display: flex;
     gap: 8px;
     align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.product-search {
+    align-items: center;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    color: #94a3b8;
+    display: flex;
+    min-width: 190px;
+    padding: 0 9px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.product-search:focus-within {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.product-search > i {
+    font-size: 0.78rem;
+}
+
+.product-search input {
+    border: 0;
+    color: #475569;
+    flex: 1;
+    font-family: inherit;
+    font-size: 0.86rem;
+    min-width: 0;
+    outline: 0;
+    padding: 7px 8px;
+    width: 130px;
+}
+
+.product-search input::-webkit-search-cancel-button {
+    display: none;
+}
+
+.product-search button {
+    align-items: center;
+    background: transparent;
+    border: 0;
+    color: #94a3b8;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    padding: 2px;
+}
+
+.product-search button:hover {
+    color: #475569;
 }
 
 .filter-select {

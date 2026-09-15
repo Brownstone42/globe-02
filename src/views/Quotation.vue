@@ -19,6 +19,15 @@
             </header>
 
             <form class="quotation-layout" @submit.prevent="submitQuotation">
+                <input
+                    v-model="website"
+                    class="quotation-honeypot"
+                    type="text"
+                    name="website"
+                    tabindex="-1"
+                    autocomplete="off"
+                    aria-hidden="true"
+                />
                 <div class="quotation-main">
                     <section class="product-table">
                         <div class="table-head">
@@ -107,12 +116,9 @@
 
 <script>
 import { mapStores } from 'pinia'
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
+import { addDoc, collection, serverTimestamp, updateDoc } from 'firebase/firestore'
 import { db } from '@/firebase'
 import { useProductStore } from '@/stores/productStore'
-
-const QUOTATION_EMAIL_TO = 'idealglobe.ppc@gmail.com'
-const QUOTATION_EMAIL_CC = 'nupavee.t@gmail.com'
 
 export default {
     name: 'Quotation',
@@ -120,6 +126,7 @@ export default {
         return {
             selectedItems: [], showProductPicker: false,
             form: { name: '', phone: '', company: '', email: '', lineId: '', message: '' },
+            website: '',
             submitting: false, submitted: false, submitError: '', referenceNumber: '',
         }
     },
@@ -145,32 +152,11 @@ export default {
             }
         },
         removeProduct(productId) { this.selectedItems = this.selectedItems.filter((item) => item.productId !== productId) },
-        buildQuotationEmail(products) {
-            const customer = this.form
-            const productLines = products.map((product, index) =>
-                `${index + 1}. ${product.name || '-'} | SKU: ${product.sku || '-'} | จำนวน: ${product.quantity} ${product.unit}`,
-            )
-
-            return [
-                `มีคำขอใบเสนอราคาใหม่ (${this.referenceNumber})`,
-                '',
-                `ชื่อผู้ติดต่อ: ${customer.name || '-'}`,
-                `บริษัท: ${customer.company || '-'}`,
-                `โทรศัพท์: ${customer.phone || '-'}`,
-                `อีเมล: ${customer.email || '-'}`,
-                `LINE ID: ${customer.lineId || '-'}`,
-                '',
-                'รายการสินค้า:',
-                ...productLines,
-                '',
-                'รายละเอียดเพิ่มเติม:',
-                customer.message || '-',
-            ].join('\n')
-        },
         async submitQuotation() {
             if (!this.selectedItems.length) { this.submitError = 'กรุณาเลือกสินค้าอย่างน้อย 1 รายการ'; return }
             this.submitting = true; this.submitError = ''
             this.referenceNumber = `RFQ-${String(Date.now()).slice(-7)}`
+            let requestRef = null
             try {
                 const products = this.selectedItems.map(({ productId, product, quantity, unit }) => ({
                     productId,
@@ -180,32 +166,59 @@ export default {
                     unit,
                 }))
 
-                await addDoc(collection(db, 'quotationRequests'), {
+                requestRef = await addDoc(collection(db, 'quotationRequests'), {
                     referenceNumber: this.referenceNumber,
                     customer: { ...this.form },
                     products,
                     emailNotification: {
-                        to: QUOTATION_EMAIL_TO,
-                        cc: QUOTATION_EMAIL_CC,
+                        status: 'pending',
                     },
                     status: 'new', createdAt: serverTimestamp(),
                 })
 
-                await addDoc(collection(db, 'mail'), {
-                    to: [QUOTATION_EMAIL_TO],
-                    cc: [QUOTATION_EMAIL_CC],
-                    replyTo: this.form.email,
-                    message: {
-                        subject: `[${this.referenceNumber}] คำขอใบเสนอราคาใหม่จาก ${this.form.company || this.form.name}`,
-                        text: this.buildQuotationEmail(products),
-                    },
-                    createdAt: serverTimestamp(),
+                const response = await fetch('/api/send-quotation', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        referenceNumber: this.referenceNumber,
+                        customer: { ...this.form },
+                        products,
+                        website: this.website,
+                    }),
                 })
+
+                const result = await response.json().catch(() => ({}))
+                if (!response.ok || !result.ok) {
+                    throw new Error(result.error || `Email service returned ${response.status}`)
+                }
+
+                // Email delivery must not be reported as failed only because the
+                // optional audit-status update is blocked by Firestore rules.
+                try {
+                    await updateDoc(requestRef, {
+                        'emailNotification.status': 'sent',
+                        'emailNotification.sentAt': serverTimestamp(),
+                    })
+                } catch (statusError) {
+                    console.warn('quotation email status update failed:', statusError)
+                }
 
                 this.submitted = true; window.scrollTo({ top: 0, behavior: 'smooth' })
             } catch (error) {
                 console.error('quotation submit error:', error)
-                this.submitError = 'ไม่สามารถส่งคำขอได้ในขณะนี้ กรุณาลองใหม่อีกครั้งหรือติดต่อผ่าน Line'
+                if (requestRef) {
+                    try {
+                        await updateDoc(requestRef, {
+                            'emailNotification.status': 'failed',
+                            'emailNotification.failedAt': serverTimestamp(),
+                        })
+                    } catch (statusError) {
+                        console.warn('quotation email failure status update failed:', statusError)
+                    }
+                    this.submitError = 'บันทึกคำขอแล้ว แต่ไม่สามารถส่งอีเมลได้ กรุณาติดต่อผ่าน Line'
+                } else {
+                    this.submitError = 'ไม่สามารถส่งคำขอได้ในขณะนี้ กรุณาลองใหม่อีกครั้งหรือติดต่อผ่าน Line'
+                }
             } finally { this.submitting = false }
         },
     },
@@ -213,6 +226,15 @@ export default {
 </script>
 
 <style scoped>
+.quotation-honeypot {
+    height: 1px;
+    left: -10000px;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    width: 1px;
+}
+
 .quotation-aside .trust-card {
     background: #d6efc7 !important;
     border-color: #02b54f;

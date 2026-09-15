@@ -1,0 +1,10 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/send-quotation"
+  to = "/.netlify/functions/send-quotation"
+  status = 200
+
